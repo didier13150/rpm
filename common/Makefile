@@ -9,7 +9,7 @@ SRCDEFINES := --define "_source_filedigest_algorithm 1" \
 ARCH := $(shell uname -i)
 DISTRIB := $(shell source /etc/os-release && echo $${ID}-$${VERSION_ID})
 TARGET := $(DISTRIB)-$(ARCH)
-              
+
 all: fedora
 
 fedora: clean sources build log
@@ -27,7 +27,7 @@ sources:
 		echo "$(SRCFILE) already exists"; \
 	else \
 		echo "Download Source $(SRCURL)"; \
-		wget $(SRCURL); \
+		$(shell $(DOWNLOAD)) \
 	fi
 
 srpm: sources
@@ -36,6 +36,6 @@ srpm: sources
 build: srpm
 	-mock -r '$(TARGET)' rebuild *.src.rpm
 	-mv /var/lib/mock/$(TARGET)/result/*.rpm $(SRCDIR)
-	
+
 log:
 	@mv /var/lib/mock/$(TARGET)/result/*.log $(SRCDIR)
