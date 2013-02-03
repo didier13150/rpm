@@ -1,0 +1,20 @@
+diff -u pmrendermode.cpp.orig pmrendermode.cpp
+--- pmrendermode.cpp.orig	2012-07-15 14:09:04.907702865 +0200
++++ pmrendermode.cpp	2012-07-15 14:08:09.640791088 +0200
+@@ -187,10 +187,12 @@
+       cl.append( tmp );
+    }
+    cl.append( QString( "+Q%1" ).arg( m_quality ) );
+-   if( m_radiosity )
+-      cl.append( QString( "+QR" ) );
+-   else
+-      cl.append( QString( "-QR" ) );
++   // Radiosity is automatically detected with povray 3.7
++   // and QR option was removed
++   //if( m_radiosity )
++   //   cl.append( QString( "+QR" ) );
++   //else
++   //   cl.append( QString( "-QR" ) );
+ 
+    if( m_antialiasing )
+    {
