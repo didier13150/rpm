@@ -1,0 +1,11 @@
+--- src/list.h.orig	2005-06-27 06:32:49.000000000 +0200
++++ src/list.h	2011-11-14 11:29:43.159929789 +0100
+@@ -21,6 +21,8 @@
+ #ifndef _PAC_LIST_H
+ #define _PAC_LIST_H
+ 
++#include <limits.h>
++
+ #define FREELIST(p) { list_free(p); p = NULL; }
+ 
+ /* your average linked list */

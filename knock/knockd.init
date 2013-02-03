@@ -1,0 +1,78 @@
+#!/bin/bash
+#
+# knockd	This shell script takes care of starting and stopping knockd.
+#
+# chkconfig: 345 55 45
+# description: knockd is a port-knock server.
+# probe: false
+# processname: knockd
+# pidfile: /var/run/knockd.pid
+### BEGIN INIT INFO
+# Provides: knockd
+# Required-Start: $network
+# Required-Stop: $network
+# Default-Start: 3 4 5
+# Short-Description: knockd.
+# Description: knockd is a port-knock server. It listens to all traffic on an
+#ethernet (or PPP) interface, looking for special "knock" sequences of
+#port-hits. A client makes these port-hits by sending a TCP (or UDP) packet
+#to a port on the server. This port need not be open -- since knockd listens
+#at the link-layer level, it sees all traffic even if it's destined for a #
+#closed port. When the server detects a specific sequence of port-hits, it
+#runs a command defined in its configuration file. This can be used to open
+#up holes in a firewall for quick access.
+### END INIT INFO
+
+
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+# Source networking configuration.
+. /etc/sysconfig/network
+
+[ -f /usr/sbin/knockd ] || exit 0
+
+[ -f /etc/sysconfig/knockd ] && . /etc/sysconfig/knockd
+
+# See how we were called.
+case "$1" in
+	start)
+		if [ -n "`/sbin/pidof knockd`" ]; then
+			echo -n "knockd: already running"
+			RETVAL=$?
+			echo
+			exit $RETVAL
+		fi
+		echo -n "Starting knockd: "
+		/usr/sbin/knockd -d ${OPTIONS}
+		RETVAL=$?
+		[ $RETVAL -eq 0 ] && success || failure
+		echo
+		[ $RETVAL -eq 0 ] && touch /var/lock/subsys/knockd
+		;;
+	stop)
+		echo -n "Stopping knockd: "
+		killproc knockd
+		RETVAL=$?
+		echo
+		[ $RETVAL -eq 0 ] && rm -f /var/lock/subsys/knockd
+		;;
+	status)
+		status knockd
+		RETVAL=$?
+		;;
+	restart|reload)
+		$0 stop
+		$0 start
+		RETVAL=$?
+		;;
+	*)
+		echo "Usage: knockd {start|stop|status|restart}"
+		exit 1
+		;;
+esac
+
+exit $RETVAL
+
+
+
