@@ -22,15 +22,7 @@ rpmlint:
 	rpmlint *.spec
 	rpmlint *.rpm
 
-sources:
-	@if test -f $(SRCFILE); then \
-		echo "$(SRCFILE) already exists"; \
-	else \
-		echo "Download Source $(SRCURL)"; \
-		$(shell $(DOWNLOAD)) \
-	fi
-
-srpm: sources
+srpm:
 	rpmbuild $(RPMDEFINES) $(SRCDEFINES) -bs $(NAME).spec
 
 build: srpm
