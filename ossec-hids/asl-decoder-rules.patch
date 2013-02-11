@@ -1,0 +1,678 @@
+diff -ruN ossec-hids-2.5.1-orig/etc/decoder.xml ossec-hids-2.5.1/etc/decoder.xml
+--- ossec-hids-2.5.1-orig/etc/decoder.xml	2010-10-12 15:17:36.000000000 -0400
++++ ossec-hids-2.5.1/etc/decoder.xml	2010-10-28 11:14:07.000000000 -0400
+@@ -1,4 +1,4 @@
+-<!-- @(#) $Id$
++<!-- @(#) $Id: decoder.xml,v 1.166 2010/06/15 12:52:01 dcid Exp $
+   -  OSSEC log decoder.
+   -  Author: Daniel B. Cid
+   -  License: http://www.ossec.net/en/licensing.html
+@@ -589,7 +589,56 @@
+   <order>user, srcip</order>
+ </decoder>
+ 
++<!-- SMTP Auth decoder
++  - Examples:
++  - smtp_auth: SMTP connect from (null)@whq.atomicorp.com [10.10.11.134]
++  - smtp_auth: smtp_auth: SMTP user scott : logged in from (null)@dev.whq.atomicorp.com [10.10.11.134]
++-->
++<decoder name="smtpauth">
++  <program_name>^smtp_auth</program_name>
++</decoder>
++
++<decoder name="smtpauth-failed">
++  <parent>smtpauth</parent>
++  <prematch>^smtp_auth</prematch>
++  <regex offset="after_prematch">FAILED: (\S+) - password incorrect from \S+ [(\S+\d)]$</regex>
++  <order>user, srcip</order>
++</decoder>
++
++<decoder name="smtpauth-login">
++  <parent>smtpauth</parent>
++  <prematch>^SMTP</prematch>
++  <regex offset="after_prematch">user (\S+) : logged in from \S+ [(\S+\d)]$</regex>
++  <order>user, srcip</order>
++</decoder>
++
++
++<decoder name="smtpauth-generic">
++  <parent>smtpauth</parent>
++  <regex>[(\S+\d)]$</regex>
++  <order>srcip</order>
++</decoder>
++
++
++
++
++<!-- DenyHosts decoder
++  - Examples:
++  - denyhosts: Added the following hosts to /etc/hosts.deny - 196.41.3.197 (mail.replay.co.za)
++  - WARNING: Could not add the following hosts to /etc/hosts.deny - 196.41.3.197 (mail.replay.co.za)
++  - Observed the following suspicious login activity??
+ 
++-->
++<decoder name="denyhosts">
++  <program_name>^denyhosts</program_name>
++</decoder>
++
++<decoder name="denyhosts-add">
++  <parent>denyhosts</parent>
++  <prematch>^Added</prematch>
++  <regex offset="after_prematch">the following hosts to \S+ - (\S+) \S+$</regex>
++  <order>srcip</order>
++</decoder>
+ 
+ <!-- Courier decoder
+   - Examples:
+@@ -762,6 +811,20 @@
+ </decoder>
+ 
+ 
++<decoder name="modsecurity-errorlog">
++  <prematch>^[modsecurity] </prematch>
++</decoder>  
++
++<decoder name="modsecurity-errorlog-ip">
++  <parent>modsecurity-errorlog</parent>
++  
++  <prematch offset="after_parent">^[client</prematch>
++  <regex offset="after_prematch">^ (\d+.\d+.\d+.\d+)] </regex>
++  <order>srcip</order>
++</decoder> 
++
++
++
+ 
+ 
+ <!-- SMF-SAV Sendmail Milter decoder.
+@@ -1934,6 +1997,41 @@
+   <order>id</order>
+ </decoder>
+ 
++<!-- Atomicorp: minicon decoder  -->
++<decoder name="mincon">
++  <program_name>^mincon</program_name>
++  </decoder>
++
++<decoder name="mincon-failure">
++  <parent>mincon</parent>
++  <prematch>srcip=\S+\s+user=\S+</prematch>
++  <regex>srcip=(\S+)\s+user=(\S+)</regex>
++  <order>srcip, user</order>
++</decoder>
++
++<!-- Atomicorp: spamdyke decoder -->
++<decoder name="spamdyke">
++  <program_name>spamdyke</program_name>
++</decoder>
++
++<decoder name="spamdyke-denied">
++  <parent>spamdyke</parent>
++  <prematch>^DENIED_RDNS_MISSING|^DENIED_RDNS_RESOLVE|^DENIED_RBL_MATCH|^DENIED_BLACKLIST_IP|^DENIED_BLACKLIST_NAME|^DENIED_IP_IN_RDNS|^DENIED_IP_IN_CC_RDNS</prematch>
++  <regex offset="after_prematch">from: \S+ to: \S+ origin_ip: (\S+)</regex>
++  <order>srcip</order>
++</decoder>
++
++
++<!-- Clamav and Freshclam decoder -->
++<decoder name="clamd">
++  <program_name>^clamd</program_name>
++</decoder>
++
++<decoder name="freshclam">
++  <program_name>^freshclam</program_name>
++</decoder>
++
++
+ 
+ 
+ <!-- EOF -->
+diff -ruN ossec-hids-2.5.1-orig/etc/rules/asl_rules.xml ossec-hids-2.5.1/etc/rules/asl_rules.xml
+--- ossec-hids-2.5.1-orig/etc/rules/asl_rules.xml	1969-12-31 19:00:00.000000000 -0500
++++ ossec-hids-2.5.1/etc/rules/asl_rules.xml	2010-10-28 11:17:14.000000000 -0400
+@@ -0,0 +1,411 @@
++<!-- 
++  -  Official rules for ASL
++  -  Author: Scott R. Shinn
++  -  License: http://www.ossec.net/en/licensing.html
++  -->
++
++
++<!-- ASL mod_security -->
++
++<group name="modsecurity,">
++  <rule id="60100" level="0">
++    <decoded_as>modsecurity-errorlog</decoded_as>
++    <description>Apache messages grouped.</description>
++  </rule>    
++
++  <rule id="60101" level="0">
++    <if_sid>60100</if_sid>
++    <match>^[modsecurity] </match>
++    <description>Apache error messages grouped.</description>
++  </rule>
++
++  <rule id="60117" level="6">
++    <if_sid>60101</if_sid>
++    <match>id "350000"</match>
++    <description>Access attempt blocked by Mod Security RBL.</description>
++    <options>no_email_alert</options>
++  </rule>
++
++
++  <rule id="60118" level="7">
++    <if_sid>60101</if_sid>
++    <match>Access denied</match>
++    <description>Access attempt blocked by Mod Security.</description>
++    <group>access_denied,</group>
++  </rule>
++
++  <rule id="60119" level="12" frequency="6" timeframe="120">
++    <if_matched_sid>60118</if_matched_sid>
++    <same_source_ip />
++    <description>Multiple attempts blocked by Mod Security.</description>
++    <group>access_denied,</group>
++  </rule>
++
++  <rule id="60121" level="7">
++    <if_sid>60101</if_sid>
++    <match>CRITICAL</match>
++    <description>Critical alert by Mod Security.</description>
++    <group>access_denied,</group>
++  </rule>
++
++  <rule id="60122" level="6">
++    <if_sid>60101</if_sid>
++    <match>ALERT</match>
++    <description>ALERT by Mod Security.</description>
++    <group>access_denied,</group>
++  </rule>
++
++  <rule id="60123" level="5">
++    <if_sid>60101</if_sid>
++    <match>WARNING</match>
++    <description>WARNING by Mod Security.</description>
++    <group>access_denied,</group>
++  </rule>
++
++  <rule id="60124" level="3">
++    <if_sid>60101</if_sid>
++    <match>NOTICE</match>
++    <description>NOTICE by Mod Security.</description>
++    <group>access_denied,</group>
++  </rule>
++
++<!-- http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html -->
++  <rule id="60125" level="4">
++    <if_sid>60101</if_sid>
++    <match>400</match>
++    <description>Bad Request</description>
++  </rule>
++
++  <rule id="60126" level="5">
++    <if_sid>60101</if_sid>
++    <match>401</match>
++    <description>HTTP Authorization failed</description>
++    <group>access_denied,</group>
++  </rule>
++
++  <rule id="60127" level="5">
++    <if_sid>60101</if_sid>
++    <match>402</match>
++    <description>Payment Required </description>
++    <group>access_denied,</group>
++  </rule>
++
++  <rule id="60128" level="5">
++    <if_sid>60101</if_sid>
++    <match>403</match>
++    <description>Forbidden</description>
++    <group>access_denied,</group>
++  </rule>
++
++  <rule id="60129" level="5">
++    <if_sid>60101</if_sid>
++    <match>404</match>
++    <description>File Not Found</description>
++    <group>access_denied,</group>
++  </rule>
++
++  <rule id="60130" level="5">
++    <if_sid>60101</if_sid>
++    <match>405</match>
++    <description>Method Not Allowed</description>
++    <group>access_denied,</group>
++  </rule>
++
++<!-- 406
++ The resource identified by the request is only capable of generating response entities which have content characteristics not acceptable according to the accept headers sent in the request.
++
++Unless it was a HEAD request, the response SHOULD include an entity containing a list of available entity characteristics and location(s) from which the user or user agent can choose the one most appropriate. The entity format is specified by the media type given in the Content-Type header field. Depending upon the format and the capabilities of the user agent, selection of the most appropriate choice MAY be performed automatically. However, this specification does not define any standard for such automatic selection.
++
++      Note: HTTP/1.1 servers are allowed to return responses which are
++      not acceptable according to the accept headers sent in the
++      request. In some cases, this may even be preferable to sending a
++      406 response. User agents are encouraged to inspect the headers of
++      an incoming response to determine if it is acceptable.
++
++If the response could be unacceptable, a user agent SHOULD temporarily stop receipt of more data and query the user for a decision on further actions. 
++-->
++  <rule id="60131" level="5">
++    <if_sid>60101</if_sid>
++    <match>406</match>
++    <description>Not Acceptible</description>
++    <group>access_denied,</group>
++  </rule>
++
++  <rule id="60132" level="5">
++    <if_sid>60101</if_sid>
++    <match>407</match>
++    <description>Proxy Authentication Required</description>
++    <group>access_denied,</group>
++  </rule>
++
++  <rule id="60133" level="5">
++    <if_sid>60101</if_sid>
++    <match>408</match>
++    <description>Request Timeout</description>
++    <group>access_denied,</group>
++  </rule>
++
++<!--
++ The request could not be completed due to a conflict with the current state of the resource. This code is only allowed in situations where it is expected that the user might be able to resolve the conflict and resubmit the request. The response body SHOULD include enough information for the user to recognize the source of the conflict. Ideally, the response entity would include enough information for the user or user agent to fix the problem; however, that might not be possible and is not required.
++
++Conflicts are most likely to occur in response to a PUT request. For example, if versioning were being used and the entity being PUT included changes to a resource which conflict with those made by an earlier (third-party) request, the server might use the 409 response to indicate that it can't complete the request. In this case, the response entity would likely contain a list of the differences between the two versions in a format defined by the response Content-Type.
++10.4.11
++-->
++  <rule id="60134" level="5">
++    <if_sid>60101</if_sid>
++    <match>409</match>
++    <description>Conflict</description>
++    <group>access_denied,</group>
++  </rule>
++
++  <rule id="60135" level="5">
++    <if_sid>60101</if_sid>
++    <match>410</match>
++    <description>Gone</description>
++    <group>access_denied,</group>
++  </rule>
++
++  <rule id="60136" level="5">
++    <if_sid>60101</if_sid>
++    <match>411</match>
++    <description>Length Required</description>
++    <group>access_denied,</group>
++  </rule>
++
++  <rule id="60137" level="5">
++    <if_sid>60101</if_sid>
++    <match>412</match>
++    <description>Precondition Failed</description>
++    <group>access_denied,</group>
++  </rule>
++
++
++  <rule id="60138" level="5">
++    <if_sid>60101</if_sid>
++    <match>413</match>
++    <description>Request Entity Too Large</description>
++    <group>access_denied,</group>
++  </rule>
++
++  <rule id="60139" level="5">
++    <if_sid>60101</if_sid>
++    <match>414</match>
++    <description>Request URI Too long</description>
++    <group>access_denied,</group>
++  </rule>
++
++
++  <rule id="60140" level="5">
++    <if_sid>60101</if_sid>
++    <match>415</match>
++    <description>Unspported Media Type</description>
++    <group>access_denied,</group>
++  </rule>
++
++  <rule id="60141" level="5">
++    <if_sid>60101</if_sid>
++    <match>416</match>
++    <description>Requested range not satisfied</description>
++    <group>access_denied,</group>
++  </rule>
++
++
++  <rule id="60142" level="5">
++    <if_sid>60101</if_sid>
++    <match>417</match>
++    <description>Expectation Failed</description>
++    <group>access_denied,</group>
++  </rule>
++
++
++
++</group> <!-- ERROR_LOG,APACHE -->
++
++
++
++<!-- ASL PAM, Syslog -->
++
++<!-- TODO: Suppress getaddrinfo  (may be done already)
++
++** Alert 1225464463.121226: - syslog,sshd,
++2008 Oct 31 10:47:43 www2->/var/log/secure
++Rule: 5702 (level 5) -> 'Reverse lookup error (bad ISP or attack).'
++Src IP: 203-113-116-60.totisp.net
++User: (none)
++Oct 31 10:47:43 www2 sshd[30741]: reverse mapping checking getaddrinfo for 203-1
++13-116-60.totisp.net failed - POSSIBLE BREAKIN ATTEMPT!
++-->
++
++<!-- TODO: Yum install
++2008 Nov 03 12:55:50 c5-central->/var/log/messages
++Rule: 59997 (level 3) -> '(null)'
++Src IP: (none)
++User: (none)
++Nov  3 12:55:50 c5-central yum: Installed: qgreylist - 0.3-3.el5.art.i386
++
++-->
++
++<!-- Suppress greylist 
++** Alert 1225746585.108255: mail  - syslog,errors,
++2008 Nov 03 16:09:45 ac3->/var/log/maillog
++Rule: 1002 (level 2) -> 'Unknown problem somewhere in the system.'
++Src IP: (none)
++User: (none)
++Nov  3 16:09:44 ac3 greylist[23153]: IP 199.125.85.46 new - temp error
++
++-->
++
++<!-- Suppress error unknown alert error message -->
++<group name="syslog,errors"> 
++  
++  <!-- Greylist messages -->
++  <rule id="59996" level="0" >
++    <match>failed_on_DATA_command</match>
++    <description>Greylisting: Temporary delay</description>
++  </rule>
++
++  <rule id="59997" level="0" >
++    <match>new - temp error</match>
++    <description>Greylisting: Temporary delay</description>
++  </rule>
++
++  <rule id="59998" level="0" >
++    <match>back too soon - temp error again</match>
++    <description>Greylisting: Back too soon</description>
++  </rule>
++
++
++  <!-- PAM messages -->
++  <rule id="59999" level="1">
++    <match>error retrieving information about user</match>
++    <description> PAM: error retrieving information about user</description>
++  </rule>
++
++  <!-- ASL stack test messages -->
++  <rule id="60000" level="0">
++    <match> anonmap</match>
++    <description> ASL stack testing tool anonmap</description>
++  </rule>
++
++  <!-- ASL stack test messages -->
++  <rule id="60001" level="0">
++    <match> execbss</match>
++    <description> ASL stack testing tool execbss</description>
++  </rule>
++
++  <!-- ASL stack test messages -->
++  <rule id="60002" level="0">
++    <match> execdata</match>
++    <description> ASL stack testing tool execdata</description>
++  </rule>
++
++  <!-- ASL stack test messages -->
++  <rule id="60003" level="0">
++    <match> execheap</match>
++    <description> ASL stack testing tool execheap</description>
++  </rule>
++
++  <!-- ASL stack test messages -->
++  <rule id="60004" level="0">
++    <match> execstack</match>
++    <description> ASL stack testing tool execstack</description>
++  </rule>
++
++  <!-- ASL stack test messages -->
++  <rule id="60005" level="0">
++    <match> shlibbss</match>
++    <description> ASL stack testing tool shlibbss</description>
++  </rule>
++
++  <!-- named connection refused resolving -->
++  <rule id="60006" level="0">
++    <match> connection refused resolving</match>
++    <description> named error when it attempts to resolve from a host this is refusing connections</description>
++  </rule>
++
++  <!-- proftp chroot error -->
++  <rule id="60007" level="0">
++    <program_name>proftpd</program_name>
++    <match>error retrieving information about user 0</match>
++    <description> proftp error when chrooting</description>
++  </rule>
++
++  <!-- proftp chroot error -->
++  <rule id="60008" level="0">
++    <program_name>proftpd</program_name>
++    <match>Unable to open config file: /etc/security/pam_env.conf: No such file or directory</match>
++    <description> proftp error when chrooting</description>
++  </rule>
++
++  <!-- proftp chroot error -->
++  <rule id="60009" level="0">
++    <program_name>proftpd</program_name>
++    <match>Deprecated pam_stack module called from service</match>
++    <description> proftp error when chrooting</description>
++  </rule>
++
++  <!-- ASL stack test messages -->
++  <rule id="60010" level="0">
++    <match>writetext</match>
++    <description> ASL stack testing tool writetext</description>
++  </rule>
++
++</group>
++
++<group name="syslog,denyhosts,">
++  <rule id="60800" level="0">
++    <decoded_as>denyhosts</decoded_as>
++    <description>Grouping for the Denyhosts rules.</description>
++  </rule>
++
++  <rule id="60801" level="7">
++    <if_sid>60800</if_sid>
++    <match>Added</match>
++    <description>SSH brute force attack detected.</description>
++  </rule>
++</group>
++
++
++<group name="syslog,smtpauth,">
++  <rule id="60900" level="0">
++    <decoded_as>smtpauth</decoded_as>
++    <description>Grouping for the smtpauth rules.</description>
++  </rule>
++
++  <rule id="60901" level="1">
++    <if_sid>60900</if_sid>
++    <match>SMTP connect</match>
++    <description>SMTP auth connection</description> 
++    <group>connection_attempt,</group>
++  </rule>
++   
++  <rule id="60902" level="1">
++    <if_sid>60900</if_sid>
++    <match>SMTP user</match>
++    <description>SMTP auth authentication success.</description> 
++    <group>authentication_success,</group>
++  </rule>
++
++  <rule id="60903" level="5">
++    <if_sid>60900</if_sid>
++    <match>^LOGIN FAILED,|FAILED:|LOGIN FAILED</match>
++    <description>smtp_auth authentication failed.</description>
++    <group>authentication_failed,</group>
++  </rule>
++
++  <rule id="60910" level="10" frequency="10" timeframe="60">
++    <if_matched_sid>60903</if_matched_sid>
++    <same_source_ip />
++    <description>Multiple authentication failures from same source.</description>
++    <group>authentication_failures,</group>
++  </rule>
++
++
++
++</group>
++
++
++
++
++<!-- EOF -->
++
+diff -ruN ossec-hids-2.5.1-orig/etc/rules/asl_waf_rules.xml ossec-hids-2.5.1/etc/rules/asl_waf_rules.xml
+--- ossec-hids-2.5.1-orig/etc/rules/asl_waf_rules.xml	1969-12-31 19:00:00.000000000 -0500
++++ ossec-hids-2.5.1/etc/rules/asl_waf_rules.xml	2010-10-28 11:17:14.000000000 -0400
+@@ -0,0 +1,45 @@
++<!-- 
++  -  Official rules for ASL
++  -  Author: Scott R. Shinn
++  -  License: http://www.ossec.net/en/licensing.html
++  -->
++
++
++<!-- ASL Web Application Firewall rules. Rule ID: 60200-60250-->
++
++
++
++<group name="modsecurity,">
++  
++  <!-- RBL ruleset, we do not want to email these alerts -->
++  <rule id="60200" level="6">
++    <if_sid>60101</if_sid>
++    <match>id "350000"</match>
++    <description>Access attempt blocked by Mod Security RBL.</description>
++    <options>no_email_alert</options>
++  </rule>
++
++  <!-- Domain is serving Malware, do not shun -->
++  <rule id="60201" level="13">
++    <if_sid>60101</if_sid>
++    <match>id "360009"</match>
++    <description>Malware domain detected in webserver output - this is a CRITICAL security issue.  This means your system may be serving up malware.</description>
++    <options>no_ar</options>
++  </rule>
++  
++  <rule id="60202" level="13">
++    <if_sid>60101</if_sid>
++    <match>id "370980"</match>
++    <description>Possibly malicious iframe tag in output.</description>
++    <options>no_ar</options>
++  </rule>
++
++  <rule id="60203" level="13">
++    <if_sid>60101</if_sid>
++    <match>id "370981"</match>
++    <description>Possibly malicious iframe tag in output.</description>
++    <options>no_ar</options>
++  </rule>
++
++
++</group> <!-- ERROR_LOG,APACHE -->
+diff -ruN ossec-hids-2.5.1-orig/etc/rules/clam_av_rules.xml ossec-hids-2.5.1/etc/rules/clam_av_rules.xml
+--- ossec-hids-2.5.1-orig/etc/rules/clam_av_rules.xml	1969-12-31 19:00:00.000000000 -0500
++++ ossec-hids-2.5.1/etc/rules/clam_av_rules.xml	2010-10-28 11:17:14.000000000 -0400
+@@ -0,0 +1,63 @@
++
++<group name="clamd,freshclam,">
++
++  <rule id="100100" level="0" noalert="1">
++    <decoded_as>clamd</decoded_as>
++    <description>Grouping of the clamd rules.</description>
++  </rule>
++
++  <rule id="100101" level="0" noalert="1">
++    <decoded_as>freshclam</decoded_as>
++    <description>ClamAV database update</description>
++  </rule>
++
++  <rule id="100102" level="8">
++    <if_sid>100100</if_sid>
++    <match>FOUND</match>
++    <description>Virus detected</description>
++    <group>virus</group>
++  </rule>
++  
++  <rule id="100103" level="10">
++    <if_sid>100100</if_sid>
++    <match>^ERROR: </match>
++    <description>Clamd error</description>
++    <group>virus</group>
++  </rule>
++  
++  <rule id="100104" level="7">
++    <if_sid>100100</if_sid>
++    <match>^WARNING: </match>
++    <description>Clamd warning</description>
++    <group>virus</group>
++  </rule>
++  
++  <rule id="100105" level="3">
++    <if_sid>100100</if_sid>
++    <match>clamd daemon</match>
++    <description>Clamd restarted</description>
++    <group>virus</group>
++  </rule>
++
++  <rule id="100106" level="3">
++    <if_sid>100100</if_sid>
++    <match>Database modification detected</match>
++    <description>Clamd database updated</description>
++    <group>virus</group>
++  </rule>
++
++  <rule id="100107" level="3">
++    <if_sid>100101</if_sid>
++    <match>ClamAV update process started </match>
++    <description>ClamAV database update</description>
++    <group>virus</group>
++  </rule>
++
++  <rule id="100108" level="3">
++    <if_sid>100101</if_sid>
++    <match>Database updated </match>
++    <description>ClamAV database updated</description>
++    <group>virus</group>
++  </rule>
++
++</group> <!-- clamd, freshclam -->
+diff -ruN ossec-hids-2.5.1-orig/etc/rules/postfix_rules.xml ossec-hids-2.5.1/etc/rules/postfix_rules.xml
+--- ossec-hids-2.5.1-orig/etc/rules/postfix_rules.xml	2010-10-12 15:17:36.000000000 -0400
++++ ossec-hids-2.5.1/etc/rules/postfix_rules.xml	2010-10-28 11:17:14.000000000 -0400
+@@ -1,4 +1,4 @@
+-<!-- @(#) $Id$
++<!-- @(#) $Id: postfix_rules.xml,v 1.19 2010/04/15 18:56:32 dcid Exp $
+   -  Official postfix rules for OSSEC.
+   -  Author: Ahmet Ozturk
+   -  Author: Daniel B. Cid
+@@ -53,7 +53,7 @@
+     <group>spam,</group>
+   </rule>
+   
+-  <rule id="3306" level="6">
++  <rule id="3306" level="5">
+     <if_sid>3301, 3302</if_sid>
+     <match> blocked using </match>
+     <description>IP Address black-listed by anti-spam (blocked).</description>

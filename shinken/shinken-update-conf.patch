@@ -1,0 +1,12 @@
+diff -U 3 -dHtBbrN -- setup.py.orig setup.py
+--- setup.py.orig	2011-01-20 15:34:38.000000000 +0100
++++ setup.py	2011-02-09 19:02:18.000000000 +0100
+@@ -281,7 +281,7 @@
+
+
+ #Here, even with --root we should change the file with good values
+-if os.name != 'nt' and ('install' in sys.argv or 'sdist' in sys.argv):
++if 0:
+     #then update the /etc/*d.ini files ../var value with the real var one
+     print "Now updating the /etc/shinken/*d/ini files with the good value for var"
+     update_ini_file_with_var(os.sep.join([root_path, etc_path, 'brokerd.ini']))

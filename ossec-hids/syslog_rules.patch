@@ -1,0 +1,11 @@
+--- etc/rules/syslog_rules.xml	2008-05-13 10:50:40.000000000 -0400
++++ etc/rules/syslog_rules.xml.new	2008-05-13 10:51:12.000000000 -0400
+@@ -18,7 +18,7 @@
+ <!-- Bad words matching. Any log containing these messages
+   -  will be triggered.
+   -->
+-<var name="BAD_WORDS">core_dumped|failure|error|attack|bad |illegal |denied|refused|unauthorized|fatal|failed|Segmentation Fault|Corrupted</var>
++<var name="BAD_WORDS">core_dumped|failure |error |attack |bad |illegal |denied |refused |unauthorized |fatal |failed|Segmentation Fault|Corrupted</var>
+ 
+ 
+ <!-- Syslog errors. -->

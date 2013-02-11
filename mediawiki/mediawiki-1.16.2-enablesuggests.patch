@@ -1,0 +1,11 @@
+--- mediawiki-1.16.2/includes/DefaultSettings.php~	2011-04-05 00:06:11.000000000 +0200
++++ mediawiki-1.16.2/includes/DefaultSettings.php	2011-04-06 17:27:50.210084838 +0200
+@@ -2065,7 +2065,7 @@
+  * (results are passed around in OpenSearch format)
+  * Requires $wgEnableOpenSearchSuggest = true;
+  */
+-$wgEnableMWSuggest = false;
++$wgEnableMWSuggest = true;
+ 
+ /**
+  * Enable OpenSearch suggestions requested by MediaWiki. Set this to

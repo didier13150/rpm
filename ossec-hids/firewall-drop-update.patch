@@ -1,0 +1,29 @@
+--- active-response/firewall-drop.sh		2007-11-26 06:46:04.000000000 -0500
++++ active-response/firewall-drop.sh		2007-11-26 06:48:50.000000000 -0500
+@@ -23,6 +23,10 @@ RULEID=""
+ ACTION=$1
+ USER=$2
+ IP=$3
++TIMESTAMP=`date +%s`
++OHOME="/var/ossec/"
++
++
+ 
+ LOCAL=`dirname $0`;
+ cd $LOCAL
+@@ -52,9 +56,15 @@ if [ "X${UNAME}" = "XLinux" ]; then
+    if [ "x${ACTION}" = "xadd" ]; then
+       ARG1="-I INPUT -s ${IP} -j DROP"
+       ARG2="-I FORWARD -s ${IP} -j DROP"
++      # ASL (track IP for web gui)
++      touch $OHOME/var/shun-${TIMESTAMP}-${IP}-$5
+    else
+       ARG1="-D INPUT -s ${IP} -j DROP"
+       ARG2="-D FORWARD -s ${IP} -j DROP"
++      # ASL (track IP for web gui)
++      if [ -f $OHOME/var/*${IP}* ]; then
++        rm -f  $OHOME/var/*${IP}*
++      fi
+    fi
+    
+    # Checking if iptables is present

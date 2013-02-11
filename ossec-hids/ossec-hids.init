@@ -1,0 +1,117 @@
+#!/bin/bash
+#
+# ossec-hids      This shell script takes care of starting and stopping
+#                 the OSSEC-HIDS daemon(s).
+#
+# chkconfig: 2345 99 15
+# description:    OSSEC-HIDS is an Open Source Host-based Intrusion \
+#                 Detection System.
+# config: /etc/ossec-init.conf
+
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+# Source networking configuration.
+. /etc/sysconfig/network
+
+# Check that networking is up.
+[ ${NETWORKING} = "no" ] && exit 1
+
+# Check for binaries and configs
+[ -x /var/ossec/bin/ossec-control ] && {
+  OSSEC=/var/ossec/bin/ossec-control
+  SHORT=ossec-hids
+}
+[ -z "$OSSEC" ] && exit 1
+[ -r /etc/ossec-init.conf ] || exit 1
+
+
+RETVAL=0
+
+start() {
+	# Start daemons.
+	echo -n $"Starting $SHORT: "
+	#initlog -q -c "$OSSEC start"
+	$OSSEC start > /dev/null 2>&1
+	RETVAL=$?
+
+	[ $RETVAL -eq 0 ] && touch /var/lock/subsys/$SHORT
+
+	[ $RETVAL -eq 0 ] && success $"$SHORT startup" || failure $"$SHORT startup"
+	echo
+	return $RETVAL
+}
+
+stop() {
+	# Stop daemons.
+	echo -n $"Shutting down $SHORT: "
+	#initlog -q -c "$OSSEC stop"
+	$OSSEC stop > /dev/null 2>&1
+	RETVAL=$?
+
+	[ $RETVAL -eq 0 ] && rm -f /var/lock/subsys/$SHORT
+
+	[ $RETVAL -eq 0 ] && success $"$SHORT shutdown" || failure $"$SHORT shutdown"
+	echo
+	return $RETVAL
+}
+
+rhstatus() {
+	$OSSEC status
+	RETVAL=0
+	return $RETVAL
+}
+
+restart() {
+	stop
+	sleep 10
+	start
+}
+
+# This is a special condition used by ASL
+reload() {
+        # Stop daemons.
+        echo -n $"Reloading $SHORT: "
+        #initlog -q -c "$OSSEC stop"
+        $OSSEC reload > /dev/null
+        RETVAL=$?
+
+        [ $RETVAL -eq 0 ] && rm -f /var/lock/subsys/$SHORT
+
+        [ $RETVAL -eq 0 ] && success $"$SHORT reload" || failure $"$SHORT reload"
+        echo
+        return $RETVAL
+
+	start
+
+}
+
+
+
+# See how we were called.
+case "$1" in
+	start)
+	  start
+	  ;;
+	stop)
+	  stop
+	  ;;
+	status)
+	  rhstatus
+	  ;;
+	restart)
+	  restart
+	  ;;
+	condrestart)
+	  if [ -e /var/lock/subsys/$SHORT ]; then restart; fi
+	  ;;
+	reload)
+	  reload
+	  ;;
+	*)
+	  echo $"Usage: ossec-hids {start|stop|status|restart|condrestart|reload}"
+	  exit 1
+esac
+
+exit $RETVAL
+

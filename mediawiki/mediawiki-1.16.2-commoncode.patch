@@ -1,0 +1,225 @@
+diff -rud mediawiki-1.16.2.org/config/index.php mediawiki-1.16.2/config/index.php
+--- mediawiki-1.16.2.org/config/index.php	2009-08-19 19:03:00.000000000 +0200
++++ mediawiki-1.16.2/config/index.php	2011-04-04 23:12:48.902087595 +0200
+@@ -20,8 +20,9 @@
+ # http://www.gnu.org/copyleft/gpl.html
+ 
+ # Attempt to set up the include path, to fix problems with relative includes
+-$IP = dirname( dirname( __FILE__ ) );
++$IP = '/usr/share/mediawiki';
+ define( 'MW_INSTALL_PATH', $IP );
++if (! isset($DIR)) $DIR = getcwd() . "/..";
+ 
+ # Define an entry point and include some files
+ define( "MEDIAWIKI", true );
+diff -rud mediawiki-1.16.2.org/config/Installer.php mediawiki-1.16.2/config/Installer.php
+--- mediawiki-1.16.2.org/config/Installer.php	2011-01-04 07:15:54.000000000 +0100
++++ mediawiki-1.16.2/config/Installer.php	2011-04-05 10:57:41.794334902 +0200
+@@ -1023,7 +1023,7 @@
+ 						if ($wgDatabase->isOpen()) {
+ 							$wgDBOracleDefTS = $conf->DBdefTS_ora;
+ 							$wgDBOracleTempTS = $conf->DBtempTS_ora;
+-							$res = $wgDatabase->sourceFile( "../maintenance/ora/user.sql"  );
++							$res = $wgDatabase->sourceFile( "$IP/maintenance/ora/user.sql"  );
+ 							if ($res !== true) dieout($res);
+ 						} else {
+ 							echo "<li>Invalid database superuser, please supply a valid superuser account.</li>";
+@@ -1201,7 +1201,7 @@
+ 							print " <b class='error'>If the next step fails, see <a href='http://dev.mysql.com/doc/mysql/en/old-client.html'>http://dev.mysql.com/doc/mysql/en/old-client.html</a> for help.</b>";
+ 						}
+ 						print "</li>\n";
+-						$res = $wgDatabase->sourceFile( "../maintenance/users.sql" );
++						$res = $wgDatabase->sourceFile( "$IP/maintenance/users.sql" );
+ 						if ($res !== true) dieout($res);
+ 					}
+ 				}
+@@ -1237,10 +1237,10 @@
+ 			# FIXME: Check for errors
+ 			print "<li>Creating tables...";
+ 			if ($conf->DBtype == 'mysql') {
+-				$res = $wgDatabase->sourceFile( "../maintenance/tables.sql" );
++				$res = $wgDatabase->sourceFile( "$IP/maintenance/tables.sql" );
+ 				if ($res === true) {
+ 					print " done.</li>\n<li>Populating interwiki table... \n";
+-					$res = $wgDatabase->sourceFile( "../maintenance/interwiki.sql" );
++					$res = $wgDatabase->sourceFile( "$IP/maintenance/interwiki.sql" );
+ 				}
+ 				if ($res === true) {
+ 					print " done.</li>\n";
+@@ -1296,7 +1296,7 @@
+ 				} else {
+ 					# Yes, so run the grants
+ 					echo( "<li>" . htmlspecialchars( "Granting user permissions to $wgDBuser on $wgDBname..." ) );
+-					$res = $wgDatabase->sourceFile( "../maintenance/users.sql" );
++					$res = $wgDatabase->sourceFile( "$IP/maintenance/users.sql" );
+ 					if ( $res === true ) {
+ 						echo( " success.</li>\n" );
+ 					} else {
+@@ -1922,13 +1922,8 @@
+ # Further documentation for configuration settings may be found at:
+ # http://www.mediawiki.org/wiki/Manual:Configuration_settings
+ 
+-# If you customize your file layout, set \$IP to the directory that contains
+-# the other MediaWiki files. It will be used as a base to locate files.
+-if( defined( 'MW_INSTALL_PATH' ) ) {
+-	\$IP = MW_INSTALL_PATH;
+-} else {
+-	\$IP = dirname( __FILE__ );
+-}
++\$IP = '/usr/share/mediawiki';
++if (! isset(\$DIR)) \$DIR = getcwd();
+ 
+ \$path = array( \$IP, \"\$IP/includes\", \"\$IP/languages\" );
+ set_include_path( implode( PATH_SEPARATOR, \$path ) . PATH_SEPARATOR . get_include_path() );
+diff -rud mediawiki-1.16.2.org/includes/DefaultSettings.php mediawiki-1.16.2/includes/DefaultSettings.php
+--- mediawiki-1.16.2.org/includes/DefaultSettings.php	2011-01-31 23:34:51.000000000 +0100
++++ mediawiki-1.16.2/includes/DefaultSettings.php	2011-04-06 20:17:57.596459871 +0200
+@@ -154,7 +154,7 @@
+ $wgStyleSheetPath = &$wgStylePath;
+ $wgArticlePath      = false; ///< default to "{$wgScript}/$1" or "{$wgScript}?title=$1", depending on $wgUsePathInfo
+ $wgUploadPath       = false; ///< defaults to "{$wgScriptPath}/images"
+-$wgUploadDirectory	= false; ///< defaults to "{$IP}/images"
++$wgUploadDirectory	= false; ///< defaults to "{$DIR}/images"
+ $wgHashedUploadDirectory	= true;
+ $wgLogo				= false; ///< defaults to "{$wgStylePath}/common/images/wiki.png"
+ $wgFavicon			= '/favicon.ico';
+@@ -1957,7 +1957,7 @@
+  */
+ $wgUseTeX = false;
+ /** Location of the texvc binary */
+-$wgTexvc = './math/texvc';
++$wgTexvc = "$IP/math/texvc";
+ /**
+   * Texvc background color
+   * use LaTeX color format as used in \special function
+diff -rud mediawiki-1.16.2.org/includes/Setup.php mediawiki-1.16.2/includes/Setup.php
+--- mediawiki-1.16.2.org/includes/Setup.php	2010-01-29 05:29:26.000000000 +0100
++++ mediawiki-1.16.2/includes/Setup.php	2011-04-05 00:03:19.580335385 +0200
+@@ -45,7 +45,7 @@
+ if( $wgLogo === false ) $wgLogo = "$wgStylePath/common/images/wiki.png";
+ 
+ if( $wgUploadPath === false ) $wgUploadPath = "$wgScriptPath/images";
+-if( $wgUploadDirectory === false ) $wgUploadDirectory = "$IP/images";
++if( $wgUploadDirectory === false ) $wgUploadDirectory = "$DIR/images";
+ 
+ if( $wgMathPath === false ) $wgMathPath = "{$wgUploadPath}/math";
+ if( $wgMathDirectory === false ) $wgMathDirectory = "{$wgUploadDirectory}/math";
+diff -rud mediawiki-1.16.2.org/includes/templates/NoLocalSettings.php mediawiki-1.16.2/includes/templates/NoLocalSettings.php
+--- mediawiki-1.16.2.org/includes/templates/NoLocalSettings.php	2010-02-11 18:25:10.000000000 +0100
++++ mediawiki-1.16.2/includes/templates/NoLocalSettings.php	2011-04-05 00:04:21.691301702 +0200
+@@ -58,7 +58,7 @@
+ 		<h1>MediaWiki <?php echo htmlspecialchars( $wgVersion ) ?></h1>
+ 		<div class='error'>
+ 		<?php
+-		if ( file_exists( 'config/LocalSettings.php' ) ) {
++		if ( file_exists( $DIR . 'config/LocalSettings.php' ) ) {
+ 			echo( 'To complete the installation, move <tt>config/LocalSettings.php</tt> to the parent directory.' );
+ 		} else {
+ 			echo( "Please <a href=\"" . htmlspecialchars( $path ) . "config/index." . htmlspecialchars( $ext ) . "\" title='setup'> set up the wiki</a> first." );
+diff -rud mediawiki-1.16.2.org/includes/WebStart.php mediawiki-1.16.2/includes/WebStart.php
+--- mediawiki-1.16.2.org/includes/WebStart.php	2009-05-07 20:30:26.000000000 +0200
++++ mediawiki-1.16.2/includes/WebStart.php	2011-04-05 00:01:32.882085561 +0200
+@@ -54,15 +54,8 @@
+ # its purpose.
+ define( 'MEDIAWIKI', true );
+ 
+-# Full path to working directory.
+-# Makes it possible to for example to have effective exclude path in apc.
+-# Also doesn't break installations using symlinked includes, like
+-# dirname( __FILE__ ) would do.
+-$IP = getenv( 'MW_INSTALL_PATH' );
+-if ( $IP === false ) {
+-	$IP = realpath( '.' );
+-}
+-
++if (! isset($DIR)) $DIR = getcwd();
++$IP = '/usr/share/mediawiki';
+ 
+ # Start profiler
+ if( file_exists("$IP/StartProfiler.php") ) {
+@@ -106,14 +99,14 @@
+ 	# LocalSettings.php is the per site customization file. If it does not exit
+ 	# the wiki installer need to be launched or the generated file moved from
+ 	# ./config/ to ./
+-	if( !file_exists( "$IP/LocalSettings.php" ) ) {
++	if( !file_exists( "$DIR/LocalSettings.php" ) ) {
+ 		require_once( "$IP/includes/DefaultSettings.php" ); # used for printing the version
+ 		require_once( "$IP/includes/templates/NoLocalSettings.php" );
+ 		die();
+ 	}
+ 
+-	# Include site settings. $IP may be changed (hopefully before the AutoLoader is invoked)
+-	require_once( "$IP/LocalSettings.php" );
++	# Include site settings.
++	require_once( "$DIR/LocalSettings.php" );
+ }
+ wfProfileOut( 'WebStart.php-conf' );
+ 
+diff -rud mediawiki-1.16.2.org/maintenance/checkSyntax.php mediawiki-1.16.2/maintenance/checkSyntax.php
+--- mediawiki-1.16.2.org/maintenance/checkSyntax.php	2010-03-10 14:38:51.000000000 +0100
++++ mediawiki-1.16.2/maintenance/checkSyntax.php	2011-04-04 23:00:56.689335854 +0200
+@@ -149,11 +149,11 @@
+ 		}
+ 
+ 		// Manually add two user-editable files that are usually sources of problems
+-		if ( file_exists( "$IP/LocalSettings.php" ) ) {
+-			$this->mFiles[] = "$IP/LocalSettings.php";
++		if ( file_exists( "$DIR/LocalSettings.php" ) ) {
++			$this->mFiles[] = "$DIR/LocalSettings.php";
+ 		}
+-		if ( file_exists( "$IP/AdminSettings.php" ) ) {
+-			$this->mFiles[] = "$IP/AdminSettings.php";
++		if ( file_exists( "$DIR/AdminSettings.php" ) ) {
++			$this->mFiles[] = "$DIR/AdminSettings.php";
+ 		}
+ 
+ 		$this->output( 'done.', 'listfiles' );
+diff -rud mediawiki-1.16.2.org/maintenance/language/validate.php mediawiki-1.16.2/maintenance/language/validate.php
+--- mediawiki-1.16.2.org/maintenance/language/validate.php	2008-05-20 19:13:28.000000000 +0200
++++ mediawiki-1.16.2/maintenance/language/validate.php	2011-04-04 22:58:05.635085532 +0200
+@@ -13,7 +13,7 @@
+ define( 'MEDIAWIKI', 1 );
+ define( 'NOT_REALLY_MEDIAWIKI', 1 );
+ 
+-$IP = dirname( __FILE__ ) . '/../..';
++$IP = '/usr/share/mediawiki';
+ 
+ require_once( "$IP/includes/Defines.php" );
+ require_once( "$IP/languages/Language.php" );
+diff -rud mediawiki-1.16.2.org/maintenance/Maintenance.php mediawiki-1.16.2/maintenance/Maintenance.php
+--- mediawiki-1.16.2.org/maintenance/Maintenance.php	2011-01-04 07:15:54.000000000 +0100
++++ mediawiki-1.16.2/maintenance/Maintenance.php	2011-04-05 00:59:33.722084924 +0200
+@@ -407,10 +407,8 @@
+ 		# Define us as being in MediaWiki
+ 		define( 'MEDIAWIKI', true );
+ 
+-		# Setup $IP, using MW_INSTALL_PATH if it exists
+-		$IP = strval( getenv( 'MW_INSTALL_PATH' ) ) !== ''
+-			? getenv( 'MW_INSTALL_PATH' )
+-			: realpath( dirname( __FILE__ ) . '/..' );
++		# Setup $IP
++		$IP = '/usr/share/mediawiki';
+ 
+ 		$wgCommandLineMode = true;
+ 		# Turn off output buffering if it's on
+@@ -736,7 +734,7 @@
+ 		if ( isset( $this->mOptions['conf'] ) ) {
+ 			$settingsFile = $this->mOptions['conf'];
+ 		} else {
+-			$settingsFile = "$IP/LocalSettings.php";
++			$settingsFile = "LocalSettings.php";
+ 		}
+ 		if ( isset( $this->mOptions['wiki'] ) ) {
+ 			$bits = explode( '-', $this->mOptions['wiki'] );
+diff -rud mediawiki-1.16.2.org/maintenance/tests/bootstrap.php mediawiki-1.16.2/maintenance/tests/bootstrap.php
+--- mediawiki-1.16.2.org/maintenance/tests/bootstrap.php	2010-02-07 17:42:50.000000000 +0100
++++ mediawiki-1.16.2/maintenance/tests/bootstrap.php	2011-04-04 22:58:05.638085481 +0200
+@@ -8,7 +8,7 @@
+  */
+ 
+ global $wgCommandLineMode, $IP, $optionsWithArgs;
+-$IP = dirname( dirname( dirname( __FILE__ ) ) );
++$IP = '/usr/share/mediawiki';
+ define( 'MW_PHPUNIT_TEST', true );
+ 
+ require_once( "$IP/maintenance/commandLine.inc" );

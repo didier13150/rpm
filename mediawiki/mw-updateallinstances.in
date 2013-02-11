@@ -1,0 +1,10 @@
+#! /bin/sh
+
+cat @sysconfdir@/mediawiki/instances | while read path; do
+  echo "$path" | grep '^ *#' > /dev/null && continue
+  mw-createinstance "$path"
+  if test -e "$path"/LocalSettings.php; then
+    cd "$path"
+    php @datadir@/mediawiki/maintenance/update.php --quick
+  fi
+done

@@ -1,0 +1,20 @@
+diff -ru ossec-hids-100326-orig/etc/rules/courier_rules.xml ossec-hids-100326/etc/rules/courier_rules.xml
+--- ossec-hids-100326-orig/etc/rules/courier_rules.xml	2010-03-08 06:39:48.000000000 -0500
++++ ossec-hids-100326/etc/rules/courier_rules.xml	2010-04-01 09:07:23.000000000 -0400
+@@ -47,14 +47,14 @@
+     <group>authentication_success,</group>
+   </rule>  
+   
+-  <rule id="3910" level="10" frequency="10" timeframe="30">
++  <rule id="3910" level="10" frequency="10" timeframe="10">
+     <if_matched_sid>3902</if_matched_sid>
+     <description>Courier brute force (multiple failed logins).</description>
+     <group>authentication_failures,</group>
+     <same_source_ip />
+   </rule>
+ 
+-  <rule id="3911" level="10" frequency="15" timeframe="30">
++  <rule id="3911" level="5" frequency="30" timeframe="20">
+     <if_matched_sid>3901</if_matched_sid>
+     <same_source_ip />
+     <description>Multiple connection attempts from same source.</description>

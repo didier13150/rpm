@@ -1,0 +1,15 @@
+diff -ru ossec-hids-2.4.1-orig/src/init/ossec-server.sh ossec-hids-2.4.1/src/init/ossec-server.sh
+--- ossec-hids-2.4.1-orig/src/init/ossec-server.sh	2010-04-15 14:56:33.000000000 -0400
++++ ossec-hids-2.4.1/src/init/ossec-server.sh	2010-04-29 13:21:09.000000000 -0400
+@@ -299,6 +299,11 @@
+ 	stopa
+ 	start
+ 	;;
++  reload)
++        DAEMONS="ossec-monitord ossec-logcollector ossec-remoted ossec-syscheckd ossec-analysisd ossec-maild ${DB_DAEMON} ${CSYSLOG_DAEMON} ${AGENTLESS_DAEMON}"
++	stopa
++	start
++        ;;
+   status)
+     status
+ 	;;

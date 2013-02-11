@@ -1,0 +1,12 @@
+--- src/os_dbd/dbmake.sh	2008-08-19 14:50:32.000000000 -0400
++++ src/os_dbd/dbmake.sh	2009-04-27 12:58:00.000000000 -0400
+@@ -48,7 +48,8 @@
+ 
+ 
+ # Looking for postgresql
+-ls "`which psql 2>/dev/null`" > /dev/null 2>&1
++#ls "`which psql 2>/dev/null`" > /dev/null 2>&1
++false
+ if [ $? = 0 ]; then
+ 
+     # Checking if pg_config is installed to use it.

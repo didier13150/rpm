@@ -1,0 +1,18 @@
+This mediawiki package supports multiple instances, sometimes also
+called Wiki Farms or Wiki Families, but you can use it for a single
+instance just as well.
+
+This works by running mw-createinstance <path>, where <path> is the
+new desired location of your wiki(s) like
+
+mw-createinstance /srv/my.host/wiki
+
+Note that the parent directories must exist.
+
+You also need to create an Apache config entry (if you use Apache for
+serving mediawiki) like
+
+DocumentRoot /srv/my.host/wiki
+Alias /skins /usr/share/mediawiki/skins
+
+(this example is for short URLs, e.g. ones w/o a "/wiki/" in the URL)

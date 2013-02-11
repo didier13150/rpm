@@ -1,0 +1,12 @@
+diff -up ossec-hids-2.2/src/Config.Make.orig ossec-hids-2.2/src/Config.Make
+--- ossec-hids-2.2/src/Config.Make.orig	2008-09-04 20:35:08.000000000 +0200
++++ ossec-hids-2.2/src/Config.Make	2009-09-17 15:21:14.000000000 +0200
+@@ -8,7 +8,7 @@
+ include ${PT}Config.OS
+ 
+ 
+-CFLAGS = -g -Wall -I${PT} -I${PT}headers ${CPATH} ${CEXTRA} ${DEXTRA} ${EEXTRA} ${FEXTRA} ${GEXTRA} ${HEXTRA} -DARGV0=\"${NAME}\" -DXML_VAR=\"var\" -DOSSECHIDS
++CFLAGS = -Wall -I${PT} -I${PT}headers $(CPPFLAGS) ${CPATH} ${CEXTRA} ${DEXTRA} ${EEXTRA} ${FEXTRA} ${GEXTRA} ${HEXTRA} -DARGV0=\"${NAME}\" -DXML_VAR=\"var\" -DOSSECHIDS
+ 
+ SOURCES = *.c
+ OBJECTS = *.o 
