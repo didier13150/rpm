@@ -7,12 +7,12 @@ Distribution:	%{_distribution}
 Packager:	%{_packager}
 Summary:	An Open Source Host-based Intrusion Detection System
 Name:		ossec-hids
-Version:	2.6
+Version:	2.7
 Release:	1%{?dist}
 License:	GPL
 Group:		Applications/System
 #Source0:	http://www.ossec.net/files/%{name}-%{version}.tar.gz
-Source0:	http://www.ossec.net/files/ossec-hids-%{cvs}.tar.gz
+Source0:	http://www.ossec.net/files/ossec-hids-%{version}.tar.gz
 Source2:	%{name}.init
 Source3:	asl_rules.xml
 Source4:	authpsa_rules.xml
@@ -123,11 +123,11 @@ log collection and alerting.
 
 
 %prep
-%setup -q -n %{name}-%{cvs}
+%setup -q -n %{name}-%{version}
 #%setup -q
 %if %{asl}
 #%patch1 -p1
-%patch2 -p1
+#%patch2 -p1
 %patch3 -p0
 %patch4 -p0
 %patch5 -p0
@@ -137,7 +137,7 @@ log collection and alerting.
 #%patch10 -p1
 %patch11 -p1
 #%patch12 -p1
-%patch13 -p1
+#%patch13 -p1
 #%patch14 -p1
 #%patch15 -p1
 #%patch16 -p1
@@ -151,7 +151,7 @@ log collection and alerting.
 #%patch24 -p0
 #%patch25 -p0
 %endif
-%patch9 -p1
+#%patch9 -p1
 
 # Prepare for docs
 rm -rf contrib/specs
@@ -422,7 +422,8 @@ fi
 %{_localstatedir}/%{prg}/bin/syscheck_control
 %{_localstatedir}/%{prg}/bin/ossec-logtest
 %{_localstatedir}/%{prg}/bin/verify-agent-conf
-
+%{_localstatedir}/%{prg}/bin/agent-auth
+%{_localstatedir}/%{prg}/bin/ossec-authd
 
 %attr(750,%{prg},%{prg}) %dir %{_localstatedir}/%{prg}/logs/archives
 %attr(750,%{prg},%{prg}) %dir %{_localstatedir}/%{prg}/logs/alerts
@@ -439,9 +440,11 @@ fi
 
 
 %changelog
+* Mon Feb 11 2013 Didier Fabert <didier.fabert@gmail.com> 2.7-1
+- Update 2.7
 
 * Fri Sep 16 2011 Didier Fabert <dfabert@b2pweb.com> 2.6-1
-- Update
+- Update 2.6
 
 * Thu Mar 17 2011 Didier Fabert <dfabert@b2pweb.com> 2.5.1-9
 - Rebuild

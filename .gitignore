@@ -5,3 +5,6 @@
 *.rpm
 *.bak
 *.log
+doc
+.directory
+
