@@ -1,0 +1,26 @@
+diff -ruN ossec-hids-2.7/src/analysisd/analysisd.c ossec-hids-2.7-new/src/analysisd/analysisd.c
+--- ossec-hids-2.7/src/analysisd/analysisd.c	2012-11-08 21:24:55.000000000 -0500
++++ ossec-hids-2.7-new/src/analysisd/analysisd.c	2012-12-10 17:45:14.000000000 -0500
+@@ -870,14 +870,14 @@
+             /* We only check if the last message is
+              * duplicated on syslog.
+              */
+-            else if(lf->decoder_info->type == SYSLOG)
+-            {
+-                /* Checking if the message is duplicated */
+-                if(LastMsg_Stats(lf->full_log) == 1)
+-                    goto CLMEM;
+-                else
+-                    LastMsg_Change(lf->full_log);
+-            }
++            //else if(lf->decoder_info->type == SYSLOG)
++            //{
++            //    /* Checking if the message is duplicated */
++            //    if(LastMsg_Stats(lf->full_log) == 1)
++            //        goto CLMEM;
++            //    else
++            //        LastMsg_Change(lf->full_log);
++            //}
+ 
+ 
+             /* Stats checking */

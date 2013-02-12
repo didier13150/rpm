@@ -1,0 +1,12 @@
+diff -ruN ossec-hids-2.6-orig/src/init/ossec-server.sh ossec-hids-2.6/src/init/ossec-server.sh
+--- ossec-hids-2.6-orig/src/init/ossec-server.sh	2011-07-11 15:36:58.000000000 -0400
++++ ossec-hids-2.6/src/init/ossec-server.sh	2012-06-13 11:20:45.000000000 -0400
+@@ -218,7 +218,7 @@
+     for i in ${SDAEMONS}; do
+         pstatus ${i};
+         if [ $? = 0 ]; then
+-            ${DIR}/bin/${i} ${DEBUG_CLI};
++            ${DIR}/bin/${i} ${DEBUG_CLI} 2> /dev/null;
+             if [ $? != 0 ]; then
+                 unlock;
+                 exit 1;

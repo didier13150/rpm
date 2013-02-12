@@ -1,0 +1,15 @@
+--- ossec-hids-2.7/src/Config.Make	2012-11-08 21:24:55.000000000 -0500
++++ ossec-hids-2.7-new/src/Config.Make	2012-12-12 09:46:30.004274282 -0500
+@@ -8,7 +8,11 @@
+ include ${PT}Config.OS
+ 
+ 
+-CFLAGS = -g -Wall -I${PT} -I${PT}headers ${CPATH} ${CEXTRA} ${DEXTRA} ${EEXTRA} ${FEXTRA} ${GEXTRA} ${HEXTRA} ${CGEOIP} -DARGV0=\"${NAME}\" -DXML_VAR=\"var\" -DOSSECHIDS
++CFLAGS = -g -Wall -I${PT} -I${PT}headers ${CPATH} ${CEXTRA} ${DEXTRA} ${EEXTRA} ${FEXTRA} ${GEXTRA} ${HEXTRA} ${CGEOIP} -DARGV0=\"${NAME}\" -DXML_VAR=\"var\" -DOSSECHIDS -D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector -fPIE -pie -Wl,-z,relro,-z,now
++LDFLAGS= -fPIE -pie -Wl,-z,relro
++SH_LDFLAGS= -fPIE -pie -Wl,-z,relro
++
++
+ 
+ SOURCES = *.c
+ OBJECTS = *.o 

@@ -1,0 +1,21 @@
+diff -ruN ossec-hids-2.6/src/error_messages/error_messages.h ossec-hids-2.6.new/src/error_messages/error_messages.h
+--- ossec-hids-2.6/src/error_messages/error_messages.h	2011-07-11 15:36:58.000000000 -0400
++++ ossec-hids-2.6.new/src/error_messages/error_messages.h	2011-07-25 18:49:21.000000000 -0400
+@@ -61,7 +61,7 @@
+ #define SETGID_ERROR	"%s(1207): ERROR: Unable to switch to group: '%s'."
+ #define SETUID_ERROR	"%s(1208): ERROR: Unable to switch to user: '%s'."
+ #define CHROOT_ERROR	"%s(1209): ERROR: Unable to chroot to directory: '%s'."
+-#define QUEUE_ERROR	    "%s(1210): ERROR: Queue '%s' not accessible: '%s'."
++#define QUEUE_ERROR	    "%s(1210): NOTICE: Queue is '%s'."
+ #define QUEUE_FATAL	    "%s(1211): ERROR: Unable to access queue: '%s'. Giving up.."
+ #define PID_ERROR	    "%s(1212): ERROR: Unable to create PID file."
+ #define DENYIP_WARN 	"%s(1213): WARN: Message from %s not allowed."
+@@ -143,7 +143,7 @@
+                         "You must specify a 'name', 'executable' and 'expect'."
+ #define AR_MISS         "%s(1281): ERROR: Missing options in the active response " \
+                         "configuration. "                        
+-#define ARQ_ERROR       "%s(1301): ERROR: Unable to connect to active response queue."
++#define ARQ_ERROR       "%s(1301): INFO: Unable to connect to active response queue (ossec is still starting)."
+ #define AR_INV_LOC      "%s(1302): ERROR: Invalid active response location: '%s'."
+ #define AR_INV_CMD      "%s(1303): ERROR: Invalid command '%s' in the active response."
+ #define AR_DEF_AGENT    "%s(1304): ERROR: No agent defined for response."

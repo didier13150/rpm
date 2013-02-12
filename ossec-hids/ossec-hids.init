@@ -17,6 +17,16 @@
 # Check that networking is up.
 [ ${NETWORKING} = "no" ] && exit 1
 
+# Defines
+DESC="the OSSEC HIDS"
+NAME="ossec-hids"
+PROG="ossec-control"
+EXEC="/var/ossec/bin/${PROG}"
+LOCK="/var/lock/subsys/${NAME}"
+CONF="/etc/ossec/ossec.conf"
+
+
+
 # Check for binaries and configs
 [ -x /var/ossec/bin/ossec-control ] && {
   OSSEC=/var/ossec/bin/ossec-control
@@ -56,10 +66,17 @@ stop() {
 	return $RETVAL
 }
 
-rhstatus() {
-	$OSSEC status
-	RETVAL=0
-	return $RETVAL
+
+rh_status() {
+        LANG=C LC_ALL=C ${EXEC} status
+
+        # We need the right status return value from at least one common process,
+        # otherwise the startup check for already running processes won't work.
+        status ossec-execd >/dev/null
+}
+
+rh_status_q() {
+        rh_status >/dev/null 2>&1
 }
 
 restart() {
@@ -97,7 +114,7 @@ case "$1" in
 	  stop
 	  ;;
 	status)
-	  rhstatus
+	  rh_status
 	  ;;
 	restart)
 	  restart

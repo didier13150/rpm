@@ -32,9 +32,9 @@
 #             The first public version
 
 # ASL: reload check
-if ( -e "/var/ossec/var/ossec.reload" ) {
-  exit;
-}
+#if ( -e "/var/ossec/var/ossec.reload" ) {
+#  exit;
+#}
 
 
 use DBI;
@@ -42,8 +42,10 @@ use strict;
 use Fcntl qw (:flock);
 
 
-my($ip,$dbh,$standard_period,$nonstandard_period,$max_elements,%whitelist,$dbname,$time, $rule);
+my($ip,$dbh,$standard_period,$nonstandard_period,$max_elements,%whitelist,$dbname,$timestamp,$rule);
 
+my $current_date=`/bin/date`;
+chop $current_date;
 
 ######################################################################################################
 # $standard_period    | elements which were added $standard_period seconds ago or ealier can be purged
@@ -56,20 +58,19 @@ my($ip,$dbh,$standard_period,$nonstandard_period,$max_elements,%whitelist,$dbnam
 ######################################################################################################
 # $dbname             | data are stored in the "$dbname" database
 ######################################################################################################
-$standard_period=5*24*60*60;  #120 hours
-$nonstandard_period=24*60*60; #24 hours
+#$standard_period=5*24*60*60;  #120 hours
+$standard_period=6*60*60;  #24 hours
+$nonstandard_period=6*60*60; #24 hours
 $max_elements=2000; 
 %whitelist=(
 	    "127.0.0.1"=>0,
 	    "0.0.0.0"=>0
 	    );
-$dbname="/var/ossec/var/blocklist3.sqlite";
+$dbname="/var/ossec/var/blocklist.sqlite";
 ############## open lock file ##############
 my $lock_file = '/var/ossec/var/blocklist.lock'; 
 open LOCKFILE, "<$lock_file"  or open LOCKFILE, ">>$lock_file" or warn "Cannot open $lock_file";
 ######################################################################################################
-
-
 
 #$ip=$ENV{HTTP_X_FORWARDED_FOR};
 $ip=$ENV{REMOTE_ADDR};
@@ -100,13 +101,13 @@ if($#ARGV==-1 && $ip) { #add actual IP to the database
 elsif($ARGV[0] eq "add"){      #add the content of a database to iptables
   #$user=$ARGV[1];
   $ip=$ARGV[2];
-  $time=$ARGV[3];
+  $timestamp=$ARGV[3];
   $rule=$ARGV[4];
 
   # Add to DB
   flock(LOCKFILE, LOCK_EX);
   if( !exists $whitelist{$ip} && !hacker_exists($dbh,$ip)){    #check if actual IP exists on the whitelist or in the database
-    &add_hacker_db($dbh,$ip,$time,$rule); #add hacker's IP if it doesn't exists yet
+    &add_hacker_db($dbh,$ip,$timestamp,$rule); #add hacker's IP if it doesn't exists yet
   }
   flock(LOCKFILE, LOCK_UN);
 
@@ -161,7 +162,7 @@ sub open_db{
 	my $create_query = qq{     
 	    create table hackers (
 				  ip text unique,
-				  time text,
+				  time text not null,
 				  rule integer
 				  )
 	    };
@@ -187,24 +188,44 @@ sub add_hacker_db{
     my $sth= $dbh->prepare( $insert_query );
     $sth->execute($ip,$time,$rule);
 }
+
 ###############################################################################
 # add IPs stored in the database to the iptables
 sub add_hacker_iptables{
     my $query = qq{select ip from hackers};
     my $sth= $dbh->prepare($query);
     $sth->execute;
+	my $status;
+
+    $status=system("/sbin/iptables  -L ASL-ACTIVE-RESPONSE | grep DROP > /dev/null 2>&1");
+
+	if ($status != 0) {
+		system("/sbin/iptables -N ASL-ACTIVE-RESPONSE >/dev/null");
+                #system("/sbin/iptables -A ASL-ACTIVE-RESPONSE -m limit --limit 1/minute -j LOG  --log-level info --log-prefix 'ASL Active Response '");
+		system("/sbin/iptables -A ASL-ACTIVE-RESPONSE -j DROP");
+	}
+
+	
 
     my @current_rules=`/sbin/iptables -L -n`;
     while (my ($ip) = $sth->fetchrow_array) {
+	# null check
+	next if ($ip == "");
 	# don't create duplicate iptable rule
 	next if scalar grep {/$ip/} @current_rules;
 
 	# ASL
-	my $cmd ="/sbin/iptables -I INPUT -s $ip -j DROP";
+        my $cmd ="/sbin/iptables -I INPUT 1 -s $ip -j ASL-ACTIVE-RESPONSE";
+
 
 	(system($cmd)==0) 
 		or warn "returned failure: $cmd";
+
+	# log the event
+        system ("echo \"$current_date  asl-shun.pl add - $ip $timestamp $rule\" >> /var/ossec/logs/active-responses.log ");
     }
+
+	
 }
 ###############################################################################
 #check if the "ip" of hacker exists in database
@@ -238,16 +259,23 @@ sub delete{
     }
     foreach $ip (@ips){ #remove "old" element from the database and from iptables
 	#ASL
-	my $cmd="/sbin/iptables -D INPUT -s $ip -j DROP";
+	my $cmd="/sbin/iptables -D INPUT -s $ip -j ASL-ACTIVE-RESPONSE 2>/dev/null";
+	my $count;
 	
-	(system($cmd)==0) 
-		or warn "returned failure: $cmd";
+	while (system($cmd)==0) {
+		$count++;
+	}
 
 	$dbh->do(qq{
 	    delete from hackers
 		where ip='$ip'
 	    } ) or die $dbh->errstr;
     }
+
+	# Not working for some reason
+    #system ("echo \"$current_date  asl-shun.pl delete - $ip $timestamp $rule\" >> /var/ossec/logs/active-responses.log ");
+    system ("echo \"$current_date  asl-shun.pl delete - $ip\" >> /var/ossec/logs/active-responses.log ");
+
 }
 
 ###############################################################################
@@ -274,7 +302,7 @@ sub purge{
     }
     foreach $ip (@ips){ #remove "old" element from the database and from iptables
 	#ASL
-	my $cmd="/sbin/iptables -D INPUT -s $ip -j DROP";
+	my $cmd="/sbin/iptables -D INPUT -s $ip -j ASL-ACTIVE-RESPONSE";
 	(system($cmd)==0) 
 		or warn "returned failure: $cmd";
 
@@ -317,4 +345,3 @@ sub count_hackers{
     my ($count) = $sth->fetchrow_array; 
     return $count; 
 }
-

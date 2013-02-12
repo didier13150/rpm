@@ -1,76 +1,59 @@
+# TODO
+# generate ssl cert for authd: 
+# openssl genrsa -out /var/ossec/etc/sslmanager.key 2048
+# openssl req -new -x509 -key /var/ossec/etc/sslmanager.key -out /var/ossec/etc/sslmanager.cert -days 365 
+
 %define asl 1
 %define _default_patch_fuzz 2
 
 %define prg  ossec
-%define cvs  101203
-Distribution:	%{_distribution}
-Packager:	%{_packager}
-Summary:	An Open Source Host-based Intrusion Detection System
-Name:		ossec-hids
-Version:	2.7
-Release:	1%{?dist}
-License:	GPL
-Group:		Applications/System
-#Source0:	http://www.ossec.net/files/%{name}-%{version}.tar.gz
-Source0:	http://www.ossec.net/files/ossec-hids-%{version}.tar.gz
-Source2:	%{name}.init
-Source3:	asl_rules.xml
-Source4:	authpsa_rules.xml
-Source5:	asl-shun.pl
-Source6:	ossec-hids.logrotate
-Source7:	zabbix-alert.sh
-Source8:	ossec-configure
-Source9:	exclusion_rules.xml
+%define cvs  rc1
 
-#Patch1:	ossec-server-config.patch
-Patch2:		asl-decoder-rules.patch
-Patch3:		syslog_rules.patch
-Patch4:		ossec-client-conf.patch
-Patch5:		firewall-drop-update.patch
-Patch6:		disable-psql.patch
-#Patch7:	ossec-hids-system_audit_rcl-php.patch
-#Patch8:	ossec-hids-mysql-schema.patch
-Patch9:		ossec-client-init.patch
-#Patch10:	smtp_auth-decoder.patch
-Patch11:	courier-imap-rules.patch
-#Patch12:	denyhosts-decoder.patch
-Patch13:	ossec-hids-server-reload.patch
-#Patch14:	ossec-hids-inotify-build.patch
-#Patch15:	decoder-minicon.patch
-#Patch16:	os_dbd-list-fix.patch
-#Patch17:	ar-option.patch
-# ossec dbd fixes
-Patch18:	analysisd_alerts_log.c.patch
-Patch19:	headers_read-alert.h.patch
-Patch20:	os_dbd_alert.c.patch
-Patch21:	shared_read-alert.c.patch
-# These add in alertid
-Patch22:	headers_read-alert.h-2.patch
-Patch23:	os_dbd_alert.c-2.patch
-Patch24:	shared_read-alert.c-2.patch
-Patch25:	os_dbd_mysql.schema.patch
+Summary:     An Open Source Host-based Intrusion Detection System
+Name:        ossec-hids
+Version:     2.7
+Release:     20%{?dist}
+License:     GPL
+Group:       Applications/System
+Source0:     http://www.ossec.net/files/%{name}-%{version}.tar.gz
+Source2:     %{name}.init
+Source5:     asl-shun.pl
+Source6:     ossec-hids.logrotate
+Source7:     zabbix-alert.sh
+Source8:     ossec-configure
+Source9:     ossec-hids-agent.conf
+Patch1:	     syscheck-increase-sleep.patch
+Patch4:      ossec-client-conf.patch
+Patch5:	     firewall-drop-update.patch
+Patch6:	     disable-psql.patch
+Patch9:	     ossec-client-init.patch
+Patch13:     ossec-hids-server-reload.patch
+Patch14:     ossec-hids-2.6-disable-queue-error-msg.patch
+#Patch15:     mysql-blocklist.patch
+Patch16:     mysql-newline.patch
+Patch17:     prelink-syscheck.patch
+#Patch18:     ossec-memleaks.patch
+Patch19:     ossec-hids-cmoraes-ossec-enhanced.patch
+Patch20:     ossec-hids-mysql-schema-fix1.patch
+Patch21:     ossec-hids-server-init.patch
+Patch22:	ossec-hids-2.7-duplicate-suppression-revert.patch
+Patch23:	Make.patch
+Patch24:	pam-decoder-update.patch
 
+URL:         http://www.ossec.net/
+BuildRoot:   %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+Requires(pre):    /usr/sbin/groupadd /usr/sbin/useradd
 
-URL:		http://www.%{prg}.net/
-BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-Vendor:		http://www.ossec.net
-Requires(pre):	/usr/sbin/groupadd /usr/sbin/useradd
-
-
-BuildRequires:	coreutils glibc-devel httpd-devel openssl-devel
-BuildRequires:	mysql-devel
+BuildRequires: coreutils glibc-devel httpd-devel openssl-devel
+BuildRequires: mysql-devel 
 %if 0%{?rhel} >= 6
-BuildRequires:	inotify-tools-devel
+BuildRequires: inotify-tools-devel
 %endif
 BuildRequires:	libprelude-devel
-BuildRequires:	zlib-devel
+BuildRequires: zlib-devel
 
-
-Provides:	ossec
-Requires:	inotify-tools
-
-#ExclusiveOS:	linux
-
+Provides: ossec
+Requires: inotify-tools
 
 %description
 OSSEC is a scalable, multi-platform, open source Host-based Intrusion Detection
@@ -81,20 +64,17 @@ It runs on most operating systems, including Linux, OpenBSD, FreeBSD, MacOS,
 Solaris and Windows.
 
 This package contains common files required for all packages.
-
-
-
 %package client
-Summary:	The OSSEC HIDS Client
-Group:		System Environment/Daemons
-Provides:	ossec-client
-Requires:	%{name} = %{version}-%{release}
-Requires(post):	/sbin/chkconfig
-Requires(preun):	/sbin/chkconfig /sbin/service
-Requires(postun):	/sbin/service
-Conflicts:	%{name}-server
+Summary:     The OSSEC HIDS Client
+Group:       System Environment/Daemons
+Provides:    ossec-client
+Requires:    %{name} = %{version}-%{release} 
+Requires(post):   /sbin/chkconfig 
+Requires(preun):  /sbin/chkconfig /sbin/service
+Requires(postun): /sbin/service 
+Conflicts:   %{name}-server
 %if %{asl}
-Requires:	perl-DBD-SQLite
+Requires:    perl-DBD-SQLite
 %endif
 
 %description client
@@ -103,17 +83,17 @@ OSSEC HIDS. Install this package on every client to be
 monitored.
 
 %package server
-Summary:	The OSSEC HIDS Server
-Group:		System Environment/Daemons
-Provides:	ossec-server
-Requires:	%{name} = %{version}-%{release}
-Conflicts:	%{name}-client
-Requires(pre):	/usr/sbin/groupadd /usr/sbin/useradd
-Requires(post):	/sbin/chkconfig
-Requires(preun):	/sbin/chkconfig /sbin/service
-Requires(postun):	/sbin/service
+Summary:     The OSSEC HIDS Server
+Group:       System Environment/Daemons
+Provides:    ossec-server
+Requires:    %{name} = %{version}-%{release} 
+Conflicts:   %{name}-client
+Requires(pre):    /usr/sbin/groupadd /usr/sbin/useradd
+Requires(post):   /sbin/chkconfig 
+Requires(preun):  /sbin/chkconfig /sbin/service
+Requires(postun): /sbin/service 
 %if %{asl}
-Requires:	perl-DBD-SQLite
+Requires:    perl-DBD-SQLite
 %endif
 
 %description server
@@ -121,137 +101,154 @@ The %{name}-server package contains the server part of the
 OSSEC HIDS. Install this package on a central machine for
 log collection and alerting.
 
-
 %prep
 %setup -q -n %{name}-%{version}
-#%setup -q
 %if %{asl}
-#%patch1 -p1
-#%patch2 -p1
-%patch3 -p0
+%patch1 -p1
 %patch4 -p0
 %patch5 -p0
 %patch6 -p0
-#%patch7 -p0
-#%patch8 -p0
-#%patch10 -p1
-%patch11 -p1
-#%patch12 -p1
-#%patch13 -p1
-#%patch14 -p1
+##%patch9 -p1
+##%patch13 -p1
+
+# revisit possibly
+##%patch14 -p1
+##%patch17 -p1
+
 #%patch15 -p1
-#%patch16 -p1
-#%patch17 -p1
-#%patch18 -p0
-#%patch19 -p0
-#%patch20 -p0
-#%patch21 -p0
-#%patch22 -p0
-#%patch23 -p0
-#%patch24 -p0
-#%patch25 -p0
+##%patch16 -p1
+# TODO: probably needs snapshot
+#%patch18 -p1
+##%patch19 -p1
+%patch20 -p1
+%patch21 -p1
+# new
+%patch22 -p1 
+%patch23 -p1 
+%patch24 -p1
 %endif
-#%patch9 -p1
 
 # Prepare for docs
 rm -rf contrib/specs
-rm -rf contrib/ossec-testing
 chmod -x contrib/*
 
-
 %build
+# no
+CFLAGS="$RPM_OPT_FLAGS -fpie"
+LDFLAGS="-fPIE -pie -Wl,-z,relro"
+# no
+SH_LDFLAGS="-fPIE -pie -Wl,-z,relro"
+##LDFLAGS="-pie -Wl,-z,relro -Wl,-z,now"
+export CFLAGS LDFLAGS SH_LDFLAGS
 
 # Build the agent version first
 pushd src
-echo "CEXTRA=-DCLIENT" >> ./Config.OS
 %{__make}  setagent all
 mv addagent/manage_agents ../bin/manage_client
 mv logcollector/ossec-logcollector  ../bin/client-logcollector
 mv syscheckd/ossec-syscheckd  ../bin/client-syscheckd
+mv client-agent/ossec-agentd  ../bin/client-agentd
 
 # Rebuild for server
-rm -f ./Config.OS
 %{__make} clean setdb setprelude all build
 popd
 
+# Bugfix, Cleanup for agentd
+rm -f bin/ossec-agentd
+mv bin/client-agentd bin/ossec-agentd
+
 
 # Generate the ossec-init.conf template
-echo "DIRECTORY=\"%{_localstatedir}/%{prg}\"" >  %{prg}-init.conf
-echo "VERSION=\"%{version}\""                 >> %{prg}-init.conf
-echo "DATE=\"`date`\""                        >> %{prg}-init.conf
-
-
+echo "DIRECTORY=\"%{_localstatedir}/ossec\"" >  ossec-init.conf
+echo "VERSION=\"%{version}\""                 >> ossec-init.conf
+echo "DATE=\"`date`\""                        >> ossec-init.conf
 
 %install
 [ -n "${RPM_BUILD_ROOT}" -a "${RPM_BUILD_ROOT}" != "/" ] && rm -rf ${RPM_BUILD_ROOT}
 #fixup
 mkdir -p ${RPM_BUILD_ROOT}%{_initrddir}
-mkdir -p ${RPM_BUILD_ROOT}%{_localstatedir}/%{prg}/{bin,stats,rules,tmp}
-mkdir -p ${RPM_BUILD_ROOT}%{_localstatedir}/%{prg}/rules/translated/pure_ftpd
-mkdir -p ${RPM_BUILD_ROOT}%{_localstatedir}/%{prg}/logs/{archives,alerts,firewall}
-mkdir -p ${RPM_BUILD_ROOT}%{_localstatedir}/%{prg}/queue/{alerts,%{prg},fts,syscheck,rootcheck,agent-info,rids}
-mkdir -p ${RPM_BUILD_ROOT}%{_localstatedir}/%{prg}/var/run
-mkdir -p ${RPM_BUILD_ROOT}%{_localstatedir}/%{prg}/etc/shared
-mkdir -p ${RPM_BUILD_ROOT}%{_localstatedir}/%{prg}/etc/templates
-mkdir -p ${RPM_BUILD_ROOT}%{_localstatedir}/%{prg}/etc/mysql
-mkdir -p ${RPM_BUILD_ROOT}%{_localstatedir}/%{prg}/active-response/bin
+%{__mkdir_p} ${RPM_BUILD_ROOT}%{_sysconfdir}
+%{__mkdir_p} ${RPM_BUILD_ROOT}%{_datadir}/ossec/contrib
+%{__mkdir_p} ${RPM_BUILD_ROOT}%{_localstatedir}/{log,run}
+%{__mkdir_p} ${RPM_BUILD_ROOT}%{_localstatedir}/ossec/active-response/bin
+%{__mkdir_p} ${RPM_BUILD_ROOT}%{_localstatedir}/ossec/agentless
+%{__mkdir_p} ${RPM_BUILD_ROOT}%{_localstatedir}/ossec/{bin,stats,rules,tmp}
+%{__mkdir_p} ${RPM_BUILD_ROOT}%{_localstatedir}/ossec/rules/translated/pure_ftpd
+%{__mkdir_p} ${RPM_BUILD_ROOT}%{_localstatedir}/ossec/logs/{archives,alerts,firewall}
+%{__mkdir_p} ${RPM_BUILD_ROOT}%{_localstatedir}/ossec/queue/{alerts,agentless,agent-info,diff,fts,ossec,rids,rootcheck,syscheck}
+%{__mkdir_p} ${RPM_BUILD_ROOT}%{_localstatedir}/ossec/var/run
+%{__mkdir_p} ${RPM_BUILD_ROOT}%{_localstatedir}/ossec/etc/shared
+%{__mkdir_p} ${RPM_BUILD_ROOT}%{_localstatedir}/ossec/etc/templates
+%{__mkdir_p} ${RPM_BUILD_ROOT}%{_localstatedir}/ossec/etc/mysql
+%{__mkdir_p} ${RPM_BUILD_ROOT}%{_localstatedir}/ossec/etc/decoders.d
+%{__mkdir_p} ${RPM_BUILD_ROOT}%{_localstatedir}/ossec/etc/rules.d
+%{__mkdir_p} ${RPM_BUILD_ROOT}%{_localstatedir}/ossec/stats
+%{__mkdir_p} ${RPM_BUILD_ROOT}%{_localstatedir}/ossec/tmp
+%{__mkdir_p} ${RPM_BUILD_ROOT}%{_localstatedir}/ossec/var/run
+%{__mkdir_p} ${RPM_BUILD_ROOT}%{_localstatedir}/ossec/.ssh
 
-install -m 0600 %{prg}-init.conf ${RPM_BUILD_ROOT}%{_sysconfdir}
-install -m 0644 etc/%{prg}.conf ${RPM_BUILD_ROOT}%{_localstatedir}/%{prg}/etc/%{prg}.conf.sample
-install -m 0644 etc/%{prg}-{agent,server}.conf ${RPM_BUILD_ROOT}%{_localstatedir}/%{prg}/etc
-install -m 0644 etc/*.xml ${RPM_BUILD_ROOT}%{_localstatedir}/%{prg}/etc
-install -m 0644 etc/internal_options* ${RPM_BUILD_ROOT}%{_localstatedir}/%{prg}/etc
-install -m 0644 etc/rules/*xml ${RPM_BUILD_ROOT}%{_localstatedir}/%{prg}/rules
-install -m 0644 etc/rules/translated/pure_ftpd/* ${RPM_BUILD_ROOT}%{_localstatedir}/%{prg}/rules/translated/pure_ftpd
-install -m 0644 etc/templates/config/* ${RPM_BUILD_ROOT}%{_localstatedir}/%{prg}/etc/templates/
-install -m 0750 bin/* ${RPM_BUILD_ROOT}%{_localstatedir}/%{prg}/bin
-install -m 0755 active-response/*.sh ${RPM_BUILD_ROOT}%{_localstatedir}/%{prg}/active-response/bin
-install -m 0644 src/rootcheck/db/*.txt ${RPM_BUILD_ROOT}%{_localstatedir}/%{prg}/etc/shared
-install -m 0644 src/os_dbd/mysql.schema ${RPM_BUILD_ROOT}%{_localstatedir}/%{prg}/etc/mysql/mysql.schema
-install -m 0550 src/init/%{prg}-{client,server}.sh ${RPM_BUILD_ROOT}%{_localstatedir}/%{prg}/bin
-install -m 0755 %{SOURCE2} ${RPM_BUILD_ROOT}%{_initrddir}/%{name}
+%{__install} -m 0755 %{SOURCE2} ${RPM_BUILD_ROOT}%{_initrddir}/%{name}
+install -m 0600 ossec-init.conf ${RPM_BUILD_ROOT}%{_sysconfdir}
+
+install -m 0644 etc/ossec.conf ${RPM_BUILD_ROOT}%{_localstatedir}/ossec/etc/ossec.conf.sample
+install -m 0644 etc/ossec-{agent,server}.conf ${RPM_BUILD_ROOT}%{_localstatedir}/ossec/etc
+install -m 0644 etc/*.xml ${RPM_BUILD_ROOT}%{_localstatedir}/ossec/etc
+install -m 0644 etc/internal_options* ${RPM_BUILD_ROOT}%{_localstatedir}/ossec/etc
+install -m 0644 etc/rules/*xml ${RPM_BUILD_ROOT}%{_localstatedir}/ossec/rules
+install -m 0644 etc/rules/translated/pure_ftpd/* ${RPM_BUILD_ROOT}%{_localstatedir}/ossec/rules/translated/pure_ftpd
+install -m 0644 etc/templates/config/* ${RPM_BUILD_ROOT}%{_localstatedir}/ossec/etc/templates/
+install -m 0750 bin/* ${RPM_BUILD_ROOT}%{_localstatedir}/ossec/bin
+install -m 0755 active-response/*.sh ${RPM_BUILD_ROOT}%{_localstatedir}/ossec/active-response/bin
+install -m 0644 src/rootcheck/db/*.txt ${RPM_BUILD_ROOT}%{_localstatedir}/ossec/etc/shared
+install -m 0644 src/os_dbd/mysql.schema ${RPM_BUILD_ROOT}%{_localstatedir}/ossec/etc/mysql/mysql.schema
+install -m 0550 src/init/ossec-{client,server}.sh ${RPM_BUILD_ROOT}%{_localstatedir}/ossec/bin
+install -m 0550 src/agentlessd/scripts/* ${RPM_BUILD_ROOT}%{_localstatedir}/ossec/agentless
+%{__install} -m 0755 bin/agent-auth           ${RPM_BUILD_ROOT}%{_localstatedir}/ossec/bin
+
+# Install contrib files
+pushd contrib
+%{__install} -m 0750 {config2xml,*.pl,*.sh}   ${RPM_BUILD_ROOT}%{_datadir}/ossec/contrib
+%{__install} -m 0640 *.{conf,pm,sql,txt}      ${RPM_BUILD_ROOT}%{_datadir}/ossec/contrib
+popd
 
 # create the faux ossec.conf, %ghost'ed files must exist in the buildroot
-touch ${RPM_BUILD_ROOT}%{_localstatedir}/%{prg}/etc/%{prg}.conf
+touch ${RPM_BUILD_ROOT}%{_localstatedir}/ossec/etc/ossec.conf
 
 %if %{asl}
 mkdir -p $RPM_BUILD_ROOT/etc/logrotate.d
-install -m 0644 %{SOURCE3} ${RPM_BUILD_ROOT}%{_localstatedir}/%{prg}/rules
-install -m 0644 %{SOURCE4} ${RPM_BUILD_ROOT}%{_localstatedir}/%{prg}/rules
-install -m 0644 %{SOURCE9} ${RPM_BUILD_ROOT}%{_localstatedir}/%{prg}/rules
-install -m 0755 %{SOURCE5} ${RPM_BUILD_ROOT}%{_localstatedir}/%{prg}/active-response/bin/asl-shun.pl
-install -m 0644 %{SOURCE6} ${RPM_BUILD_ROOT}/etc/logrotate.d/ossec-hids
-install -m 0755 %{SOURCE7} ${RPM_BUILD_ROOT}%{_localstatedir}/%{prg}/active-response/bin/zabbix-alert.sh
-install -m 0755 %{SOURCE8} ${RPM_BUILD_ROOT}%{_localstatedir}/%{prg}/bin/ossec-configure
+install -m 0755 %{SOURCE5} ${RPM_BUILD_ROOT}%{_localstatedir}/ossec/active-response/bin/asl-shun.pl
+install -m 0644 %{SOURCE6} ${RPM_BUILD_ROOT}/etc/logrotate.d/%{name}
+install -m 0755 %{SOURCE7} ${RPM_BUILD_ROOT}%{_localstatedir}/ossec/active-response/bin/zabbix-alert.sh
+install -m 0755 %{SOURCE8} ${RPM_BUILD_ROOT}%{_localstatedir}/ossec/bin/ossec-configure
+install -m 0644 %{SOURCE9} ${RPM_BUILD_ROOT}%{_localstatedir}/ossec/etc/shared/agent.conf
 %endif
 
 %pre
-if ! id -g %{prg} > /dev/null 2>&1; then
-  groupadd -r %{prg}
+if ! id -g ossec > /dev/null 2>&1; then
+  groupadd -r ossec
 fi
-if ! id -u %{prg} > /dev/null 2>&1; then
-  useradd -g %{prg} -G %{prg}       \
-	-d %{_localstatedir}/%{prg} \
-	-r -s /sbin/nologin %{prg}
+if ! id -u ossec > /dev/null 2>&1; then
+  useradd -g ossec -G ossec       \
+	-d %{_localstatedir}/ossec \
+	-r -s /sbin/nologin ossec
+fi
+if ! id -u ossecr > /dev/null 2>&1; then
+  useradd -g ossec -G ossec       \
+	-d %{_localstatedir}/ossec \
+	-r -s /sbin/nologin ossecr
 fi
 
 %pre server
-if ! id -u %{prg}m > /dev/null 2>&1; then
-  useradd -g %{prg} -G %{prg}       \
-	-d %{_localstatedir}/%{prg} \
-	-r -s /sbin/nologin %{prg}m
+if ! id -u ossecm > /dev/null 2>&1; then
+  useradd -g ossec -G ossec       \
+	-d %{_localstatedir}/ossec \
+	-r -s /sbin/nologin ossecm
 fi
-if ! id -u %{prg}e > /dev/null 2>&1; then
-  useradd -g %{prg} -G %{prg}       \
-	-d %{_localstatedir}/%{prg} \
-	-r -s /sbin/nologin %{prg}e
+if ! id -u ossece > /dev/null 2>&1; then
+  useradd -g ossec -G ossec       \
+	-d %{_localstatedir}/ossec \
+	-r -s /sbin/nologin ossece
 fi
-if ! id -u %{prg}r > /dev/null 2>&1; then
-  useradd -g %{prg} -G %{prg}       \
-	-d %{_localstatedir}/%{prg} \
-	-r -s /sbin/nologin %{prg}r
-fi
-
 
 %post client
 if [ $1 = 1 ]; then
@@ -259,23 +256,24 @@ if [ $1 = 1 ]; then
   chkconfig %{name} on
 fi
 
-echo "TYPE=\"agent\"" >> %{_sysconfdir}/%{prg}-init.conf
+echo "TYPE=\"agent\"" >> %{_sysconfdir}/ossec-init.conf
 
-if [ ! -f  %{_localstatedir}/%{prg}/etc/%{prg}.conf ]; then
-  ln -sf %{prg}-agent.conf %{_localstatedir}/%{prg}/etc/%{prg}.conf
+if [ ! -f  %{_localstatedir}/ossec/etc/ossec.conf ]; then
+  ln -sf ossec-agent.conf %{_localstatedir}/ossec/etc/ossec.conf
 fi
 
-ln -sf %{prg}-client.sh %{_localstatedir}/%{prg}/bin/%{prg}-control
+ln -sf ossec-client.sh %{_localstatedir}/ossec/bin/ossec-control
 
 # daemon trickery
 ln -sf /var/ossec/bin/ossec-client-logcollector /var/ossec/bin/ossec-logcollector
 ln -sf /var/ossec/bin/ossec-client-syscheckd    /var/ossec/bin/ossec-syscheckd
-ln -sf %{_localstatedir}/%{prg}/bin/client-logcollector  %{_localstatedir}/%{prg}/bin/%{prg}-logcollector
-ln -sf %{_localstatedir}/%{prg}/bin/client-syscheckd  %{_localstatedir}/%{prg}/bin/%{prg}-syscheckd
+ln -sf %{_localstatedir}/ossec/bin/client-logcollector  %{_localstatedir}/ossec/bin/ossec-logcollector 
+ln -sf %{_localstatedir}/ossec/bin/client-syscheckd  %{_localstatedir}/ossec/bin/ossec-syscheckd 
 
-touch %{_localstatedir}/%{prg}/logs/ossec.log
-chown %{prg}:%{prg} %{_localstatedir}/%{prg}/logs/ossec.log
-chmod 0664 %{_localstatedir}/%{prg}/logs/ossec.log
+touch %{_localstatedir}/ossec/logs/ossec.log
+chown ossec:ossec %{_localstatedir}/ossec/logs/ossec.log
+chmod 0664 %{_localstatedir}/ossec/logs/ossec.log
+
 
 if [ -f %{_localstatedir}/lock/subsys/%{name} ]; then
   %{_initrddir}/%{name} restart
@@ -287,22 +285,29 @@ if [ $1 = 1 ]; then
   chkconfig %{name} on
 fi
 
-echo "TYPE=\"server\"" >> %{_sysconfdir}/%{prg}-init.conf
+echo "TYPE=\"server\"" >> %{_sysconfdir}/ossec-init.conf
 
-if [ ! -f %{_localstatedir}/%{prg}/etc/%{prg}.conf ]; then
-  ln -sf %{prg}-server.conf %{_localstatedir}/%{prg}/etc/%{prg}.conf
+if [ ! -f %{_localstatedir}/ossec/etc/ossec.conf ]; then
+  ln -sf ossec-server.conf %{_localstatedir}/ossec/etc/ossec.conf
 fi
 
-ln -sf %{prg}-server.sh %{_localstatedir}/%{prg}/bin/%{prg}-control
+ln -sf ossec-server.sh %{_localstatedir}/ossec/bin/ossec-control
 
-touch %{_localstatedir}/%{prg}/logs/ossec.log
-chown %{prg}:%{prg} %{_localstatedir}/%{prg}/logs/ossec.log
-chmod 0664 %{_localstatedir}/%{prg}/logs/ossec.log
+touch %{_localstatedir}/ossec/logs/ossec.log
+chown ossec:ossec %{_localstatedir}/ossec/logs/ossec.log
+#chmod 0664 %{_localstatedir}/ossec/logs/ossec.log
+
+# fixup for ASL 2.2 -> ASL 3.0
+if grep -q asl_rules /var/ossec/etc/ossec.conf; then
+  /usr/bin/perl -p -i -e "s[<include>asl_rules.xml</include>][]g" /var/ossec/etc/ossec.conf
+  if [ -f /etc/asl/config ]; then
+    /usr/bin/perl -p -i -e s[OSSEC_VERSION=.*][OSSEC_VERSION=0] /etc/asl/VERSION
+  fi
+fi
 
 if [ -f %{_localstatedir}/lock/subsys/%{name} ]; then
   %{_initrddir}/%{name} restart
 fi
-
 
 %preun client
 if [ $1 = 0 ]; then
@@ -313,11 +318,11 @@ if [ $1 = 0 ]; then
     %{_initrddir}/%{name} stop
   fi
 
-  rm -f %{_localstatedir}/%{prg}/etc/localtime
-  rm -f %{_localstatedir}/%{prg}/etc/%{prg}.conf
-  rm -f %{_localstatedir}/%{prg}/bin/%{prg}-control
-  rm -f %{_localstatedir}/%{prg}/bin/%{prg}-logcollector
-  rm -f %{_localstatedir}/%{prg}/bin/%{prg}-syscheckd
+  rm -f %{_localstatedir}/ossec/etc/localtime
+  rm -f %{_localstatedir}/ossec/etc/ossec.conf
+  rm -f %{_localstatedir}/ossec/bin/ossec-control
+  rm -f %{_localstatedir}/ossec/bin/ossec-logcollector 
+  rm -f %{_localstatedir}/ossec/bin/ossec-syscheckd 
 fi
 
 %preun server
@@ -329,125 +334,221 @@ if [ $1 = 0 ]; then
     %{_initrddir}/%{name} stop
   fi
 
-  rm -f %{_localstatedir}/%{prg}/etc/localtime
-  rm -f %{_localstatedir}/%{prg}/etc/%{prg}.conf
-  rm -f %{_localstatedir}/%{prg}/bin/%{prg}-control
+  rm -f %{_localstatedir}/ossec/etc/localtime
+  rm -f %{_localstatedir}/ossec/etc/ossec.conf
+  rm -f %{_localstatedir}/ossec/bin/ossec-control
 fi
 
-
 %triggerin -- glibc
-[ -r %{_sysconfdir}/localtime ] && cp -fpL %{_sysconfdir}/localtime %{_localstatedir}/%{prg}/etc
-
+[ -r %{_sysconfdir}/localtime ] && cp -fpL %{_sysconfdir}/localtime %{_localstatedir}/ossec/etc
 
 %clean
 [ -n "${RPM_BUILD_ROOT}" -a "${RPM_BUILD_ROOT}" != "/" ] && rm -rf ${RPM_BUILD_ROOT}
-
 
 %files
 %defattr(-,root,root)
 %doc BUGS CONFIG INSTALL* README
 %doc %dir doc
-%attr(550,root,%{prg}) %dir %{_localstatedir}/%{prg}
-%attr(550,root,%{prg}) %dir %{_localstatedir}/%{prg}/active-response
-%attr(550,root,%{prg}) %dir %{_localstatedir}/%{prg}/active-response/bin
-%attr(550,root,%{prg}) %dir %{_localstatedir}/%{prg}/bin
-%attr(550,root,%{prg}) %dir %{_localstatedir}/%{prg}/etc
-%attr(770,%{prg},%{prg}) %dir %{_localstatedir}/%{prg}/etc/shared
-%attr(750,%{prg},%{prg}) %dir %{_localstatedir}/%{prg}/etc/templates
-%attr(640,%{prg},%{prg}) %{_localstatedir}/%{prg}/etc/templates/*
-%attr(750,%{prg},%{prg}) %dir %{_localstatedir}/%{prg}/logs
-%attr(550,root,%{prg}) %dir %{_localstatedir}/%{prg}/queue
-%attr(770,%{prg},%{prg}) %dir %{_localstatedir}/%{prg}/queue/alerts
-%attr(770,%{prg},%{prg}) %dir %{_localstatedir}/%{prg}/queue/%{prg}
-%attr(750,%{prg},%{prg}) %dir %{_localstatedir}/%{prg}/queue/syscheck
-%attr(550,root,%{prg}) %dir %{_localstatedir}/%{prg}/var
-%attr(770,root,%{prg}) %dir %{_localstatedir}/%{prg}/var/run
+%attr(550,root,ossec) %dir %{_localstatedir}/ossec
+%attr(550,root,ossec) %dir %{_localstatedir}/ossec/active-response
+%attr(550,root,ossec) %{_localstatedir}/ossec/active-response/bin
+%attr(550,root,ossec) %{_localstatedir}/ossec/agentless
+%attr(550,root,ossec) %dir %{_localstatedir}/ossec/bin
+%attr(550,root,ossec) %dir %{_localstatedir}/ossec/etc
+%attr(770,ossec,ossec) %dir %{_localstatedir}/ossec/etc/shared
+%attr(750,ossec,ossec) %dir %{_localstatedir}/ossec/etc/templates
+%attr(640,ossec,ossec) %{_localstatedir}/ossec/etc/templates/*
+%attr(770,ossec,ossec) %dir %{_localstatedir}/ossec/logs
+%attr(550,root,ossec) %dir %{_localstatedir}/ossec/queue
+%attr(770,ossec,ossec) %dir %{_localstatedir}/ossec/queue/ossec
+%attr(750,ossec,ossec) %dir %{_localstatedir}/ossec/queue/diff
+%attr(550,root,ossec) %dir %{_localstatedir}/ossec/var
+%attr(770,root,ossec) %dir %{_localstatedir}/ossec/var/run
 %if %{asl}
-%config(noreplace) /etc/logrotate.d/ossec-hids
-%{_localstatedir}/%{prg}/bin/%{prg}-configure
+%config(noreplace) /etc/logrotate.d/%{name}
+%{_localstatedir}/ossec/bin/ossec-configure
 %endif
-
 
 %files client
 %defattr(-,root,root)
-%attr(600,root,root) %verify(not md5 size mtime) %{_sysconfdir}/%{prg}-init.conf
+%attr(600,root,root) %verify(not md5 size mtime) %{_sysconfdir}/ossec-init.conf
 %{_initrddir}/*
-%config(noreplace) %{_localstatedir}/%{prg}/etc/%{prg}-agent.conf
-%config(noreplace) %{_localstatedir}/%{prg}/etc/internal_options*
-%config(noreplace) %{_localstatedir}/%{prg}/etc/shared/*
-%{_localstatedir}/%{prg}/etc/*.sample
-%{_localstatedir}/%{prg}/active-response/bin/*
-%{_localstatedir}/%{prg}/bin/%{prg}-client.sh
-%{_localstatedir}/%{prg}/bin/%{prg}-agentd
-%{_localstatedir}/%{prg}/bin/client-logcollector
-%{_localstatedir}/%{prg}/bin/client-syscheckd
-%{_localstatedir}/%{prg}/bin/%{prg}-execd
-%{_localstatedir}/%{prg}/bin/manage_client
-%attr(755,%{prg},%{prg}) %dir %{_localstatedir}/%{prg}/queue/rids
+%config(noreplace) %{_localstatedir}/ossec/etc/ossec-agent.conf
+%config(noreplace) %{_localstatedir}/ossec/etc/internal_options*
+%config(noreplace) %{_localstatedir}/ossec/etc/shared/*
+%{_localstatedir}/ossec/etc/*.sample
+%{_localstatedir}/ossec/bin/ossec-client.sh
+%{_localstatedir}/ossec/bin/ossec-agentd
+%{_localstatedir}/ossec/bin/client-logcollector
+%{_localstatedir}/ossec/bin/client-syscheckd
+%{_localstatedir}/ossec/bin/ossec-execd
+%{_localstatedir}/ossec/bin/manage_client
+%{_localstatedir}/ossec/bin/agent-auth
+%attr(550,root,ossec) %dir %{_localstatedir}/ossec/queue/alerts
+%attr(775,root,ossec) %dir %{_localstatedir}/ossec/queue/rids
+%attr(550,root,ossec) %dir %{_localstatedir}/ossec/queue/syscheck
 
 %files server
 %defattr(-,root,root)
-%attr(600,root,root) %verify(not md5 size mtime) %{_sysconfdir}/%{prg}-init.conf
+%attr(600,root,root) %verify(not md5 size mtime) %{_sysconfdir}/ossec-init.conf
 %{_initrddir}/*
-%ghost %config(missingok,noreplace) %{_localstatedir}/%{prg}/etc/ossec.conf
-%config(noreplace) %{_localstatedir}/%{prg}/etc/%{prg}-server.conf
-%config(noreplace) %{_localstatedir}/%{prg}/etc/internal_options*
-#%config(noreplace) %{_localstatedir}/%{prg}/etc/*.xml
-%config %{_localstatedir}/%{prg}/etc/*.xml
-%config(noreplace) %{_localstatedir}/%{prg}/etc/shared/*
-%{_localstatedir}/%{prg}/etc/mysql/mysql.schema
-%{_localstatedir}/%{prg}/etc/*.sample
-%{_localstatedir}/%{prg}/active-response/bin/*
-%{_localstatedir}/%{prg}/bin/ossec-server.sh
-%{_localstatedir}/%{prg}/bin/ossec-agentd
-%{_localstatedir}/%{prg}/bin/ossec-analysisd
-%{_localstatedir}/%{prg}/bin/ossec-execd
-%{_localstatedir}/%{prg}/bin/ossec-logcollector
-%{_localstatedir}/%{prg}/bin/ossec-maild
-%{_localstatedir}/%{prg}/bin/ossec-monitord
-%{_localstatedir}/%{prg}/bin/ossec-remoted
-%{_localstatedir}/%{prg}/bin/ossec-syscheckd
-%{_localstatedir}/%{prg}/bin/ossec-dbd
-%{_localstatedir}/%{prg}/bin/ossec-reportd
-%{_localstatedir}/%{prg}/bin/ossec-agentlessd
-%{_localstatedir}/%{prg}/bin/ossec-makelists
-%{_localstatedir}/%{prg}/bin/ossec-csyslogd
-%{_localstatedir}/%{prg}/bin/ossec-regex
-%{_localstatedir}/%{prg}/bin/list_agents
-%{_localstatedir}/%{prg}/bin/manage_agents
-%{_localstatedir}/%{prg}/bin/syscheck_update
-%{_localstatedir}/%{prg}/bin/clear_stats
-%{_localstatedir}/%{prg}/bin/agent_control
-%{_localstatedir}/%{prg}/bin/rootcheck_control
-%{_localstatedir}/%{prg}/bin/syscheck_control
-%{_localstatedir}/%{prg}/bin/ossec-logtest
-%{_localstatedir}/%{prg}/bin/verify-agent-conf
-%{_localstatedir}/%{prg}/bin/agent-auth
-%{_localstatedir}/%{prg}/bin/ossec-authd
+%ghost %config(missingok,noreplace) %{_localstatedir}/ossec/etc/ossec.conf
+%config(noreplace) %{_localstatedir}/ossec/etc/ossec-server.conf
+%config(noreplace) %{_localstatedir}/ossec/etc/internal_options*
+%attr(640,ossec,ossec) %dir %{_localstatedir}/ossec/etc/shared/agent.conf
+%config %{_localstatedir}/ossec/etc/*.xml
+%config(noreplace) %{_localstatedir}/ossec/etc/shared/*
+%dir %{_datadir}/ossec/contrib
+%{_datadir}/ossec/*
+%{_localstatedir}/ossec/etc/mysql/mysql.schema
+%{_localstatedir}/ossec/etc/rules.d/
+%{_localstatedir}/ossec/etc/decoders.d/
+%{_localstatedir}/ossec/etc/*.sample
+%{_localstatedir}/ossec/bin/ossec-authd
+%{_localstatedir}/ossec/bin/agent_control
+%{_localstatedir}/ossec/bin/clear_stats
+%{_localstatedir}/ossec/bin/list_agents
+%{_localstatedir}/ossec/bin/manage_agents
+%{_localstatedir}/ossec/bin/ossec-agentd
+%{_localstatedir}/ossec/bin/ossec-agentlessd
+%{_localstatedir}/ossec/bin/ossec-analysisd
+%{_localstatedir}/ossec/bin/ossec-csyslogd
+%{_localstatedir}/ossec/bin/ossec-dbd
+%{_localstatedir}/ossec/bin/ossec-execd
+%{_localstatedir}/ossec/bin/ossec-logcollector
+%{_localstatedir}/ossec/bin/ossec-logtest
+%{_localstatedir}/ossec/bin/ossec-maild
+%{_localstatedir}/ossec/bin/ossec-makelists
+%{_localstatedir}/ossec/bin/ossec-monitord
+%{_localstatedir}/ossec/bin/ossec-regex
+%{_localstatedir}/ossec/bin/ossec-remoted
+%{_localstatedir}/ossec/bin/ossec-reportd
+%{_localstatedir}/ossec/bin/ossec-server.sh
+%{_localstatedir}/ossec/bin/ossec-syscheckd
+%{_localstatedir}/ossec/bin/rootcheck_control
+%{_localstatedir}/ossec/bin/syscheck_control
+%{_localstatedir}/ossec/bin/syscheck_update
+%{_localstatedir}/ossec/bin/verify-agent-conf
 
-%attr(750,%{prg},%{prg}) %dir %{_localstatedir}/%{prg}/logs/archives
-%attr(750,%{prg},%{prg}) %dir %{_localstatedir}/%{prg}/logs/alerts
-%attr(750,%{prg},%{prg}) %dir %{_localstatedir}/%{prg}/logs/firewall
-%attr(755,%{prg}r,%{prg}) %dir %{_localstatedir}/%{prg}/queue/agent-info
-%attr(755,%{prg}r,%{prg}) %dir %{_localstatedir}/%{prg}/queue/rids
-%attr(700,%{prg},%{prg}) %dir %{_localstatedir}/%{prg}/queue/fts
-%attr(700,%{prg},%{prg}) %dir %{_localstatedir}/%{prg}/queue/rootcheck
-%attr(550,root,%{prg}) %dir %{_localstatedir}/%{prg}/rules
-#%config(noreplace) %{_localstatedir}/%{prg}/rules/*
-%config %{_localstatedir}/%{prg}/rules/*
-%attr(750,%{prg},%{prg}) %dir %{_localstatedir}/%{prg}/stats
-%attr(770,root,%{prg}) %dir %{_localstatedir}/%{prg}/tmp
+%attr(750,ossec,ossec) %dir %{_localstatedir}/ossec/logs/archives
+%attr(770,ossec,ossec) %dir %{_localstatedir}/ossec/logs/alerts
+%attr(750,ossec,ossec) %dir %{_localstatedir}/ossec/logs/firewall
+%attr(755,ossecr,ossec) %dir %{_localstatedir}/ossec/queue/agent-info
+%attr(755,ossec,ossec) %dir %{_localstatedir}/ossec/queue/agentless
+%attr(770,ossec,ossec) %dir %{_localstatedir}/ossec/queue/alerts
+%attr(750,ossec,ossec) %dir %{_localstatedir}/ossec/queue/fts
+%attr(755,ossecr,ossec) %dir %{_localstatedir}/ossec/queue/rids
+%attr(750,ossec,ossec) %dir %{_localstatedir}/ossec/queue/rootcheck
+%attr(750,ossec,ossec) %dir %{_localstatedir}/ossec/queue/syscheck
+%attr(550,root,ossec) %dir %{_localstatedir}/ossec/rules
+#%config(noreplace) %{_localstatedir}/ossec/rules/*
+%config %{_localstatedir}/ossec/rules/*
+%attr(750,ossec,ossec) %dir %{_localstatedir}/ossec/stats
+%attr(550,root,ossec) %dir %{_localstatedir}/ossec/tmp
+%attr(550,root,ossec) %dir %{_localstatedir}/ossec/agentless
 
 
 %changelog
-* Mon Feb 11 2013 Didier Fabert <didier.fabert@gmail.com> 2.7-1
-- Update 2.7
+* Mon Feb 11 2013 Didier Fabert <didier.fabert@gmail.com> 2.7-20
+- Update to 2.7 final
 
-* Fri Sep 16 2011 Didier Fabert <dfabert@b2pweb.com> 2.6-1
-- Update 2.6
+* Mon Dec 10 2012 Support <support@atomicorp.com> - 2.7-19
+- Feature Request #XXX, revert duplicate detection in log events to help detect extremely fast brute force attacks
+- Add FORTIFY_SOURCE, PIE, and relro (full)
 
-* Thu Mar 17 2011 Didier Fabert <dfabert@b2pweb.com> 2.5.1-9
-- Rebuild
+* Thu Nov 15 2012 Support <support@atomicorp.com> - 2.7-17
+- Update to 2.7-rc2 
+
+* Wed Nov 14 2012 Support <support@atomicorp.com> - 2.6-16
+- Update to 2.7-rc1
+
+* Wed Aug 1 2012 Support <support@atomicorp.com> - 2.6-15
+- Move active response components under the common package 
+
+* Tue Jun 19 2012 Support <support@atomicorp.com> - 2.6-14
+- bugfix #xxx, correct ownership permissions on fts dir
+
+* Mon Jun 18 2012 Support <support@atomicorp.com> - 2.6-13
+- Update to init script to suppress spurious execd output
+- Add alerts queue to server package with ossec/ossec permissions
+
+* Thu Jun 7 2012 Support <support@atomicorp.com> - 2.6-12
+- Bugfix #XXX, correct any/agentd condition
+
+* Thu Jun 7 2012 Support <support@atomicorp.com> - 2.6-11
+- Moved agentless packages under server
+
+* Mon Apr 16 2012 Support <support@atomicorp.com> - 2.6-10
+- Drop timeid and cat_id indexes from schema
+
+* Tue Apr 10 2012 Support <support@atomicorp.com> - 2.6-9
+- Add new index, timeid to alerts table.
+
+* Mon Mar 26 2012 Support <support@atomicorp.com> - 2.6-8
+- Add cmoraes patch, Adds config options for enabling/disabling rootkit/syscheck options, and agent config profiles
+- Add ossec-memleaks patch
+- Add agentless directories, and agent.conf
+- Bugfix #XXX, ossec-hids.init will now return an exit code on status
+
+* Thu Nov 10 2011 Support <support@atomicorp.com> - 2.6-7
+- Add prelink_cmd support
+
+* Tue Aug 23 2011 Support <support@atomicorp.com> - 2.6-6
+- Bugfix #XXX, display multi-line events in data table correcty
+
+
+* Wed Aug 17 2011 Support <support@atomicorp.com> - 2.6-5
+- Update to asl-shun.pl purge event to default to 24 hours.
+
+* Fri Aug 05 2011 Support <support@atomicorp.com> - 2.6-4
+- Update to asl-shun.pl to change ordering of block rules
+- Revert from 0805 snapshot
+
+* Fri Aug 05 2011 Support <support@atomicorp.com> - 2.6-3
+- Update to 0805 snapshot
+
+* Mon Aug 01 2011 Support <support@atomicorp.com> - 2.6-2
+- Update to 0801 snapshot
+- Update asl-shun.pl to log to active-responses.log, blocks now go to the named chain ASL-ACTIVE-RESPONSE, and delete events are more redundant.
+
+* Tue Jul 25 2011 Support <support@atomicorp.com> - 2.6-1
+- Update to OSSEC 2.6 Final
+
+* Mon Jul 11 2011 Support <support@atomicorp.com> - 2.6.0-0.10
+- Update to snapshot 110711
+
+* Mon Jun 13 2011 Support <support@atomicorp.com> - 2.6.0-0.9
+- Update to snapshot 110613
+
+* Thu Jun 9 2011 Support <support@atomicorp.com> - 2.6.0-0.8
+- Update to snapshot 110609
+
+* Mon Jun 6 2011 Support <support@atomicorp.com> - 2.6.0-0.7
+- Update to snapshot 110606
+- Moved ossecr user creation event to the ossec-hids core package
+
+* Tue May 31 2011 Support <support@atomicorp.com> - 2.6.0-0.6
+- Update to snapshot 110531
+
+* Wed May 26 2011 Support <support@atomicorp.com> - 2.6.0-0.5
+- Update to snapshot 110526
+
+* Wed May 4 2011 Support <support@atomicorp.com> - 2.6.0-0.4
+- Update to snapshot 110504
+
+* Wed Apr 20 2011 Support <support@atomicorp.com> - 2.6.0-0.3
+- Bugfix #536, Increase the default sleep time for syscheck
+
+* Mon Apr 12 2011 Support <support@atomicorp.com> - 2.6.0-0.1
+- Renamed to 2.6 branch
+
+* Wed Apr 6 2011 Support <support@atomicorp.com> - 2.5.1-10
+- Add support for the rules/decoders dir system
+
+* Tue Apr 5 2011 Support <support@atomicorp.com> - 2.5.1-9
+- Update to snapsot 110405
+- Update asl-shun to support ossec alert ids
+- First B2PWeb build
 
 * Fri Dec 17 2010 Support <support@atomicorp.com> - 2.5.1-8
 - Changed asl-shun sqlite database to /var/ossec/var/blocklist3.sqlite
@@ -680,12 +781,12 @@ fi
 - update to 1.3
 
 * Wed Aug 8 2007 Scott R. Shinn <scott@atomicrocketturtle.com> - 1.2-8
-- minor adjustment in %post, to check for config file before overwriting it
+- minor adjustment in post, to check for config file before overwriting it
 
 * Fri Aug 3 2007 Scott R. Shinn <scott@atomicrocketturtle.com> - 1.2-7
 - v6 was first version of the patch.
 - added in logging in active-response for better ASL support
-- Disabled conf event in %post, to keep from overwriting config files.
+- Disabled conf event in post, to keep from overwriting config files. 
 
 * Mon Jun 25 2007 Scott R. Shinn <scott@atomicrocketturtle.com> - 1.2-5
 - changed permissions on queue/syscheck so it can be read by the ossec group (tweak for web gui)
@@ -695,7 +796,7 @@ fi
 - patch for a more ASL friendly client config
 
 * Thu Jun 14 2007 Scott R. Shinn <scott@atomicrocketturtle.com> - 1.2-3
-- release -2 had a bug.
+- release -2 had a bug. 
 - added ASL rules (asl_rules.xml)
 - added decoder for the asl style modsecurity logging
 - adjusted syslog_rules for qmail-scanner issue (BUG #ASL-18)

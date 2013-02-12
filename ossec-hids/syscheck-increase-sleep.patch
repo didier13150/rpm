@@ -1,0 +1,14 @@
+diff -ruN ossec-hids-110405/etc/internal_options.conf ossec-hids-110405-new/etc/internal_options.conf
+--- ossec-hids-110405/etc/internal_options.conf	2011-04-05 19:46:31.000000000 -0400
++++ ossec-hids-110405-new/etc/internal_options.conf	2011-04-20 16:08:18.000000000 -0400
+@@ -74,8 +74,8 @@
+ # usage, you can specify how much to sleep after generating
+ # the checksum of X files. The default is to sleep 2 seconds
+ # after reading 15 files.
+-syscheck.sleep=2
+-syscheck.sleep_after=15
++syscheck.sleep=4
++syscheck.sleep_after=10
+ 
+ 
+ # Database - maximum number of reconnect attempts

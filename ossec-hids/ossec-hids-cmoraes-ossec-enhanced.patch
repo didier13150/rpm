@@ -1,0 +1,1104 @@
+diff -ruN dcid-ossec-hids-aa9730451895/etc/preloaded-vars.conf cmoraes-ossec-3c4f446bab8d/etc/preloaded-vars.conf
+--- dcid-ossec-hids-aa9730451895/etc/preloaded-vars.conf	2011-06-29 16:11:33.000000000 -0400
++++ cmoraes-ossec-3c4f446bab8d/etc/preloaded-vars.conf	2011-07-05 15:21:49.000000000 -0400
+@@ -79,6 +79,12 @@
+ # ossec server. Only used on agent installations.
+ #USER_AGENT_SERVER_IP="1.2.3.4"
+ 
++# USER_AGENT_CONFIG_PROFILE specifies the agent's config profile
++# name. This is used to create agent.conf configuration profiles
++# for this particular profile name. Only used on agent installations.
++# Can be any string. E.g. LinuxDBServer or WindowsDomainController
++#USER_AGENT_CONFIG_PROFILE="generic"
++
+ 
+ 
+ ### Server/Local Installation variables. ###
+diff -ruN dcid-ossec-hids-aa9730451895/etc/templates/en/messages.txt cmoraes-ossec-3c4f446bab8d/etc/templates/en/messages.txt
+--- dcid-ossec-hids-aa9730451895/etc/templates/en/messages.txt	2011-06-29 16:11:33.000000000 -0400
++++ cmoraes-ossec-3c4f446bab8d/etc/templates/en/messages.txt	2011-07-05 15:21:49.000000000 -0400
+@@ -45,6 +45,8 @@
+ # Part 3.1/agent
+ serverip="What's the IP Address of the OSSEC HIDS server?"
+ addingip="Adding Server IP"
++configprofile="Enter the agent's config profile name (default: blank)"
++addingcfg="Setting agent's config profile name"
+ 
+ 
+ # Part 3.2
+diff -ruN dcid-ossec-hids-aa9730451895/install.sh cmoraes-ossec-3c4f446bab8d/install.sh
+--- dcid-ossec-hids-aa9730451895/install.sh	2011-06-29 16:11:33.000000000 -0400
++++ cmoraes-ossec-3c4f446bab8d/install.sh	2011-07-05 15:21:49.000000000 -0400
+@@ -330,6 +330,8 @@
+ ##########
+ # ConfigureClient()
+ ##########
++# edited by cmoraes: to add prompt for config-profile
++
+ ConfigureClient()
+ {
+ 	echo ""
+@@ -339,7 +341,7 @@
+     if [ "X${USER_AGENT_SERVER_IP}" = "X" ]; then
+         # Looping and asking for server ip
+         while [ 1 ]; do
+-	    $ECHO "  3.1- ${serverip}: "
++	    $ECHO "  3.1.1- ${serverip}: "
+ 	        read IPANSWER
+             echo $IPANSWER | grep -E "^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$" > /dev/null 2>&1
+             if [ $? = 0 ]; then
+@@ -353,11 +355,33 @@
+         IP=${USER_AGENT_SERVER_IP}
+     fi
+ 
++    # cmoraes: begin change
++    echo ""
++
++    if [ "X${USER_AGENT_CONFIG_PROFILE}" = "X" ]; then
++        # Asking for agent's config profile. Default is none.
++	$ECHO "  3.1.2- ${configprofile}: "
++	    read CFGANSWER
++        if [ "X$CFGANSWER" != "X" ]; then
++            CFG=$CFGANSWER
++	    echo ""
++	    echo "   - ${addingcfg} $CFG"
++        else
++            CFG=""
++        fi
++    else
++        CFG=${USER_AGENT_CONFIG_PROFILE}
++    fi
++
+     echo "<ossec_config>" > $NEWCONFIG
+     echo "  <client>" >> $NEWCONFIG
+-	echo "    <server-ip>$IP</server-ip>" >> $NEWCONFIG
+-	echo "  </client>" >> $NEWCONFIG
++    echo "    <server-ip>$IP</server-ip>" >> $NEWCONFIG
++    if [ "X$CFG" != "X" ]; then
++       echo "    <config-profile>$CFG</config-profile>" >> $NEWCONFIG
++    fi
++    echo "  </client>" >> $NEWCONFIG
+     echo "" >> $NEWCONFIG
++    # cmoraes: end change
+ 
+     # Syscheck?
+     UseSyscheck
+diff -ruN dcid-ossec-hids-aa9730451895/src/client-agent/agentd.c cmoraes-ossec-3c4f446bab8d/src/client-agent/agentd.c
+--- dcid-ossec-hids-aa9730451895/src/client-agent/agentd.c	2011-06-29 16:11:33.000000000 -0400
++++ cmoraes-ossec-3c4f446bab8d/src/client-agent/agentd.c	2011-07-05 15:21:49.000000000 -0400
+@@ -81,7 +81,12 @@
+         
+     OS_ReadKeys(&keys);
+     OS_StartCounter(&keys);
++
++    /* cmoraes : changed the following call to 
+     os_write_agent_info(keys.keyentries[0]->name, NULL, keys.keyentries[0]->id);
++    */
++    os_write_agent_info(keys.keyentries[0]->name, NULL, keys.keyentries[0]->id,
++                        logr->profile);
+ 
+ 
+     /* Start up message */
+diff -ruN dcid-ossec-hids-aa9730451895/src/client-agent/config.c cmoraes-ossec-3c4f446bab8d/src/client-agent/config.c
+--- dcid-ossec-hids-aa9730451895/src/client-agent/config.c	2011-06-29 16:11:33.000000000 -0400
++++ cmoraes-ossec-3c4f446bab8d/src/client-agent/config.c	2011-07-05 15:21:49.000000000 -0400
+@@ -34,6 +34,7 @@
+     logr->lip = NULL;
+     logr->rip_id = 0;
+     logr->execdq = 0;
++    logr->profile = NULL;   /*cmoraes*/
+ 
+     modules|= CCLIENT;
+ 
+diff -ruN dcid-ossec-hids-aa9730451895/src/config/client-config.c cmoraes-ossec-3c4f446bab8d/src/config/client-config.c
+--- dcid-ossec-hids-aa9730451895/src/config/client-config.c	2011-06-29 16:11:33.000000000 -0400
++++ cmoraes-ossec-3c4f446bab8d/src/config/client-config.c	2011-07-05 15:21:49.000000000 -0400
+@@ -26,6 +26,8 @@
+     char *xml_local_ip = "local_ip";
+     char *xml_client_port = "port";
+     char *xml_ar_disabled = "disable-active-response";
++    /* cmoraes */
++    char *xml_profile_name = "config-profile";
+ 
+     agent *logr;
+ 
+@@ -147,6 +149,12 @@
+                 return(OS_INVALID);
+             }
+         }
++        /* cmoraes */
++        else if(strcmp(node[i]->element,xml_profile_name) == 0)
++        {
++            /* profile name can be anything hence no validation */
++            os_strdup(node[i]->content, logr->profile);
++        }
+         else
+         {
+             merror(XML_INVELEM, ARGV0, node[i]->element);
+diff -ruN dcid-ossec-hids-aa9730451895/src/config/client-config.h cmoraes-ossec-3c4f446bab8d/src/config/client-config.h
+--- dcid-ossec-hids-aa9730451895/src/config/client-config.h	2011-06-29 16:11:33.000000000 -0400
++++ cmoraes-ossec-3c4f446bab8d/src/config/client-config.h	2011-07-05 15:21:49.000000000 -0400
+@@ -23,7 +23,8 @@
+     int execdq;
+     int rip_id;
+     char *lip;
+-	char **rip; /* remote (server) ip */
++    char **rip; /* remote (server) ip */
++    char *profile;
+ }agent;
+ 
+ 
+diff -ruN dcid-ossec-hids-aa9730451895/src/config/config.c cmoraes-ossec-3c4f446bab8d/src/config/config.c
+--- dcid-ossec-hids-aa9730451895/src/config/config.c	2011-06-29 16:11:33.000000000 -0400
++++ cmoraes-ossec-3c4f446bab8d/src/config/config.c	2011-07-05 15:21:49.000000000 -0400
+@@ -27,21 +27,21 @@
+                                    void *d2)
+ {
+     int i = 0;
+-    char *osglobal = "global";
+-    char *osrules = "rules";
+-    char *ossyscheck = "syscheck";
+-    char *osrootcheck = "rootcheck";
+-    char *osalerts = "alerts";
+-    char *osemailalerts = "email_alerts";
+-    char *osdbd = "database_output";
+-    char *oscsyslogd = "syslog_output";
+-    char *oscagentless = "agentless";
+-    char *oslocalfile = "localfile";
+-    char *osremote = "remote";
+-    char *osclient = "client";
+-    char *oscommand = "command";
+-    char *osreports = "reports";
+-    char *osactive_response = "active-response";
++    char *osglobal = "global";                    /*Server Config*/
++    char *osrules = "rules";                      /*Server Config*/
++    char *ossyscheck = "syscheck";                /*Agent Config*/
++    char *osrootcheck = "rootcheck";              /*Agent Config*/
++    char *osalerts = "alerts";                    /*Server Config*/
++    char *osemailalerts = "email_alerts";         /*Server Config*/
++    char *osdbd = "database_output";              /*Server Config*/
++    char *oscsyslogd = "syslog_output";           /*Server Config*/
++    char *oscagentless = "agentless";             /*Server Config*/
++    char *oslocalfile = "localfile";              /*Agent Config*/
++    char *osremote = "remote";                    /*Agent Config*/
++    char *osclient = "client";                    /*Agent Config*/
++    char *oscommand = "command";                  /*? Config*/
++    char *osreports = "reports";                  /*Server Config*/
++    char *osactive_response = "active-response";  /*Agent Config*/
+ 
+     
+     while(node[i])
+@@ -169,9 +169,12 @@
+     char *xml_start_ossec = "ossec_config";
+     char *xml_start_agent = "agent_config";
+ 
++    /* Attributes of the <agent_config> tag */
+     char *xml_agent_name = "name";
+     char *xml_agent_os = "os";
+     char *xml_agent_overwrite = "overwrite";
++    /* cmoraes */
++    char *xml_agent_profile = "profile";
+     
+ 
+     if(OS_ReadXML(cfgfile,&xml) < 0)
+@@ -238,6 +241,7 @@
+             {    
+                 while(node[i]->attributes[attrs] && node[i]->values[attrs])
+                 {
++                    /* Checking if there is an "name=" attribute */
+                     if(strcmp(xml_agent_name, node[i]->attributes[attrs]) == 0)
+                     {
+                         #ifdef CLIENT
+@@ -277,6 +281,38 @@
+                         }
+                         #endif
+                     }
++                    /* cmoraes: added this else if loop to check for "profile=" */
++                    else if(strcmp(xml_agent_profile, node[i]->attributes[attrs]) == 0)
++                    {
++                        #ifdef CLIENT
++                        char *agentprofile = os_read_agent_profile();
++                        debug2("Read agent config profile name [%s]", agentprofile);
++
++                        if(!agentprofile)
++                        {
++                            passed_agent_test = 0;
++                        }
++                        else
++                        {
++                            /* match the profile name of this <agent_config> section
++                             * with a comma separated list of values in agent's
++                             * <config-profile> tag. 
++                             */
++                            if(!OS_Match3(node[i]->values[attrs], agentprofile, ","))
++                            {
++                                passed_agent_test = 0;
++                                debug2("[%s] did not match agent config profile name [%s]", 
++                                       node[i]->values[attrs], agentprofile);
++                            }
++                            else
++                            {
++                                debug2("Matched agent config profile name [%s]", agentprofile);
++                            }
++                            free(agentprofile);
++                        }
++                        #endif
++                    }
++                    /* cmoraes: end add */
+                     else if(strcmp(xml_agent_overwrite, node[i]->attributes[attrs]) == 0)
+                     {
+                     }
+@@ -288,8 +324,25 @@
+                     attrs++;
+                 }
+             }
++            #ifdef CLIENT
++            else
++            {
++                debug2("agent_config element does not have any attributes.");
++
++                /* if node does not have any attributes, it is a generic config block.
++                 * check if agent has a profile name
++                 * if agent does not have profile name, then only read this generic 
++                 * agent_config block
++                 */
++
++                if (!os_read_agent_profile())
++                {
++                    debug2("but agent has a profile name.");
++                    passed_agent_test = 0;
++                }
++            }
++            #endif
+ 
+-            
+             /* Main element does not need to have any child */
+             if(chld_node)
+             {
+@@ -298,7 +351,7 @@
+                     merror(CONFIG_ERROR, ARGV0, cfgfile);
+                     return(OS_INVALID);
+                 }
+-
++      
+                 OS_ClearNode(chld_node);    
+             }
+         }
+diff -ruN dcid-ossec-hids-aa9730451895/src/config/rootcheck-config.c cmoraes-ossec-3c4f446bab8d/src/config/rootcheck-config.c
+--- dcid-ossec-hids-aa9730451895/src/config/rootcheck-config.c	2011-06-29 16:11:33.000000000 -0400
++++ cmoraes-ossec-3c4f446bab8d/src/config/rootcheck-config.c	2011-07-05 15:21:49.000000000 -0400
+@@ -35,7 +35,9 @@
+     char *xml_disabled = "disabled";
+     char *xml_base_dir = "base_directory";
+     char *xml_ignore = "ignore";
++    char *xml_disable_check = "disable_check";
+ 
++    debug2("Entering Read_Rootcheck()");
+ 
+     rootcheck = (rkconfig *)configp;
+     
+@@ -150,6 +152,132 @@
+         {
+             os_strdup(node[i]->content, rootcheck->basedir);
+         }
++        else if(strcmp(node[i]->element, xml_disable_check) == 0)
++        {
++           char **disabled_checks;
++           char *tmp_str;
++
++           debug2("before OS_Strbreak. content = [%s]", node[i]->content);
++           /* break the comma separated content into values */
++           disabled_checks=OS_StrBreak(',', node[i]->content, 
++                                       strlen(node[i]->content)+1);
++
++           char *d;
++           
++           debug2("after OS_Strbreak");
++
++           /* check values against allowed list */
++           char *str_dev = "/dev";
++           char *str_sys = "system";
++           char *str_proc = "processes";
++           char *str_allports = "allports";
++           char *str_openports = "openports";
++           char *str_interfaces = "interfaces";
++
++           
++           /* Doing it for each check */
++           while(*disabled_checks)
++           {
++               int i = 0;
++               char *tmp_dcheck;
++       
++               debug2("Staring while loop. disabled_check = [%s]", *disabled_checks);
++               tmp_dcheck = *disabled_checks;
++               debug2("Before Trim: tmp_dcheck = [%s]", tmp_dcheck);
++       
++               /* Removing spaces at the beginning */
++               while(*tmp_dcheck == ' ')
++               {
++                   tmp_dcheck++;
++               }
++       
++               /* Removing spaces, tab, \n and \r at the begining */
++               tmp_str = tmp_dcheck;
++               while (*tmp_str == ' '  || *tmp_str == '	' ||
++                      *tmp_str == '\n' || *tmp_str == '\r' )
++               {
++                   tmp_str++;
++               }
++
++               tmp_dcheck = tmp_str;
++               debug2("After Trimming spaces in beginning: tmp_dcheck = [%s]", tmp_dcheck);
++
++               /* Trim at the end */
++               while (*tmp_str != ' '  && *tmp_str != '	' && *tmp_str != '\0' &&
++                      *tmp_str != '\n' && *tmp_str != '\r')
++               {
++                   debug2("tmpstr [%c]", *tmp_str);
++                   tmp_str++;
++               }
++               /* At this point, tmp_str is either at the end of the string
++                  or at the first space, tab, \n or \r in the string.
++                  Terminate the string here, since space/tab is not allowed
++                */
++               *tmp_str = '\0';
++
++               /* Now tmp_dcheck points to the first non-null value of the 
++                  contents which has been trimmed at the beginning and end
++                */
++
++               debug2("After Trimming spaces at the end: tmp_dcheck = [%s]", tmp_dcheck);
++       
++               if (strcasecmp(tmp_dcheck, str_dev) == 0)
++               {
++                   debug2("if dev");
++                   rootcheck->check_dev_disabled = TRUE;
++               } 
++               else if (strcasecmp(tmp_dcheck, str_sys) == 0)
++               {
++                   debug2("if sys");
++                   rootcheck->check_sys_disabled = TRUE;
++               } 
++               else if (strcasecmp(tmp_dcheck, str_proc) == 0)
++               {
++                   debug2("if proc");
++                   rootcheck->check_proc_disabled = TRUE;
++               } 
++               else if (strcasecmp(tmp_dcheck, str_allports) == 0)
++               {
++                   debug2("if all ports");
++                   rootcheck->check_allports_disabled = TRUE;
++               } 
++               else if (strcasecmp(tmp_dcheck, str_openports) == 0)
++               {
++                   debug2("if open ports");
++                   rootcheck->check_openports_disabled = TRUE;
++               } 
++               else if (strcasecmp(tmp_dcheck, str_interfaces) == 0)
++               {
++                   debug2("if interfaces");
++                   rootcheck->check_intf_disabled = TRUE;
++               } 
++               else
++               {
++                   debug2("nothing matches - throw error");
++                   /* raise error if unknown value */
++                   merror(XML_VALUEERR, ARGV0, node[i]->element, tmp_dcheck);
++                   return(OS_INVALID);
++               }
++
++               debug2("After if check loop: tmp_dcheck = [%s]", tmp_dcheck);
++
++               /* Next entry */
++               disabled_checks++;    
++           }
++
++           debug2("read rootkit check config: dev_disabled = %d", 
++                  rootcheck->check_dev_disabled);
++           debug2("read rootkit check config: sys_disabled = %d", 
++                  rootcheck->check_sys_disabled);
++           debug2("read rootkit check config: proc_disabled = %d", 
++                  rootcheck->check_proc_disabled);
++           debug2("read rootkit check config: allports_disabled = %d", 
++                  rootcheck->check_allports_disabled);
++           debug2("read rootkit check config: openports_disabled = %d", 
++                  rootcheck->check_openports_disabled);
++           debug2("read rootkit check config: interfaces_disabled = %d", 
++                  rootcheck->check_intf_disabled);
++        }
+         else
+         {
+             merror(XML_INVELEM, ARGV0, node[i]->element);
+diff -ruN dcid-ossec-hids-aa9730451895/src/config/rootcheck-config.h cmoraes-ossec-3c4f446bab8d/src/config/rootcheck-config.h
+--- dcid-ossec-hids-aa9730451895/src/config/rootcheck-config.h	2011-06-29 16:11:33.000000000 -0400
++++ cmoraes-ossec-3c4f446bab8d/src/config/rootcheck-config.h	2011-07-05 15:21:49.000000000 -0400
+@@ -36,6 +36,14 @@
+     int readall;
+     int disabled;
+ 
++    /* cmoraes: added */
++    int check_dev_disabled;       /*looking for files on /dev */
++    int check_sys_disabled;       /* scan whole system looking for other issues */
++    int check_proc_disabled;      /* process checking */
++    int check_allports_disabled;  /* scan all ports */
++    int check_openports_disabled; /* scan open ports */
++    int check_intf_disabled;      /* scan interfaces */
++
+     int time;
+     int queue;
+ }rkconfig;
+diff -ruN dcid-ossec-hids-aa9730451895/src/config/syscheck-config.h cmoraes-ossec-3c4f446bab8d/src/config/syscheck-config.h
+--- dcid-ossec-hids-aa9730451895/src/config/syscheck-config.h	2011-06-29 16:11:33.000000000 -0400
++++ cmoraes-ossec-3c4f446bab8d/src/config/syscheck-config.h	2011-07-05 15:21:49.000000000 -0400
+@@ -42,36 +42,36 @@
+ 
+ typedef struct _config
+ {
+-    int tsleep;
++    int tsleep;            /* sleep for sometime for daemon to settle */
+     int sleep_after;
+-    int rootcheck;
+-    int disabled;
++    int rootcheck;         /* set to 0 when rootcheck is disabled */
++    int disabled;          /* is syscheck disabled? */
+     int scan_on_start;
+     int realtime_count;
+     
+-    int time;
+-    int queue;
++    int time;              /* frequency (secs) for syscheck to run */
++    int queue;             /* file descriptor of socket to write to queue */
+     
+-    int *opts;
++    int *opts;             /* attributes set in the <directories> tag element */
+ 
+-    char *workdir;
++    char *workdir;         /* set to the DEFAULTDIR (/var/ossec) */
+     char *remote_db;
+     char *db;
+ 
+-    char *scan_day;
+-    char *scan_time;
++    char *scan_day;        /* run syscheck on this day */
++    char *scan_time;       /* run syscheck at this time */
+     
+-	char **ignore;
+-    void **ignore_regex;
++    char **ignore;         /* list of files/dirs to ignore */
++    void **ignore_regex;   /* regex of files/dirs to ignore */
+     
+-	char **dir;
++    char **dir;            /* array of directories to be scanned */
+     void **filerestrict;
+ 
+     /* Windows only registry checking */
+     #ifdef WIN32
+-	char **registry_ignore;
+-    void **registry_ignore_regex;
+-	char **registry;
++    char **registry_ignore;         /* list of registry entries to ignore */
++    void **registry_ignore_regex;   /* regex of registry entries to ignore */
++    char **registry;                /* array of registry entries to be scanned */
+     FILE *reg_fp;
+     #endif
+     
+diff -ruN dcid-ossec-hids-aa9730451895/src/error_messages/error_messages.h cmoraes-ossec-3c4f446bab8d/src/error_messages/error_messages.h
+--- dcid-ossec-hids-aa9730451895/src/error_messages/error_messages.h	2011-06-29 16:11:33.000000000 -0400
++++ cmoraes-ossec-3c4f446bab8d/src/error_messages/error_messages.h	2011-07-05 15:21:49.000000000 -0400
+@@ -97,6 +97,8 @@
+ #define IMSG_ERROR	    "%s(1222): ERROR: Invalid msg: %s"
+ #define SNDMAIL_ERROR	"%s(1223): ERROR: Error Sending email to %s (smtp server)"
+ #define XML_INV_GRAN_MAIL "%s(1224): ERROR: Invalid 'email_alerts' config (missing parameters)."
++#define CHLDWAIT_ERROR  "%s(1261): ERROR: Waiting for child process. (status: %d)."
++#define TOOMANY_WAIT_ERROR "%s(1262): ERROR: Too many errors waiting for child process(es)."
+ 
+ 
+ /* rootcheck */
+diff -ruN dcid-ossec-hids-aa9730451895/src/headers/agent_op.h cmoraes-ossec-3c4f446bab8d/src/headers/agent_op.h
+--- dcid-ossec-hids-aa9730451895/src/headers/agent_op.h	2011-06-29 16:11:33.000000000 -0400
++++ cmoraes-ossec-3c4f446bab8d/src/headers/agent_op.h	2011-07-05 15:21:49.000000000 -0400
+@@ -47,12 +47,21 @@
+  */
+ char *os_read_agent_id();
+ 
++/* cmoraes: added */
++
++/** char *os_read_agent_profile()
++ *  Reads the agent profile name for the current agent.
++ *  Returns NULL on error.
++ */
++char *os_read_agent_profile();
++
+ 
+ /** int os_write_agent_info(char *agent_name, char *agent_ip, char *agent_id)
+  *  Writes the agent info inside the queue, for the other processes to read.
+  *  Returns 1 on success or <= 0 on failure.
+  */
+-int os_write_agent_info(char *agent_name, char *agent_ip, char *agent_id);
++int os_write_agent_info(char *agent_name, char *agent_ip, char *agent_id,
++                        char *cfg_profile_name);               /*cmoraes*/
+ 
+ 
+ int os_agent_config_changed();
+diff -ruN dcid-ossec-hids-aa9730451895/src/headers/defs.h cmoraes-ossec-3c4f446bab8d/src/headers/defs.h
+--- dcid-ossec-hids-aa9730451895/src/headers/defs.h	2011-06-29 16:11:33.000000000 -0400
++++ cmoraes-ossec-3c4f446bab8d/src/headers/defs.h	2011-07-05 15:21:49.000000000 -0400
+@@ -21,6 +21,11 @@
+ #define __OS_HEADERS
+ 
+ 
++/* TRUE / FALSE definitions 
++ */
++#define TRUE            1
++#define FALSE           0
++
+ /* Read / Write definitions
+  */
+ #define READ 		1
+diff -ruN dcid-ossec-hids-aa9730451895/src/headers/shared.h cmoraes-ossec-3c4f446bab8d/src/headers/shared.h
+--- dcid-ossec-hids-aa9730451895/src/headers/shared.h	2011-06-29 16:11:33.000000000 -0400
++++ cmoraes-ossec-3c4f446bab8d/src/headers/shared.h	2011-07-05 15:21:49.000000000 -0400
+@@ -218,6 +218,7 @@
+ #include "file-queue.h"
+ #include "read-agents.h"
+ #include "report_op.h"
++#include "string_op.h"
+ 
+ #include "os_xml/os_xml.h"
+ #include "os_regex/os_regex.h"
+diff -ruN dcid-ossec-hids-aa9730451895/src/headers/string_op.h cmoraes-ossec-3c4f446bab8d/src/headers/string_op.h
+--- dcid-ossec-hids-aa9730451895/src/headers/string_op.h	1969-12-31 19:00:00.000000000 -0500
++++ cmoraes-ossec-3c4f446bab8d/src/headers/string_op.h	2011-07-05 15:21:49.000000000 -0400
+@@ -0,0 +1,28 @@
++/* @(#) $Id$ */
++
++/* Copyright (C) 2009 Trend Micro Inc.
++ * All rights reserved.
++ *
++ * This program is a free software; you can redistribute it
++ * and/or modify it under the terms of the GNU General Public
++ * License (version 2) as published by the FSF - Free Software
++ * Foundation
++ *
++ * License details at the LICENSE file included with OSSEC or
++ * online at: http://www.ossec.net/en/licensing.html
++ */
++
++
++#ifndef H_STRINGOP_OS
++#define H_STRINGOP_OS
++
++
++/** os_trimcrlf
++ * Trims the cr and/or LF from the last positions of a string
++ */
++void os_trimcrlf(char *str);
++
++
++#endif
++
++/* EOF */
+diff -ruN dcid-ossec-hids-aa9730451895/src/LOCATION cmoraes-ossec-3c4f446bab8d/src/LOCATION
+--- dcid-ossec-hids-aa9730451895/src/LOCATION	2011-06-29 16:11:33.000000000 -0400
++++ cmoraes-ossec-3c4f446bab8d/src/LOCATION	2011-07-05 15:21:49.000000000 -0400
+@@ -1,4 +1,4 @@
+-DIR="/var/ossec"
++DIR="/var/agent26"
+ CC=gcc
+ GCC=gcc
+ CLANG=clang
+diff -ruN dcid-ossec-hids-aa9730451895/src/os_maild/maild.c cmoraes-ossec-3c4f446bab8d/src/os_maild/maild.c
+--- dcid-ossec-hids-aa9730451895/src/os_maild/maild.c	2011-06-29 16:11:33.000000000 -0400
++++ cmoraes-ossec-3c4f446bab8d/src/os_maild/maild.c	2011-07-05 15:21:49.000000000 -0400
+@@ -454,6 +454,7 @@
+             {
+                 if(p_status != 0)
+                 {
++                    merror(CHLDWAIT_ERROR,ARGV0,p_status);
+                     merror(SNDMAIL_ERROR,ARGV0,mail->smtpserver);
+                     n_errs++;
+                 }
+@@ -463,6 +464,7 @@
+             /* Too many errors */
+             if(n_errs > 6)
+             {
++                merror(TOOMANY_WAIT_ERROR,ARGV0);
+                 merror(SNDMAIL_ERROR,ARGV0,mail->smtpserver);
+                 exit(1);
+             }
+diff -ruN dcid-ossec-hids-aa9730451895/src/os_regex/os_match.c cmoraes-ossec-3c4f446bab8d/src/os_regex/os_match.c
+--- dcid-ossec-hids-aa9730451895/src/os_regex/os_match.c	2011-06-29 16:11:33.000000000 -0400
++++ cmoraes-ossec-3c4f446bab8d/src/os_regex/os_match.c	2011-07-05 15:21:49.000000000 -0400
+@@ -14,8 +14,7 @@
+ #include <string.h>
+ #include <stdlib.h>
+ 
+-#include "os_regex.h"
+-
++#include <shared.h>
+ 
+ /** int OS_Match2(char *pattern, char *str) v0.4
+  *
+@@ -44,4 +43,43 @@
+ }
+ 
+ 
++/** int OS_Match3(char *pattern, char *str) v2.6
++ *
++ *  This function is used
++ *  to match any values from a delimited string
++ *  e.g. match pattern "abc" from string "123,abc,xyz"
++ */
++int OS_Match3(char *pattern, char *str, char *delimiter)
++{
++    int r_code = 0;
++    char *token = NULL;
++    char *dupstr = NULL;
++    char *saveptr = NULL;
++   
++    /* debug2("1. str [%s], dupstr [%s], token[%s], delim [%s]", str, dupstr, token, delimiter); */
++
++    os_strdup(str, dupstr);
++    /* debug2("2. str [%s], dupstr [%s], token[%s], delim [%s]", str, dupstr, token, delimiter); */
++
++    token = strtok_r(dupstr, delimiter, &saveptr);
++    /* debug2("3. str [%s], dupstr [%s], token[%s], delim [%s]", str, dupstr, token, delimiter); */
++
++    while (token != NULL)
++    {
++        debug2("Matching [%s] with [%s]", pattern, token);
++        if (!strcmp(pattern, token))
++        {
++            r_code = 1;
++            break;
++        }
++
++        token = strtok_r(NULL, delimiter, &saveptr);
++    }
++    
++    /* debug2("4. str [%s], dupstr [%s], token[%s], delim [%s]", str, dupstr, token, delimiter); */
++    free(dupstr);
++    return(r_code);
++}
++
++
+ /* EOF */
+diff -ruN dcid-ossec-hids-aa9730451895/src/os_regex/os_regex.h cmoraes-ossec-3c4f446bab8d/src/os_regex/os_regex.h
+--- dcid-ossec-hids-aa9730451895/src/os_regex/os_regex.h	2011-06-29 16:11:33.000000000 -0400
++++ cmoraes-ossec-3c4f446bab8d/src/os_regex/os_regex.h	2011-07-05 15:21:49.000000000 -0400
+@@ -135,6 +135,8 @@
+ 
+ int OS_Match2(char *pattern, char *str);
+ 
++int OS_Match3(char *pattern, char *str, char* delimiter);
++
+     
+ /* OS_WordMatch v0.3:
+  * Searches for  pattern in the string
+diff -ruN dcid-ossec-hids-aa9730451895/src/rootcheck/rootcheck.c cmoraes-ossec-3c4f446bab8d/src/rootcheck/rootcheck.c
+--- dcid-ossec-hids-aa9730451895/src/rootcheck/rootcheck.c	2011-06-29 16:11:33.000000000 -0400
++++ cmoraes-ossec-3c4f446bab8d/src/rootcheck/rootcheck.c	2011-07-05 15:21:49.000000000 -0400
+@@ -91,6 +91,12 @@
+     rootcheck.disabled = 0;
+     rootcheck.alert_msg = NULL;
+     rootcheck.time = ROOTCHECK_WAIT;
++    rootcheck.check_dev_disabled = FALSE;
++    rootcheck.check_sys_disabled = FALSE;
++    rootcheck.check_proc_disabled = FALSE;
++    rootcheck.check_allports_disabled = FALSE;
++    rootcheck.check_openports_disabled = FALSE;
++    rootcheck.check_intf_disabled = FALSE;
+ 
+ 
+     /* We store up to 255 alerts in there. */
+diff -ruN dcid-ossec-hids-aa9730451895/src/rootcheck/run_rk_check.c cmoraes-ossec-3c4f446bab8d/src/rootcheck/run_rk_check.c
+--- dcid-ossec-hids-aa9730451895/src/rootcheck/run_rk_check.c	2011-06-29 16:11:33.000000000 -0400
++++ cmoraes-ossec-3c4f446bab8d/src/rootcheck/run_rk_check.c	2011-07-05 15:21:49.000000000 -0400
+@@ -317,28 +317,69 @@
+    
+     /*** Third check, looking for files on the /dev ***/
+     debug1("%s: DEBUG: Going into check_rc_dev", ARGV0);
+-    check_rc_dev(rootcheck.basedir);
++    if (rootcheck.check_dev_disabled == FALSE)
++    {
++        check_rc_dev(rootcheck.basedir);
++    }
++    else
++    {
++        merror("%s: INFO: Scan of /dev disabled.", ARGV0);
++    }
+     
+     /*** Fourth check,  scan the whole system looking for additional issues */
+     debug1("%s: DEBUG: Going into check_rc_sys", ARGV0);
+-    check_rc_sys(rootcheck.basedir);
++    if (rootcheck.check_sys_disabled == FALSE)
++    {
++        check_rc_sys(rootcheck.basedir);
++    }
++    else
++    {
++        merror("%s: INFO: Scan of entire system disabled.", ARGV0);
++    }
+     
+     /*** Process checking ***/
+     debug1("%s: DEBUG: Going into check_rc_pids", ARGV0); 
+-    check_rc_pids();         
++    if (rootcheck.check_proc_disabled == FALSE)
++    {
++        check_rc_pids();         
++    }
++    else
++    {
++        merror("%s: INFO: Scan of processes disabled.", ARGV0);
++    }
+ 
+     /*** Check all the ports ***/
+     debug1("%s: DEBUG: Going into check_rc_ports", ARGV0); 
+-    check_rc_ports();    
++    if (rootcheck.check_allports_disabled == FALSE)
++    {
++        check_rc_ports();    
++    }
++    else
++    {
++        merror("%s: INFO: Scan of all ports disabled.", ARGV0);
++    }
+ 
+     /*** Check open ports ***/
+     debug1("%s: DEBUG: Going into check_open_ports", ARGV0); 
+-    check_open_ports();
++    if (rootcheck.check_openports_disabled == FALSE)
++    {
++        check_open_ports();
++    }
++    else
++    {
++        merror("%s: INFO: Scan of open ports disabled.", ARGV0);
++    }
+         
+     /*** Check interfaces ***/
+     debug1("%s: DEBUG: Going into check_rc_if", ARGV0); 
+-    check_rc_if();
+-    
++    if (rootcheck.check_intf_disabled == FALSE)
++    {
++        check_rc_if();
++    } 
++    else
++    {
++        merror("%s: INFO: Scan of interfaces disabled.", ARGV0);
++    }
+     
+     debug1("%s: DEBUG: Completed with all checks.", ARGV0);    
+    
+diff -ruN dcid-ossec-hids-aa9730451895/src/shared/agent_op.c cmoraes-ossec-3c4f446bab8d/src/shared/agent_op.c
+--- dcid-ossec-hids-aa9730451895/src/shared/agent_op.c	2011-06-29 16:11:33.000000000 -0400
++++ cmoraes-ossec-3c4f446bab8d/src/shared/agent_op.c	2011-07-05 15:21:49.000000000 -0400
+@@ -77,6 +77,8 @@
+     char buf[1024 + 1];
+     FILE *fp = NULL;
+ 
++    debug2("%s: calling os_read_agent_name().", ARGV0);
++
+     if(isChroot())
+         fp = fopen(AGENT_INFO_FILE, "r");
+     else
+@@ -109,6 +111,8 @@
+         os_strdup(buf, ret);
+         fclose(fp);
+         
++        debug2("%s: os_read_agent_name returned (%s).", __local_name, ret);
++
+         return(ret);
+     }
+ 
+@@ -127,6 +131,8 @@
+     char buf[1024 + 1];
+     FILE *fp;
+ 
++    debug2("%s: calling os_read_agent_ip().", ARGV0);
++
+     fp = fopen(AGENT_INFO_FILE, "r");
+     if(!fp)
+     {
+@@ -162,6 +168,8 @@
+     char buf[1024 + 1];
+     FILE *fp;
+ 
++    debug2("%s: calling os_read_agent_id().", ARGV0);
++
+     fp = fopen(AGENT_INFO_FILE, "r");
+     if(!fp)
+     {
+@@ -187,12 +195,72 @@
+ }
+ 
+ 
++/*  cmoraes: begin add */
++
++/** char *os_read_agent_profile()
++ *  Reads the agent profile name for the current agent.
++ *  Returns NULL on error.
++ *
++ *  Description:
++ *  Comma separated list of strings that used to identify what type 
++ *  of configuration is used for this agent.
++ *  The profile name is set in the agent's etc/ossec.conf file
++ *  It is matched with the ossec manager's agent.conf file to read
++ *  configuration only applicable to this profile name.
++ *  
++ */
++char* os_read_agent_profile()
++{
++    char buf[1024 + 1];
++    FILE *fp;
++
++    debug2("%s: calling os_read_agent_profile().", __local_name);
++
++    if(isChroot())
++        fp = fopen(AGENT_INFO_FILE, "r");
++    else
++        fp = fopen(AGENT_INFO_FILEP, "r");
++
++    if(!fp)
++    {
++        debug2("%s: Failed to open file. Errno=%d.", ARGV0, errno);
++        merror(FOPEN_ERROR, __local_name, AGENT_INFO_FILE);
++        return(NULL);
++    }
++
++    buf[1024] = '\0';
++
++
++    /* Getting profile */
++    if(fgets(buf, 1024, fp) && fgets(buf, 1024, fp) && 
++       fgets(buf, 1024, fp) && fgets(buf, 1024, fp))
++    {
++        char *ret = NULL;
++
++        /* Trim the /n and/or /r at the end of the string */
++        os_trimcrlf(buf);
++
++        os_strdup(buf, ret);
++        debug2("%s: os_read_agent_profile() = [%s]", __local_name, ret);
++
++        fclose(fp);
++
++        return(ret);
++    }
++
++    fclose(fp);
++    return(NULL);
++}
++/* cmoraes: end add */
++
+ 
+ /** int os_write_agent_info(char *agent_name, char *agent_ip, char *agent_id)
+  *  Writes the agent info inside the queue, for the other processes to read.
+  *  Returns 1 on success or <= 0 on failure.
+  */
+-int os_write_agent_info(char *agent_name, char *agent_ip, char *agent_id)
++/* cmoraes: changed function. added cfg_profile_name parameter */
++int os_write_agent_info(char *agent_name, char *agent_ip, 
++                        char *agent_id,   char *cfg_profile_name)
+ {
+     FILE *fp;
+ 
+@@ -203,7 +271,8 @@
+         return(0);
+     }
+ 
+-    fprintf(fp, "%s\n-\n%s\n", agent_name, agent_id);
++    /*cmoraes: added cfg_profile_name parameter*/
++    fprintf(fp, "%s\n-\n%s\n%s\n", agent_name, agent_id, cfg_profile_name);
+     fclose(fp);
+     return(1);
+ }
+diff -ruN dcid-ossec-hids-aa9730451895/src/shared/string_op.c cmoraes-ossec-3c4f446bab8d/src/shared/string_op.c
+--- dcid-ossec-hids-aa9730451895/src/shared/string_op.c	1969-12-31 19:00:00.000000000 -0500
++++ cmoraes-ossec-3c4f446bab8d/src/shared/string_op.c	2011-07-05 15:21:49.000000000 -0400
+@@ -0,0 +1,53 @@
++/* @(#) $Id$ */
++
++/* Copyright (C) 2009 Trend Micro Inc.
++ * All rights reserved.
++ *
++ * This program is a free software; you can redistribute it
++ * and/or modify it under the terms of the GNU General Public
++ * License (version 2) as published by the FSF - Free Software
++ * Foundation
++ *
++ * License details at the LICENSE file included with OSSEC or
++ * online at: http://www.ossec.net/en/licensing.html
++ */
++
++
++#include "shared.h"
++#include "string.h"
++
++/** os_trimcrlf
++ * Trims the cr and/or LF from the last positions of a string
++ */
++void os_trimcrlf(char *str)
++{
++    int len;
++
++    len=strlen(str);
++    len--;
++
++    while (str[len]=='\n' || str[len]=='\r')
++    {
++       str[len]='\0'; 
++       len--;
++    } 
++}
++
++/**  os_substring
++ *   Breaks a string into fields based on the delimiter
++ *   and returns field in numbered position
++ *   Parameters:
++ *      str - the string to be searched
++ *      delimiter - the string to be used as delimiter
++ *      pos - the field to be returned
++ */
++char* os_substring(char *str, char *pattern, int pos)
++{
++   char *ret;
++   int  i;
++
++   return(ret);
++}
++
++
++/* EOF */
+diff -ruN dcid-ossec-hids-aa9730451895/src/syscheckd/config.c cmoraes-ossec-3c4f446bab8d/src/syscheckd/config.c
+--- dcid-ossec-hids-aa9730451895/src/syscheckd/config.c	2011-06-29 16:11:33.000000000 -0400
++++ cmoraes-ossec-3c4f446bab8d/src/syscheckd/config.c	2011-07-05 15:21:49.000000000 -0400
+@@ -39,12 +39,16 @@
+     #endif
+ 
+ 
++    debug2("%s: Reading Configuration [%s]", "syscheckd", cfgfile);
++
+     /* Reading config */
+     if(ReadConfig(modules, cfgfile, &syscheck, NULL) < 0)
+         return(OS_INVALID);
+ 
+ 
+     #ifdef CLIENT
++    debug2("%s: Reading Client Configuration [%s]", "syscheckd", cfgfile);
++
+     /* Reading shared config */
+     modules|= CAGENT_CONFIG;
+     ReadConfig(modules, AGENTCONFIG, &syscheck, NULL);
+diff -ruN dcid-ossec-hids-aa9730451895/src/syscheckd/create_db.c cmoraes-ossec-3c4f446bab8d/src/syscheckd/create_db.c
+--- dcid-ossec-hids-aa9730451895/src/syscheckd/create_db.c	2011-06-29 16:11:33.000000000 -0400
++++ cmoraes-ossec-3c4f446bab8d/src/syscheckd/create_db.c	2011-07-05 15:21:49.000000000 -0400
+@@ -312,7 +312,7 @@
+     char f_name[PATH_MAX +2]; 
+     DIR *dp;
+     
+-	struct dirent *entry;
++    struct dirent *entry;
+ 
+     f_name[PATH_MAX +1] = '\0';
+ 	
+@@ -328,7 +328,7 @@
+     
+     /* Opening the directory given */
+     dp = opendir(dir_name);
+-	if(!dp)
++    if(!dp)
+     {
+         if(errno == ENOTDIR)
+         {
+@@ -406,6 +406,8 @@
+         *s_name = '\0';
+         
+         strncpy(s_name, entry->d_name, PATH_MAX - dir_size -2);
++
++        /* Check integrity of the file */
+         read_file(f_name, opts, restriction);
+     }
+ 
+diff -ruN dcid-ossec-hids-aa9730451895/src/util/verify-agent-conf.c cmoraes-ossec-3c4f446bab8d/src/util/verify-agent-conf.c
+--- dcid-ossec-hids-aa9730451895/src/util/verify-agent-conf.c	2011-06-29 16:11:33.000000000 -0400
++++ cmoraes-ossec-3c4f446bab8d/src/util/verify-agent-conf.c	2011-07-05 15:21:49.000000000 -0400
+@@ -20,10 +20,27 @@
+ #define ARGV0 "verify-agent-conf"
+ 
+ 
++/** help **/
++void helpmsg()
++{
++    printf("\nOSSEC HIDS %s: Verify agent.conf syntax for errors.\n", ARGV0);
++    printf("Usage:  %s [-f <agent.conf file>]\n\n", ARGV0);
++    printf("Available options:\n");
++    printf("\t-h          This help message.\n");
++    printf("\t-f          Full file name and path to config file to be tested.\n");
++    printf("\t            If this option is not specified the following default\n");
++    printf("\t            will be used.\n");
++    printf(" ");
++    printf("\t            Validation is successful, if no errors are shown.\n");
++    exit(1);
++}
++
+ 
+ /* main: v0.3: 2005/04/04 */
+ int main(int argc, char **argv)
+ {
++    char* ar=AGENTCONFIG;
++    int c=0;
+     int modules = 0;
+     logreader_config log_config;
+ 
+@@ -32,10 +49,47 @@
+     OS_SetName(ARGV0);
+         
+ 
++    /* printf ("Agrc [%d], Argv [%s]\n", argc, *argv); */
++
++    /* user arguments */
++    if(argc > 1)
++    {
++        while((c = getopt(argc, argv, "Vdhf:")) != -1)
++        {
++            switch(c){
++                case 'V':
++                    print_version();
++                    break;
++                case 'h':
++                    helpmsg();
++                    break;
++                case 'd':
++                    nowDebug();
++                    break;
++                case 'f':
++                    if(!optarg)
++                    {
++                        merror("%s: -f needs an argument",ARGV0);
++                        helpmsg();
++                    }
++                    ar = optarg;
++                    break;
++                default:
++                    helpmsg();
++                    break;
++            }
++    
++        }
++    }
++
++    
++    
++    printf("\n%s: Verifying [%s].\n\n", ARGV0, ar);
++
+     modules|= CLOCALFILE;
+     modules|= CAGENT_CONFIG;
+     log_config.config = NULL;
+-    if(ReadConfig(modules, AGENTCONFIG, &log_config, NULL) < 0)
++    if(ReadConfig(modules, ar, &log_config, NULL) < 0)
+     {
+         return(OS_INVALID);
+     }

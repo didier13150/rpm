@@ -1,0 +1,21 @@
+diff -ruN ossec-hids-2.6/etc/decoder.xml ossec-hids-2.6-new/etc/decoder.xml
+--- ossec-hids-2.6/etc/decoder.xml	2011-07-11 15:36:57.000000000 -0400
++++ ossec-hids-2.6-new/etc/decoder.xml	2013-01-02 15:38:06.000000000 -0500
+@@ -45,13 +45,15 @@
+   - Sep 28 15:28:58 server login: pam_unix(login:session): session opened for user carl by LOGIN(uid=0)
+   - Sep 28 15:35:18 server sshd[123]: pam_unix(sshd:session): session opened for user carl by (uid=0)
+   -->
++
++<! -- rev: 2 -->
+ <decoder name="pam">
+-  <program_name>(pam_unix)$</program_name>
++  <program_name>(pam_unix)$|(pam_succeed_if)$</program_name>
+ </decoder>
+ 
+ <decoder name="pam">
+   <program_name></program_name>
+-  <prematch>^pam_unix|^\(pam_unix\)</prematch>
++  <prematch>^pam_unix|^\(pam_unix\)|^pam_succeed_if</prematch>
+ </decoder>
+ 
+ <decoder name="pam-user">

@@ -1,0 +1,230 @@
+diff -uNr ossec-hids-2.6/src/config/syscheck-config.c ossec-hids-2.6.new/src/config/syscheck-config.c
+--- ossec-hids-2.6/src/config/syscheck-config.c	2011-07-11 21:36:58.000000000 +0200
++++ ossec-hids-2.6.new/src/config/syscheck-config.c	2011-10-16 22:18:44.000000000 +0200
+@@ -546,6 +546,7 @@
+     char *xml_alert_new_files = "alert_new_files";
+     char *xml_disabled = "disabled";
+     char *xml_scan_on_start = "scan_on_start";
++    char *xml_prefilter_cmd = "prefilter_cmd";
+ 
+     /* Configuration example 
+     <directories check_all="yes">/etc,/usr/bin</directories>
+@@ -828,6 +829,34 @@
+         {
+             /* alert_new_files option is not read here. */
+         }
++        else if(strcmp(node[i]->element,xml_prefilter_cmd) == 0)
++        {
++            char cmd[OS_MAXSTR];
++            struct stat statbuf;
++
++            #ifdef WIN32
++            ExpandEnvironmentStrings(node[i]->content, cmd, sizeof(cmd) -1);
++            #else
++            strncpy(cmd, node[i]->content, sizeof(cmd)-1);
++            #endif
++
++            if (strlen(cmd) > 0) {
++                char statcmd[OS_MAXSTR];
++                char *ix;
++                strncpy(statcmd, cmd, sizeof(statcmd)-1);
++                if (ix = index(statcmd, ' ')) { *ix = '\0'; }
++                if (stat(statcmd, &statbuf) == 0) {
++                    // More checks needed (perms, owner, etc.)
++                    os_calloc(1, strlen(cmd)+1, syscheck->prefilter_cmd);
++                    strncpy(syscheck->prefilter_cmd, cmd, strlen(cmd));
++                }
++                else
++                {
++                    merror(XML_VALUEERR,ARGV0, node[i]->element, node[i]->content);
++                    return(OS_INVALID);
++                }
++            }
++        }
+         else
+         {
+             merror(XML_INVELEM, ARGV0, node[i]->element);
+diff -uNr ossec-hids-2.6/src/config/syscheck-config.h ossec-hids-2.6.new/src/config/syscheck-config.h
+--- ossec-hids-2.6/src/config/syscheck-config.h	2011-07-11 21:36:58.000000000 +0200
++++ ossec-hids-2.6.new/src/config/syscheck-config.h	2011-10-16 22:02:10.000000000 +0200
+@@ -79,6 +79,8 @@
+ 
+     rtfim *realtime;
+ 
++    char *prefilter_cmd;
++
+ }config;
+ 
+ #endif
+diff -uNr ossec-hids-2.6/src/os_crypto/md5_sha1/main.c ossec-hids-2.6.new/src/os_crypto/md5_sha1/main.c
+--- ossec-hids-2.6/src/os_crypto/md5_sha1/main.c	2011-07-11 21:36:59.000000000 +0200
++++ ossec-hids-2.6.new/src/os_crypto/md5_sha1/main.c	2011-10-16 21:55:57.000000000 +0200
+@@ -8,7 +8,7 @@
+ 
+ void usage(char **argv)
+ {
+-    printf("%s file str\n%s str string\n",argv[0],argv[0]);
++    printf("%s prefilter_cmd file str\n%s str string\n",argv[0],argv[0]);
+     exit(1);
+ }
+ 
+@@ -21,13 +21,13 @@
+     os_md5 filesum1;
+     os_sha1 filesum2;
+ 
+-    if(argc < 3)
++    if(argc < 4)
+         usage(argv);
+    
+     
+-    if(strcmp(argv[1],"file") == 0)
++    if(strcmp(argv[2],"file") == 0)
+     {
+-        OS_MD5_SHA1_File(argv[2], filesum1, filesum2);
++        OS_MD5_SHA1_File(argv[3], argv[1], filesum1, filesum2);
+     }
+     
+     else
+diff -uNr ossec-hids-2.6/src/os_crypto/md5_sha1/md5_sha1_op.c ossec-hids-2.6.new/src/os_crypto/md5_sha1/md5_sha1_op.c
+--- ossec-hids-2.6/src/os_crypto/md5_sha1/md5_sha1_op.c	2011-07-11 21:36:59.000000000 +0200
++++ ossec-hids-2.6.new/src/os_crypto/md5_sha1/md5_sha1_op.c	2011-10-16 21:52:59.000000000 +0200
+@@ -16,10 +16,11 @@
+ 
+ #include "../md5/md5.h"
+ #include "../sha1/sha.h"
++#include "headers/defs.h"
+ 
+ 
+  
+-int OS_MD5_SHA1_File(char * fname, char *md5output, char *sha1output)
++int OS_MD5_SHA1_File(char *fname, char *prefilter_cmd, char *md5output, char *sha1output)
+ {
+     int n;
+     FILE *fp;
+@@ -27,6 +27,8 @@
+     unsigned char sha1_digest[SHA_DIGEST_LENGTH];
+     unsigned char md5_digest[16];
+ 
++    char cmd[OS_MAXSTR];
++
+     SHA_CTX sha1_ctx;
+     MD5_CTX md5_ctx;
+ 
+@@ -36,10 +38,19 @@
+     sha1output[0] = '\0';
+     buf[2048 +1] = '\0';
+ 
+-    fp = fopen(fname,"r");
+-    if(!fp)
+-        return(-1);
+-
++    /* Use prefilter_cmd if set */
++    if (prefilter_cmd == NULL) {
++	fp = fopen(fname,"r");
++	if(!fp)
++	    return(-1);
++    } else {
++	strncpy(cmd, prefilter_cmd, sizeof(cmd) - 1);
++	strcat(cmd, " ");
++	strncat(cmd, fname, sizeof(cmd) - strlen(cmd) - 1);
++	fp = popen(cmd, "r");
++	if(!fp)
++	    return(-1);
++    }
+ 
+     /* Initializing both hashes */
+     MD5Init(&md5_ctx);
+@@ -74,7 +85,11 @@
+ 
+ 
+     /* Closing it */
+-    fclose(fp);
++    if (prefilter_cmd == NULL) {
++        fclose(fp);
++    } else {
++        pclose(fp);
++    }
+ 
+     return(0);
+ }
+diff -uNr ossec-hids-2.6/src/os_crypto/md5_sha1/md5_sha1_op.h ossec-hids-2.6.new/src/os_crypto/md5_sha1/md5_sha1_op.h
+--- ossec-hids-2.6/src/os_crypto/md5_sha1/md5_sha1_op.h	2011-07-11 21:36:59.000000000 +0200
++++ ossec-hids-2.6.new/src/os_crypto/md5_sha1/md5_sha1_op.h	2011-10-16 21:50:00.000000000 +0200
+@@ -17,7 +17,7 @@
+ #define __MD5SHA1_OP_H
+ 
+ 
+-int OS_MD5_SHA1_File(char *fname, char *md5output, char *sha1output);
++int OS_MD5_SHA1_File(char *fname, char *prefilter_cmd, char *md5output, char *sha1output);
+ 
+ 
+ #endif
+diff -uNr ossec-hids-2.6/src/syscheckd/config.c ossec-hids-2.6.new/src/syscheckd/config.c
+--- ossec-hids-2.6/src/syscheckd/config.c	2011-07-11 21:36:59.000000000 +0200
++++ ossec-hids-2.6.new/src/syscheckd/config.c	2011-10-16 22:14:37.000000000 +0200
+@@ -37,6 +37,7 @@
+     syscheck.registry = NULL;
+     syscheck.reg_fp = NULL;
+     #endif
++    syscheck.prefilter_cmd = NULL;
+ 
+ 
+     /* Reading config */
+diff -uNr ossec-hids-2.6/src/syscheckd/create_db.c ossec-hids-2.6.new/src/syscheckd/create_db.c
+--- ossec-hids-2.6/src/syscheckd/create_db.c	2011-07-11 21:36:59.000000000 +0200
++++ ossec-hids-2.6.new/src/syscheckd/create_db.c	2011-10-16 22:20:48.000000000 +0200
+@@ -152,7 +152,7 @@
+                 {
+                     if(S_ISREG(statbuf_lnk.st_mode))
+                     {
+-                        if(OS_MD5_SHA1_File(file_name, mf_sum, sf_sum) < 0)
++                        if(OS_MD5_SHA1_File(file_name, syscheck.prefilter_cmd, mf_sum, sf_sum) < 0)
+                         {
+                             strncpy(mf_sum, "xxx", 4);
+                             strncpy(sf_sum, "xxx", 4);
+@@ -160,10 +160,10 @@
+                     }
+                 }
+             }
+-            else if(OS_MD5_SHA1_File(file_name, mf_sum, sf_sum) < 0)
++            else if(OS_MD5_SHA1_File(file_name, syscheck.prefilter_cmd, mf_sum, sf_sum) < 0)
+ 
+             #else
+-            if(OS_MD5_SHA1_File(file_name, mf_sum, sf_sum) < 0)
++            if(OS_MD5_SHA1_File(file_name, syscheck.prefilter_cmd, mf_sum, sf_sum) < 0)
+             #endif
+             
+             {
+diff -uNr ossec-hids-2.6/src/syscheckd/run_check.c ossec-hids-2.6.new/src/syscheckd/run_check.c
+--- ossec-hids-2.6/src/syscheckd/run_check.c	2011-07-11 21:36:59.000000000 +0200
++++ ossec-hids-2.6.new/src/syscheckd/run_check.c	2011-10-16 22:22:46.000000000 +0200
+@@ -518,7 +518,7 @@
+         if(sha1sum || md5sum)
+         {
+             /* Generating checksums of the file. */
+-            if(OS_MD5_SHA1_File(file_name, mf_sum, sf_sum) < 0)
++            if(OS_MD5_SHA1_File(file_name, syscheck.prefilter_cmd, mf_sum, sf_sum) < 0)
+             {
+                 strncpy(sf_sum, "xxx", 4);
+                 strncpy(mf_sum, "xxx", 4);
+@@ -537,7 +537,7 @@
+                 if(sha1sum || md5sum)
+                 {
+                     /* Generating checksums of the file. */
+-                    if(OS_MD5_SHA1_File(file_name, mf_sum, sf_sum) < 0)
++                    if(OS_MD5_SHA1_File(file_name, syscheck.prefilter_cmd, mf_sum, sf_sum) < 0)
+                     {
+                         strncpy(sf_sum, "xxx", 4);
+                         strncpy(mf_sum, "xxx", 4);
+diff -uNr ossec-hids-2.6/src/syscheckd/win-registry.c ossec-hids-2.6.new/src/syscheckd/win-registry.c
+--- ossec-hids-2.6/src/syscheckd/win-registry.c	2011-07-11 21:36:59.000000000 +0200
++++ ossec-hids-2.6.new/src/syscheckd/win-registry.c	2011-10-16 22:23:07.000000000 +0200
+@@ -345,7 +345,7 @@
+         /* Generating checksum of the values */
+         fclose(checksum_fp);
+ 
+-        if(OS_MD5_SHA1_File(SYS_REG_TMP, mf_sum, sf_sum) == -1)
++        if(OS_MD5_SHA1_File(SYS_REG_TMP, syscheck.prefilter_cmd, mf_sum, sf_sum) == -1)
+         {
+             merror(FOPEN_ERROR, ARGV0, SYS_REG_TMP);
+             return;
