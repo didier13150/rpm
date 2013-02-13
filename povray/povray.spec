@@ -5,7 +5,8 @@ Release:       1%{?dist}
 License:       Freeware
 Summary:       Persistence of Vision Raytracer
 URL:           http://www.povray.org
-Source:        http://www.povray.org/redirect/www.povray.org/beta/source/%{name}-%{version}.tar.gz
+Source0:       http://www.povray.org/redirect/www.povray.org/beta/source/%{name}-%{version}.tar.gz
+Patch0:        povray-boost-1.50.patch
 Group:         Applications/Multimedia
 BuildRoot:     %{_tmppath}/%{name}-%{version}-root
 BuildRequires: autoconf, automake, binutils, sed, grep, gcc-c++, libXpm
@@ -23,6 +24,7 @@ to do their own ports.
 
 %prep
 %setup -q
+%patch0 -p1
 find . -name '*.sh' -exec dos2unix {} \;
 
 %build
