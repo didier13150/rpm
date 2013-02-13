@@ -1,0 +1,23 @@
+diff -U 3 -H -b -w -B -E -d -r -N -- a/fracplanet.pro b/fracplanet.pro
+--- a/fracplanet.pro	2009-10-05 01:28:26.000000000 +0200
++++ b/fracplanet.pro	2013-02-13 19:35:12.998170199 +0100
+@@ -8,7 +8,7 @@
+ 
+ HEADERS += $$system(ls *.h)
+ SOURCES += $$system(ls *.cpp)
+-LIBS += -lboost_program_options
++LIBS += -lboost_program_options -lGLU
+ 
+ DEFINES += QT_DLL
+ 
+diff -U 3 -H -b -w -B -E -d -r -N -- a/triangle_mesh_viewer_display.cpp b/triangle_mesh_viewer_display.cpp
+--- a/triangle_mesh_viewer_display.cpp	2009-10-05 00:26:36.000000000 +0200
++++ b/triangle_mesh_viewer_display.cpp	2013-02-13 19:31:59.226559327 +0100
+@@ -17,6 +17,7 @@
+ /*  along with Fracplanet.  If not, see <http://www.gnu.org/licenses/>.   */
+ /**************************************************************************/
+ 
++#include <GL/glu.h>
+ #include "precompiled.h"
+ 
+ #include "triangle_mesh_viewer_display.h"
