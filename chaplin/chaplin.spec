@@ -5,7 +5,7 @@ Summary:        A dvd chapter tool for Linux
 License:        GPLv2
 Group:          Sound and Video
 URL:            http://www.lallafa.de/bp/chaplin.html
-Source0:        %{name}-%{version}.tgz
+Source0:        http://www.lallafa.de/bp/files/%{name}-%{version}.tgz
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires:  libdvdread-devel

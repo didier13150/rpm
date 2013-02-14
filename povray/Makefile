@@ -1,6 +1,7 @@
 SRCDIR := $(shell pwd)
 NAME := $(shell basename $(SRCDIR))
-SRC := povray-3.7.0.RC6.tar.gz
+SRCDWL := $(shell rpmspec -P $(NAME).spec | grep -i '^source' | head -1 | awk -F ':' '{print $$2":"$$3}' | tr -d ' ')
+SRCNAME := $(shell basename $(SRCDWL))
 include ../common/Makefile
 sources:
-	[ -f $(SRC) ] || wget http://www.povray.org/redirect/www.povray.org/beta/source/$(SRC)
+	[ -f $(SRCNAME) ] || wget -O $(SRCNAME) $(SRCDWL)

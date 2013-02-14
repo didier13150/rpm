@@ -10,8 +10,8 @@ Version:	0.5
 Release:	4%{?dist}
 License:	GPL
 Group:		Applications/System
-URL:		http://fossies.org/
-Source0:	http://fossies.org/unix/privat/%{name}-%{version}.tar.gz
+URL:		http://www.zeroflux.org
+Source0:	http://www.zeroflux.org/proj/knock/files/%{name}-%{version}.tar.gz
 Source1:	knockd.service
 Source2:	knockd.init
 Patch0:		knock-path-max.patch

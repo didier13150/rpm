@@ -1,6 +1,7 @@
 SRCDIR := $(shell pwd)
 NAME := $(shell basename $(SRCDIR))
-SRC := chaplin-1.10.tgz
+SRCDWL := $(shell rpmspec -P $(NAME).spec | grep -i '^source' | head -1 | awk -F ':' '{print $$2":"$$3}' | tr -d ' ')
+SRCNAME := $(shell basename $(SRCDWL))
 include ../common/Makefile
 sources:
-	[ -f $(SRC) ] || wget http://www.lallafa.de/bp/files/$(SRC)
+	[ -f $(SRCNAME) ] || wget -O $(SRCNAME) $(SRCDWL)

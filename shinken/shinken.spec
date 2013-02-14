@@ -12,8 +12,8 @@ Group:        Applications/System
 URL:          http://www.shinken-monitoring.org
 Source0:      http://www.shinken-monitoring.org/pub/%{name}-%{version}.tar.gz
 Patch0:       shinken-nolsb.patch
-BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-#BuildArch: noarch
+BuildRoot:    %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+BuildArch:    noarch
 %if 0%{?rhel} >= 6 || 0%{?fedora} >= 1
 Requires:      python, python-pyro < 4.0, chkconfig
 BuildRequires: python-devel, python-setuptools
@@ -135,20 +135,15 @@ All Shinken Modules in one meta-package.
 %global __pythonname python2.6
 %global __python /usr/bin/python26
 %endif
+%global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")
 
 # Shinken process user and group
 %define shinken_user shinken
 %define shinken_group shinken
 
-%if "%{_arch}" == "x86_64"
-%global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()" | %{__sed} -e 's/lib/lib64/')
-%else
-%global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")
-%endif
-
 %prep
 %setup -q
-%patch0 -p0 -b .nolsb
+#%patch0 -p0 -b .nolsb
 %if 0%{?rhel} < 6
 find -name '*.py' | xargs %{__sed} -i 's|^#!/usr/bin/python|#!/usr/bin/env python2.6|'
 find -name '*.py' | xargs %{__sed} -i 's|^#!/usr/bin/env python|#!/usr/bin/env python2.6|'
@@ -187,11 +182,6 @@ EOF
 
 %install
 rm -rf %{buildroot}
-# Work around for /usr/lib64 instead of /usr/lib for install
-%if "%{_lib}" == "lib64"
-%{__mkdir_p} %{buildroot}%{_libdir}
-ln -s %{buildroot}%{_libdir} %{buildroot}%{_prefix}/lib
-%endif
 CFLAGS="$RPM_OPT_FLAGS" %{__python} setup.py install -O1 --root %{buildroot} --install-scripts=/usr/sbin/
 
 %if %{with_systemd}
@@ -222,11 +212,6 @@ CFLAGS="$RPM_OPT_FLAGS" %{__python} setup.py install -O1 --root %{buildroot} --i
 
 %{__mkdir_p} %{buildroot}%{_sysconfdir}/logrotate.d/
 %{__cp} shinken.logrotate %{buildroot}%{_sysconfdir}/logrotate.d/shinken
-
-%if "%{_lib}" == "lib64"
-%{__rm} -f %{buildroot}%{_prefix}/lib
-sed -i -e 's/\/usr\/lib\//\/usr\/lib64\//g' %{buildroot}%{_sysconfdir}/%{name}/*.cfg
-%endif
 
 #%if %{with_systemd}
 # Unit file

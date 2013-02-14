@@ -1,6 +1,7 @@
 SRCDIR := $(shell pwd)
 NAME := $(shell basename $(SRCDIR))
-SRC := ossec-hids-2.7.tar.gz
+SRCDWL := $(shell rpmspec -P $(NAME).spec | grep -i '^source' | head -1 | awk -F ':' '{print $$2":"$$3}' | tr -d ' ')
+SRCNAME := $(shell basename $(SRCDWL))
 include ../common/Makefile
 sources:
-	[ -f $(SRC) ] || wget http://www.ossec.net/files/$(SRC)
+	[ -f $(SRCNAME) ] || wget -O $(SRCNAME) $(SRCDWL)

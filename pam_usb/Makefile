@@ -1,6 +1,7 @@
 SRCDIR := $(shell pwd)
 NAME := $(shell basename $(SRCDIR))
-SRC := aluzzardi-pam_usb-0.5.0-25-g6a30dff.tar.gz
+SRCDWL := $(shell rpmspec -P $(NAME).spec | grep -i '^source' | head -1 | awk -F ':' '{print $$2":"$$3}' | tr -d ' ')
+SRCNAME := $(shell basename $(SRCDWL))
 include ../common/Makefile
 sources:
-	[ -f $(SRC) ] || wget -O $(SRC) https://github.com/aluzzardi/pam_usb/tarball/master
+	[ -f $(SRCNAME) ] || wget -O $(SRCNAME) $(SRCDWL)
