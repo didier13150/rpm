@@ -36,8 +36,9 @@ cd -
 %{__rm} -rf %{buildroot}
 %{__make} install DESTDIR="%{buildroot}"
 %{__rm} -rf %{buildroot}%{_prefix}/src
-%{__install} %{SOURCE1} $RPM_BUILD_ROOT%{_datadir}/applications
 %{__mkdir_p} $RPM_BUILD_ROOT%{_datadir}/icons
+%{__mkdir_p} $RPM_BUILD_ROOT%{_datadir}/applications
+%{__install} %{SOURCE1} $RPM_BUILD_ROOT%{_datadir}/applications
 %{__cp} GeoMorph.xpm $RPM_BUILD_ROOT%{_datadir}/icons
 
 %clean
