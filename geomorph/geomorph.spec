@@ -11,7 +11,7 @@ Source1:        geomorph.desktop
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires:  gtkglext-devel, mesa-libGLU-devel
-Requires:       gtkglext, mesa-libGLU
+Requires:       gtkglext-libs, mesa-libGLU
 
 %description
 Geomorph is a height field generator and editor for the Linux operating system.
@@ -23,10 +23,13 @@ for rendering the landscape.
 
 %prep
 %setup -qn %{name}-%{version}
-%configure
+%configure \
+    --disable-rpath
 
 %build
 make %{?_smp_mflags}
+# Tarball contains an already compiled app.
+# Remove and recompile it.
 %{__rm} -f scenes/colmap
 cd scenes
 g++ colmap.c -o colmap
@@ -35,10 +38,15 @@ cd -
 %install
 %{__rm} -rf %{buildroot}
 %{__make} install DESTDIR="%{buildroot}"
+
+# Remove debug sources
 %{__rm} -rf %{buildroot}%{_prefix}/src
+# Create directories
 %{__mkdir_p} $RPM_BUILD_ROOT%{_datadir}/icons
 %{__mkdir_p} $RPM_BUILD_ROOT%{_datadir}/applications
+# Copy new desktop file
 %{__install} %{SOURCE1} $RPM_BUILD_ROOT%{_datadir}/applications
+# Copy icon file
 %{__cp} GeoMorph.xpm $RPM_BUILD_ROOT%{_datadir}/icons
 
 %clean
@@ -48,9 +56,7 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root,-)
 %{_bindir}/geomorph
 %{_datadir}/geomorph
-%{_datadir}/locale/en
-%{_datadir}/locale/fr
-%{_datadir}/locale/de
+%{_datadir}/locale/*
 %{_datadir}/applications/geomorph.desktop
 %{_datadir}/icons/GeoMorph.xpm
 
