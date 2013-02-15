@@ -1,24 +1,21 @@
 %define majorver 1.20
-
-Name: mediawiki
-Version: %{majorver}.2
-Release: 1%{?dist}
-License: GPLv2+
-Group: Development/Tools
-URL: http://www.mediawiki.org/
-Summary: A wiki engine
-Source0: http://download.wikimedia.org/mediawiki/%{majorver}/mediawiki-%{version}.tar.gz
-Source1: mediawiki.conf
-Source2: README.RPM
-Source3: mw-instance.in
-Source4: Math.tgz
-#Patch0: mediawiki-1.16.2-commoncode.patch
-#Patch1: mediawiki-1.19.2-enablesuggests.patch
-BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
-ExcludeArch: sparc64 s390 s390x
-BuildRequires: ocaml >= 3.06
-Requires: mediawiki-nomath = %{version}-%{release}
-Requires: mediawiki-math = %{version}-%{release}
+Name:           mediawiki
+Version:        %{majorver}.2
+Release:        1%{?dist}
+License:        GPLv2+
+Group:          Development/Tools
+URL:            http://www.mediawiki.org/
+Summary:        A wiki engine
+Source0:        http://download.wikimedia.org/mediawiki/%{majorver}/mediawiki-%{version}.tar.gz
+Source1:        mediawiki.conf
+BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root
+BuildArch:      noarch
+# to make sure the "apache" group is created before mediawiki is installed
+Requires(pre):  httpd
+Requires:       php-common >= 5, php-xml
+Conflicts:      php-common = 5.3.1
+Requires:       php-mysql, php-pgsql
+Requires:       diffutils, ImageMagick, php-gd
 
 %description
 MediaWiki is the software used for Wikipedia and the other Wikimedia
@@ -26,126 +23,56 @@ Foundation websites. Compared to other wikis, it has an excellent
 range of features and support for high-traffic websites using multiple
 servers
 
-This package supports wiki farms. Read the instructions for creating wiki instances under %{_defaultdocdir}/%{name}-%{version}/README.RPM.
-Remember to remove the config dir after completing the configuration.
-
-%package nomath
-Summary: mediawiki w/o texvc.
-Group: Development/Tools
-# to make sure the "apache" group is created before mediawiki is installed
-Requires(pre): httpd
-Requires: php-common >= 5, php-xml
-Conflicts: php-common = 5.3.1
-Requires: php-mysql, php-pgsql
-Requires: diffutils, ImageMagick, php-gd
-
-%description nomath
-This subpackage contains all mediawiki parts except the ones to aid in
-creating inline math. This is done for minimal wiki installs that do
-not require math formulae and therefore no dependencies to LaTeX are
-set up.
-
-%package math
-Summary: Math support for mediawiki.
-Group: Development/Tools
-Requires: mediawiki = %{version}-%{release}
-Requires: mediawiki-nomath = %{version}-%{release}
-Requires: LabPlot
-
-%description math
-This subpackage contains the math support for mediawiki.
-
 %prep
 %setup -q
-#%patch0 -p1 -b .commoncode
-#%patch1 -p0 -b .enablesuggests
 
 %build
-#cd math
-#make
 
 %install
 rm -rf %{buildroot}
 
 # move away the documentation to the final folder.
 mkdir -p %{buildroot}%{_defaultdocdir}/%{name}-%{version}
-mv -f COPYING FAQ HISTORY README RELEASE-NOTES UPGRADE CREDITS INSTALL docs \
+mv -f COPYING FAQ HISTORY README RELEASE-NOTES* UPGRADE CREDITS INSTALL docs \
   %{buildroot}%{_defaultdocdir}/%{name}-%{version}/
 
-install -p %{SOURCE2} %{buildroot}%{_defaultdocdir}/%{name}-%{version}/
-
 # now copy the rest to the buildroot.
-mkdir -p %{buildroot}%{_datadir}/mediawiki
-cp -a * %{buildroot}%{_datadir}/mediawiki/
+mkdir -p %{buildroot}%{_localstatedir}/www/wiki
+cp -a * %{buildroot}%{_localstatedir}/www/wiki
 
 # remove unneeded parts
-rm -fr %{buildroot}%{_datadir}/mediawiki/{t,test,tests}
-rm -fr %{buildroot}%{_datadir}/mediawiki/includes/zhtable
-find %{buildroot}%{_datadir}/mediawiki/ \
+rm -fr %{buildroot}%{_localstatedir}/www/wiki/{t,test,tests}
+rm -fr %{buildroot}%{_localstatedir}/www/wiki/includes/zhtable
+find %{buildroot}%{_localstatedir}/www/wiki/ \
   \( -name .htaccess -or -name \*.cmi \) \
   | xargs -r rm
 
 # fix permissions
-chmod +x %{buildroot}%{_datadir}/mediawiki/bin/*
-find %{buildroot}%{_datadir}/mediawiki -name \*.pl | xargs -r chmod +x
-
-# move arch dependent parts
-mkdir -p %{buildroot}%{_libdir}/mediawiki/math
-mv %{buildroot}%{_datadir}/mediawiki/math/texvc \
-   %{buildroot}%{_libdir}/mediawiki/math/
-rm -fr %{buildroot}%{_datadir}/mediawiki/math/*
-ln -s %{_libdir}/mediawiki/math/texvc %{buildroot}%{_datadir}/mediawiki/math/
+chmod +x %{buildroot}%{_localstatedir}/www/wiki/bin/*
+find %{buildroot}%{_localstatedir}/www/wiki -name \*.pl | xargs -r chmod +x
 
 # remove version control/patch files
 find %{buildroot} -name .svnignore | xargs -r rm
 find %{buildroot} -name \*.commoncode | xargs -r rm
 
-# placeholder for a default instance
-mkdir -p %{buildroot}/var/www/wiki
-
 mkdir -p %{buildroot}%{_sysconfdir}/httpd/conf.d/
 install -p -m 0644 %{SOURCE1} \
   %{buildroot}%{_sysconfdir}/httpd/conf.d/mediawiki.conf
 
-# tools for keeping mediawiki instances current
-mkdir -p %{buildroot}%{_sbindir}
-sed -e's,@datadir@,%{_datadir},g' -e's,@sysconfdir@,%{_sysconfdir},g' \
-  < %{SOURCE3} > %{buildroot}%{_sbindir}/mw-createinstance
-sed -e's,@datadir@,%{_datadir},g' -e's,@sysconfdir@,%{_sysconfdir},g' \
-  < %{SOURCE4} > %{buildroot}%{_sbindir}/mw-updateallinstances
-chmod 0755 %{buildroot}%{_sbindir}/mw-*
-mkdir %{buildroot}%{_sysconfdir}/mediawiki
-echo /var/www/wiki > %{buildroot}%{_sysconfdir}/mediawiki/instances
-
 %clean
 rm -rf %{buildroot}
 
-%post
-%{_sbindir}/mw-updateallinstances >> /var/log/mediawiki-updates.log 2>&1 || :
-
 %files
 %defattr(-,root,root,-)
-
-%files nomath
 %{_defaultdocdir}/%{name}-%{version}
-%{_datadir}/mediawiki
-%exclude %{_datadir}/mediawiki/math
-%attr(-,apache,apache) %dir %{_datadir}/mediawiki/config
-%{_datadir}/mediawiki/config/*
-/var/www/wiki
+%{_localstatedir}/www/wiki
+%attr(-,apache,apache) %dir %{_localstatedir}/www/wiki/mw-config
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/mediawiki.conf
-%dir %{_sysconfdir}/mediawiki
-%config(noreplace) %{_sysconfdir}/mediawiki/instances
-%{_sbindir}/mw-*
-
-%files math
-%defattr(-,root,root,-)
-%{_datadir}/mediawiki/math
-%{_libdir}/mediawiki
 
 %changelog
-* Fri Jul 20 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.19.2-1
-- Update to 1.19.2
+* Fri Feb 15 2013 Didier Fabert <didier.fabert@gmail.com> - 1.20.2-1
+- Update to 1.20.2
+- No farm release
 
 * Fri Jul 20 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.16.5-61
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
