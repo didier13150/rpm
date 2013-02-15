@@ -14,6 +14,8 @@ Source12:       PdfExport.tgz
 Source13:       Mpdf.tgz
 Source14:       CategoryTree.tgz
 Source15:       Math.tgz
+Source16:       CustomTag.tgz
+Source17:       CalcBitrate.tgz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root
 BuildArch:      noarch
 # to make sure the "apache" group is created before mediawiki is installed
@@ -90,6 +92,24 @@ Requires:       LabPlot
 Math extension provides support for rendering mathematical formulas on-wiki
 via texvc
 
+%package CustomTag
+Requires:       %{name}
+Summary:        CustomTag mediawiki extension
+Group:          Development/Tools
+
+%description CustomTag
+CustomTag extension support custom tags to modify display:
+<path>, <package>, <app>, <class>
+
+%package CalcBitrate
+Requires:       %{name}
+Summary:        CalcBitrate mediawiki extension
+Group:          Development/Tools
+
+%description CalcBitrate
+CalcBitrate extension provides a bitrate calculator with the simple tag
+"<calcBitrate/>"
+
 %prep
 %setup -q
 
@@ -133,6 +153,8 @@ tar -xzf %{SOURCE12} -C %{buildroot}%{_localstatedir}/www/wiki/extensions/
 tar -xzf %{SOURCE13} -C %{buildroot}%{_localstatedir}/www/wiki/extensions/
 tar -xzf %{SOURCE14} -C %{buildroot}%{_localstatedir}/www/wiki/extensions/
 tar -xzf %{SOURCE15} -C %{buildroot}%{_localstatedir}/www/wiki/extensions/
+tar -xzf %{SOURCE16} -C %{buildroot}%{_localstatedir}/www/wiki/extensions/
+tar -xzf %{SOURCE17} -C %{buildroot}%{_localstatedir}/www/wiki/extensions/
 
 %clean
 rm -rf %{buildroot}
@@ -149,6 +171,8 @@ rm -rf %{buildroot}
 %exclude %{_localstatedir}/www/wiki/extensions/Mpdf
 %exclude %{_localstatedir}/www/wiki/extensions/CategoryTree
 %exclude %{_localstatedir}/www/wiki/extensions/Math
+%exclude %{_localstatedir}/www/wiki/extensions/CalcBitrate
+%exclude %{_localstatedir}/www/wiki/extensions/CustomTag
 
 #Cite SyntaxHighlight_GeSHi PdfExport Mpdf CategoryTree Math
 %files Cite
@@ -160,17 +184,20 @@ rm -rf %{buildroot}
 %files PdfExport
 %{_localstatedir}/www/wiki/extensions/PdfExport
 
-
 %files Mpdf
 %{_localstatedir}/www/wiki/extensions/Mpdf
-
 
 %files CategoryTree
 %{_localstatedir}/www/wiki/extensions/CategoryTree
 
-
 %files Math
 %{_localstatedir}/www/wiki/extensions/Math
+
+%files CalcBitrate
+%{_localstatedir}/www/wiki/extensions/CalcBitrate
+
+%files CustomTag
+%{_localstatedir}/www/wiki/extensions/CustomTag
 
 %changelog
 * Fri Feb 15 2013 Didier Fabert <didier.fabert@gmail.com> - 1.20.2-1
