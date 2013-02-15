@@ -8,6 +8,12 @@ URL:            http://www.mediawiki.org/
 Summary:        A wiki engine
 Source0:        http://download.wikimedia.org/mediawiki/%{majorver}/mediawiki-%{version}.tar.gz
 Source1:        mediawiki.conf
+Source10:       Cite.tgz
+Source11:       SyntaxHighlight_GeSHi.tgz
+Source12:       PdfExport.tgz
+Source13:       Mpdf.tgz
+Source14:       CategoryTree.tgz
+Source15:       Math.tgz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root
 BuildArch:      noarch
 # to make sure the "apache" group is created before mediawiki is installed
@@ -22,6 +28,67 @@ MediaWiki is the software used for Wikipedia and the other Wikimedia
 Foundation websites. Compared to other wikis, it has an excellent
 range of features and support for high-traffic websites using multiple
 servers
+
+%package Cite
+Requires:       %{name}
+Summary:        Cite mediawiki extension
+Group:          Development/Tools
+
+%description Cite
+Cite is an extension which allows a user to create footnotes. Cite includes
+several extensions which can be installed independently and operate
+independently of each other.
+
+%package SyntaxHighlight_GeSHi
+Requires:       %{name}
+Summary:        SyntaxHighlight_GeSHi mediawiki extension
+Group:          Development/Tools
+
+%description SyntaxHighlight_GeSHi
+The Extension:SyntaxHighlight GeSHi tag displays formatted source code with
+the <syntaxhighlight> tag.
+
+This extension also adds coloring according to the code language settings.
+Like the <pre> tags and the <poem> tags, the tags shows the coding exactly as
+it was typed, preserving white space.
+
+This extension also can create line numbers.
+
+%package PdfExport
+Requires:       %{name}
+Summary:        PdfExport mediawiki extension
+Group:          Development/Tools
+
+%description PdfExport
+This extension lets you view wiki pages as PDF.
+
+%package Mpdf
+Requires:       %{name}
+Summary:        Mpdf mediawiki extension
+Group:          Development/Tools
+
+%description Mpdf
+This extension lets you export printable version of wiki page as PDF file.
+For conversion uses mPDF PHP class
+
+%package CategoryTree
+Requires:       %{name}
+Summary:        CategoryTree mediawiki extension
+Group:          Development/Tools
+
+%description CategoryTree
+The CategoryTree extension provides a dynamic view of the wiki's category
+structure as a tree. It uses AJAX to load parts of the tree on demand.
+
+%package Math
+Requires:       %{name}
+Summary:        Math mediawiki extension
+Group:          Development/Tools
+Requires:       LabPlot
+
+%description Math
+Math extension provides support for rendering mathematical formulas on-wiki
+via texvc
 
 %prep
 %setup -q
@@ -59,6 +126,14 @@ mkdir -p %{buildroot}%{_sysconfdir}/httpd/conf.d/
 install -p -m 0644 %{SOURCE1} \
   %{buildroot}%{_sysconfdir}/httpd/conf.d/mediawiki.conf
 
+# Extract extensions
+tar -xzf %{SOURCE10} -C %{buildroot}%{_localstatedir}/www/wiki/extensions/
+tar -xzf %{SOURCE11} -C %{buildroot}%{_localstatedir}/www/wiki/extensions/
+tar -xzf %{SOURCE12} -C %{buildroot}%{_localstatedir}/www/wiki/extensions/
+tar -xzf %{SOURCE13} -C %{buildroot}%{_localstatedir}/www/wiki/extensions/
+tar -xzf %{SOURCE14} -C %{buildroot}%{_localstatedir}/www/wiki/extensions/
+tar -xzf %{SOURCE15} -C %{buildroot}%{_localstatedir}/www/wiki/extensions/
+
 %clean
 rm -rf %{buildroot}
 
@@ -68,6 +143,34 @@ rm -rf %{buildroot}
 %{_localstatedir}/www/wiki
 %attr(-,apache,apache) %dir %{_localstatedir}/www/wiki/mw-config
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/mediawiki.conf
+%exclude %{_localstatedir}/www/wiki/extensions/Cite
+%exclude %{_localstatedir}/www/wiki/extensions/SyntaxHighlight_GeSHi
+%exclude %{_localstatedir}/www/wiki/extensions/PdfExport
+%exclude %{_localstatedir}/www/wiki/extensions/Mpdf
+%exclude %{_localstatedir}/www/wiki/extensions/CategoryTree
+%exclude %{_localstatedir}/www/wiki/extensions/Math
+
+#Cite SyntaxHighlight_GeSHi PdfExport Mpdf CategoryTree Math
+%files Cite
+%{_localstatedir}/www/wiki/extensions/Cite
+
+%files SyntaxHighlight_GeSHi
+%{_localstatedir}/www/wiki/extensions/SyntaxHighlight_GeSHi
+
+%files PdfExport
+%{_localstatedir}/www/wiki/extensions/PdfExport
+
+
+%files Mpdf
+%{_localstatedir}/www/wiki/extensions/Mpdf
+
+
+%files CategoryTree
+%{_localstatedir}/www/wiki/extensions/CategoryTree
+
+
+%files Math
+%{_localstatedir}/www/wiki/extensions/Math
 
 %changelog
 * Fri Feb 15 2013 Didier Fabert <didier.fabert@gmail.com> - 1.20.2-1
