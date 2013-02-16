@@ -43,8 +43,8 @@ rm -rf $RPM_BUILD_ROOT
 %{__cp} -r pov $RPM_BUILD_ROOT%{_datadir}/%{name}
 %{__cp} -r trees $RPM_BUILD_ROOT%{_datadir}/%{name}
 
-sed -i -e 's#@datadir@#%{_datadir}/%{name}#' %{_bindir}/%{name}
-sed -i -e 's#@datadir@#%{_datadir}/%{name}#' %{_bindir}/%{name}-gui
+sed -i -e 's#@datadir@#%{_javadir}/%{name}#' $RPM_BUILD_ROOT%{_bindir}/%{name}
+sed -i -e 's#@datadir@#%{_javadir}/%{name}#' $RPM_BUILD_ROOT%{_bindir}/%{name}-gui
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -52,12 +52,11 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(-,root,root,-)
 %{_bindir}/%{name}*
-%{_datadir}/%{name}
+%{_javadir}/%{name}
 %{_javadocdir}/%{name}
 %{_datadir}/%{name}
 %{_datadir}/applications/%{name}.desktop
 %doc COPYING README
-
 
 %changelog
 * Sat Feb 16 2013 Didier Fabert <didier.fabert@gmail.com> 1.9.8-1
