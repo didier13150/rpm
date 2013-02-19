@@ -11,7 +11,7 @@ License:      AGPLv3+
 Group:        Applications/System
 URL:          http://www.shinken-monitoring.org
 Source0:      http://www.shinken-monitoring.org/pub/%{name}-%{version}.tar.gz
-Patch0:       shinken-nolsb.patch
+Patch0:       shinken-user-on-init-scripts.patch
 BuildRoot:    %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch:    noarch
 %if 0%{?rhel} >= 6 || 0%{?fedora} >= 1
@@ -127,7 +127,6 @@ Requires: %{name}-skonf = %{version}-%{release}
 %description all
 All Shinken Modules in one meta-package.
 
-
 %if 0%{?rhel} >= 6 || 0%{?fedora} >= 1
 %global __pythonname python
 %global __python /usr/bin/python
@@ -143,7 +142,7 @@ All Shinken Modules in one meta-package.
 
 %prep
 %setup -q
-#%patch0 -p0 -b .nolsb
+%patch0 -p1 -b .hcuser
 %if 0%{?rhel} < 6
 find -name '*.py' | xargs %{__sed} -i 's|^#!/usr/bin/python|#!/usr/bin/env python2.6|'
 find -name '*.py' | xargs %{__sed} -i 's|^#!/usr/bin/env python|#!/usr/bin/env python2.6|'
@@ -152,19 +151,23 @@ find -name '*.py' | xargs %{__sed} -i 's|^#!/usr/bin/env python|#!/usr/bin/env p
 sed -i -e 's!./$SCRIPT!python ./$SCRIPT!' test/quick_tests.sh
 find . -name '.gitignore' -exec rm -f {} \;
 chmod +rx %{name}/webui/plugins/impacts/impacts.py
+rm -rf  shinken/webui/plugins/eue 
 
+%{__sed} -i -e "s#@user@:@group@#%{shinken_user}:%{shinken_group}#" for_fedora/init.d/*
 
 %build
+%{__python} setup.py build
+
 cat << 'EOF' > shinken.logrotate
 /var/log/shinken/archives/*.log {
-	compress
-	daily
-	missingok
-	rotate 52
-	compress
-	notifempty
-	create 640 shinken shinken
-	sharedscripts
+    compress
+    daily
+    missingok
+    rotate 52
+    compress
+    notifempty
+    create 640 shinken shinken
+    sharedscripts
 }
 EOF
 
@@ -180,24 +183,67 @@ Meta package which contains all shinken modules:
   - %{name}-skonf
 EOF
 
+cat << 'EOF' > %{name}-tmpfiles.d.conf
+d /var/run/shinken   710 %{shinken_user} %{shinken_group}
+EOF
+
 %install
 rm -rf %{buildroot}
-CFLAGS="$RPM_OPT_FLAGS" %{__python} setup.py install -O1 --root %{buildroot} --install-scripts=/usr/sbin/
-
-%if %{with_systemd}
-# Unit file
-%{__mkdir_p} %{buildroot}%{_unitdir}/
-#install -Dp -m0644 %{SOURCE1} %{buildroot}%{_unitdir}/%{name}d.service
-%else
-# Init script
-%{__mkdir_p} %{buildroot}%{_initrddir}
-#install -Dp -m0755 %{SOURCE2} %{buildroot}%{_initrddir}/%{name}d
-%endif
+CFLAGS="$RPM_OPT_FLAGS" %{__python} setup.py install -O1 --skip-build --root %{buildroot} --install-scripts=%{_sbindir}
 
 # Remove win files, we are not seduced by the dark side of the Force
 %{__rm} -f %{buildroot}%{_sysconfdir}/%{name}/*-windows*
 # Remove void files
-%{__rm} -f %{buildroot}%{_localstatedir}/lib/%{name}/void_for_git
+find %{buildroot}%{_localstatedir} -name '*void_for_git*' -exec rm -f {} \;
+
+%{__sed} -i -e "s|\.\./var|%{_localstatedir}/lib/%{name}|" %{buildroot}%{_sysconfdir}/%{name}/brokerd.ini
+%{__sed} -i -e "s|\.\./var|%{_localstatedir}/lib/%{name}|" %{buildroot}%{_sysconfdir}/%{name}/pollerd.ini
+%{__sed} -i -e "s|\.\./var|%{_localstatedir}/lib/%{name}|" %{buildroot}%{_sysconfdir}/%{name}/reactionnerd.ini
+%{__sed} -i -e "s|\.\./var|%{_localstatedir}/lib/%{name}|" %{buildroot}%{_sysconfdir}/%{name}/schedulerd.ini
+%{__sed} -i -e 's!%{buildroot}!!g' %{buildroot}%{_sysconfdir}/%{name}/*.{ini,cfg}
+
+
+%{__mkdir_p} %{buildroot}%{_sysconfdir}/logrotate.d/
+%{__cp} shinken.logrotate %{buildroot}%{_sysconfdir}/logrotate.d/shinken
+
+install -d -m0755 %{buildroot}%{_sysconfdir}/tmpfiles.d
+install -m0644 %{name}-tmpfiles.d.conf %{buildroot}%{_sysconfdir}/tmpfiles.d/%{name}.conf
+
+install -d -m0755 %{buildroot}%{_usr}/lib/%{name}/plugins
+install  -m0755 libexec/*{.py,.ini} %{buildroot}%{_usr}/lib/%{name}/plugins
+
+install -d -m0755 %{buildroot}%{_mandir}/man3
+install -p -m0644 doc/man/* %{buildroot}%{_mandir}/man3
+
+%if %{with_systemd}
+# Unit file
+ rm -rf %{buildroot}%{_sysconfdir}/init.d
+%{__mkdir_p} %{buildroot}%{_unitdir}/
+%{__cp} for_fedora/systemd/shinken-arbiter.service %{buildroot}%{_unitdir}/shinken-arbiter.service
+%{__cp} for_fedora/systemd/shinken-broker.service %{buildroot}%{_unitdir}/shinken-broker.service
+%{__cp} for_fedora/systemd/shinken-poller.service %{buildroot}%{_unitdir}/shinken-poller.service
+%{__cp} for_fedora/systemd/shinken-reactionner.service %{buildroot}%{_unitdir}/shinken-reactionner.service
+%{__cp} for_fedora/systemd/shinken-receiver.service %{buildroot}%{_unitdir}/shinken-receiver.service
+%{__cp} for_fedora/systemd/shinken-scheduler.service %{buildroot}%{_unitdir}/shinken-scheduler.service
+%{__cp} for_fedora/systemd/shinken-skonf.service %{buildroot}%{_unitdir}/shinken-skonf.service
+%else
+# Init script
+%{__mkdir_p} %{buildroot}%{_initrddir}
+%{__cp} for_fedora/init.d/shinken-arbiter %{buildroot}%{_initrddir}/shinken-arbiter
+%{__cp} for_fedora/init.d/shinken-broker %{buildroot}%{_initrddir}/shinken-broker
+%{__cp} for_fedora/init.d/shinken-poller %{buildroot}%{_initrddir}/shinken-poller
+%{__cp} for_fedora/init.d/shinken-reactionner %{buildroot}%{_initrddir}/shinken-reactionner
+%{__cp} for_fedora/init.d/shinken-receiver %{buildroot}%{_initrddir}/shinken-receiver
+%{__cp} for_fedora/init.d/shinken-scheduler %{buildroot}%{_initrddir}/shinken-scheduler
+%{__cp} for_fedora/init.d/shinken-skonf %{buildroot}%{_initrddir}/shinken-skonf
+%endif
+
+find  %{buildroot}%{python_sitelib}/%{name}/webui/htdocs -type f -exec chmod -x {} \;
+find  %{buildroot}%{python_sitelib}/%{name} -name '*.tpl' -exec chmod -x {} \;
+find  %{buildroot}%{python_sitelib}/%{name} -name '*.js' -exec chmod -x {} \;
+find  %{buildroot}%{python_sitelib}/%{name} -name '*.css' -exec chmod -x {} \;
+find  %{buildroot}%{python_sitelib}/%{name} -name '*.png' -exec chmod -x {} \;
+
 
 %{__sed} -i -e "s|\.\./var|%{_localstatedir}/lib/%{name}|" %{buildroot}%{_sysconfdir}/%{name}/brokerd.ini
 %{__sed} -i -e "s|\.\./var|%{_localstatedir}/lib/%{name}|" %{buildroot}%{_sysconfdir}/%{name}/pollerd.ini
@@ -206,20 +252,16 @@ CFLAGS="$RPM_OPT_FLAGS" %{__python} setup.py install -O1 --root %{buildroot} --i
 %{__sed} -i -e 's!%{buildroot}!!g' %{buildroot}%{_sysconfdir}/default/%{name}
 %{__sed} -i -e 's!%{buildroot}!!g' %{buildroot}%{_sysconfdir}/%{name}/*.{ini,cfg}
 
-%{__sed} -i -e "s|/usr/local/shinken/bin|%{_bindir}|"  %{buildroot}%{_sysconfdir}/init.d/*
-%{__sed} -i -e "s|/usr/local/shinken/var|%{_localstatedir}/lib/%{name}|" %{buildroot}%{_sysconfdir}/init.d/*
-%{__sed} -i -e "s|/usr/local/shinken/etc|%{_sysconfdir}/%{name}|" %{buildroot}%{_sysconfdir}/init.d/*
+sed -i -e 's!/usr/local/shinken/libexec!%{_libdir}/nagios/plugins!' %{buildroot}%{_sysconfdir}/%{name}/resource.cfg
+sed -i -e 's!/usr/lib/nagios/plugins!%{_libdir}/nagios/plugins!' %{buildroot}%{_sysconfdir}/%{name}/resource.cfg
+sed -i -e "s!/usr/local/shinken/src/!%{_sbindir}!" FROM_NAGIOS_TO_SHINKEN
+sed -i -e "s!/usr/local/nagios/etc/!%{_sysconfdir}/shinken/!" FROM_NAGIOS_TO_SHINKEN
+sed -i -e "s!/usr/local/shinken/src/etc/!%{_sysconfdir}/shinken/!" FROM_NAGIOS_TO_SHINKEN
+sed -i -e 's!(you can also be even more lazy and call the bin/launch_all.sh script).!!' FROM_NAGIOS_TO_SHINKEN
 
-%{__mkdir_p} %{buildroot}%{_sysconfdir}/logrotate.d/
-%{__cp} shinken.logrotate %{buildroot}%{_sysconfdir}/logrotate.d/shinken
+chmod +x %{buildroot}%{python_sitelib}/%{name}/*.py
 
-#%if %{with_systemd}
-# Unit file
-#install -Dp -m0644 %{SOURCE1} %{buildroot}%{_unitdir}/%{name}d.service
-#%else
-# Init script
-#install -Dp -m0755 %{SOURCE2} %{buildroot}%{_initrddir}/%{name}d
-#%endif
+%{__rm} -f %{buildroot}%{_sysconfdir}/default/%{name}
 
 %clean
 rm -rf %{buildroot}
@@ -229,172 +271,11 @@ echo "Setup htpasswd file"
 htpasswd -b -c /etc/shinken/htpasswd.users admin m0n1t0r3
 chown %{shinken_user}:%{shinken_group} /etc/shinken/htpasswd.users
 chmod 0660 /etc/shinken/htpasswd.users
-/sbin/chkconfig --add shinken
 
 echo "If you have pnp4nagios installed, change owner and permissions of its directories"
 echo "chown -R %{shinken_user}:%{shinken_group} /var/{log,lib}/pnp4nagios"
 echo
-echo "Don't forget to install php for pnp4nagios, because it was not a shinken dependency, instead of nagios"
-
-%post arbiter
-#if [ $1 -eq 1 ] ; then
-#    # Initial installation
-#    /bin/systemctl daemon-reload >/dev/null 2>&1 || :
-#fi
-/sbin/chkconfig --add shinken-arbiter
-
-%post broker
-/sbin/chkconfig --add shinken-broker
-
-%post poller
-/sbin/chkconfig --add shinken-poller
-
-%post reactionner
-/sbin/chkconfig --add shinken-reactionner
-
-%post scheduler
-/sbin/chkconfig --add shinken-scheduler
-
-%post receiver
-/sbin/chkconfig --add shinken-receiver
-
-%preun
-/sbin/chkconfig --del shinken
-
-%preun arbiter
-#if [ $1 -eq 0 ] ; then
-#    # Package removal, not upgrade
-#    /bin/systemctl --no-reload disable %{name}-arbiter.service > /dev/null 2>&1 || :
-#    /bin/systemctl stop %{name}-arbiter.service > /dev/null 2>&1 || :
-#fi
-/etc/init.d/shinken-arbiter stop
-/sbin/chkconfig --del shinken-arbiter
-
-%preun broker
-/etc/init.d/shinken-broker stop
-/sbin/chkconfig --del shinken-broker
-
-%preun poller
-/etc/init.d/shinken-poller stop
-/sbin/chkconfig --del shinken-poller
-
-%preun reactionner
-/etc/init.d/shinken-reactionner stop
-/sbin/chkconfig --del shinken-reactionner
-
-%preun scheduler
-/etc/init.d/shinken-scheduler stop
-/sbin/chkconfig --del shinken-scheduler
-
-%preun receiver
-/etc/init.d/shinken-receiver stop
-/sbin/chkconfig --del shinken-receiver
-
-#%postun arbiter
-#/bin/systemctl daemon-reload >/dev/null 2>&1 || :
-#if [ $1 -ge 1 ] ; then
-#    # Package upgrade, not uninstall
-#    /bin/systemctl try-restart %{name}-arbiter.service >/dev/null 2>&1 || :
-#fi
-
-#%postun broker
-
-#%postun poller
-
-#%postun reactionner
-
-#%postun scheduler
-
-#%postun receiver
-
-%files arbiter
-%defattr(-,root,root)
-%if %{with_systemd}
-%{_unitdir}/%{name}-arbiter.service
-%else
-%{_sysconfdir}/init.d/%{name}-arbiter
-%endif
-%{_sbindir}/%{name}-arbiter*
-#%{_mandir}/man3/%{name}-arbiter*
-
-%files reactionner
-%defattr(-,root,root)
-%if %{with_systemd}
-%{_unitdir}/%{name}-reactionner.service
-%else
-%{_sysconfdir}/init.d/%{name}-reactionner
-%endif
-%{_sbindir}/%{name}-reactionner*
-#%{_mandir}/man3/%{name}-reactionner*
-
-%files scheduler
-%defattr(-,root,root)
-%if %{with_systemd}
-%{_unitdir}/%{name}-scheduler.service
-%else
-%{_sysconfdir}/init.d/%{name}-scheduler
-%endif
-%{_sbindir}/%{name}-scheduler*
-#%{_mandir}/man3/%{name}-scheduler*
-
-%files poller
-%defattr(-,root,root)
-%if %{with_systemd}
-%{_unitdir}/%{name}-poller.service
-%else
-%{_sysconfdir}/init.d/%{name}-poller
-%endif
-%{_sbindir}/%{name}-poller*
-#%{_mandir}/man3/%{name}-poller*
-
-%files broker
-%defattr(-,root,root)
-%if %{with_systemd}
-%{_unitdir}/%{name}-broker.service
-%{_sysconfdir}/init.d/%{name}-broker
-%endif
-%{_sbindir}/%{name}-broker*
-#%{_mandir}/man3/%{name}-broker*
-
-%files receiver
-%defattr(-,root,root)
-%if %{with_systemd}
-%{_unitdir}/%{name}-receiver.service
-%else
-%{_sysconfdir}/init.d/%{name}-receiver
-%endif
-%{_sbindir}/%{name}-receiver*
-#%{_mandir}/man3/%{name}-receiver*
-
-%files skonf
-%defattr(-,root,root)
-%if %{with_systemd}
-%{_unitdir}/%{name}-skonf.service
-%endif
-%{_sbindir}/%{name}-skonf*
-#%{_mandir}/man3/%{name}-skonf*
-
-%files all
-%defattr(-,root,root)
-%doc shinken-all
-
-%files
-%defattr(-,root,root)
-%{python_sitelib}/*
-%doc README.rst COPYING Changelog THANKS db doc FROM_NAGIOS_TO_SHINKEN
-%{_libdir}/%{name}/plugins
-#%{_mandir}/man3/%{name}-discovery*
-#%{_mandir}/man3/%{name}-admin*
-%{_sbindir}/%{name}-discovery
-%{_sbindir}/%{name}-admin
-%config(noreplace) %{_sysconfdir}/%{name}
-%config(noreplace) %{_sysconfdir}/default/%{name}
-%config(noreplace) %{_sysconfdir}/init.d/%{name}
-%config(noreplace) %{_sysconfdir}/logrotate.d/%{name}
-#%config(noreplace) %{_sysconfdir}/tmpfiles.d/%{name}.conf
-%attr(-,%{shinken_user} ,%{shinken_group}) %dir %{_localstatedir}/log/%{name}
-%attr(-,%{shinken_user} ,%{shinken_group}) %dir %{_localstatedir}/lib/%{name}
-
+echo "Don't forget to install php for pnp4nagios, because it's not a shinken dependency, instead of nagios"
 
 %pre
 if ! /usr/bin/id %{shinken_user} &>/dev/null; then
@@ -414,15 +295,269 @@ if ! /usr/bin/getent group %{shinken_group} &>/dev/null; then
     /usr/sbin/groupdel %{shinken_group} || echo "Group \"%{shinken_group}\" could not be deleted."
 fi
 
+%post arbiter
+if [ $1 -eq 1 ] ; then 
+  %if %{with_systemd}
+    /bin/systemctl daemon-reload >/dev/null 2>&1 || :
+  %else
+    /sbin/chkconfig --add %{name}-arbiter || :
+  %endif
+fi
+
+%post broker
+if [ $1 -eq 1 ] ; then 
+  %if %{with_systemd}
+    /bin/systemctl daemon-reload >/dev/null 2>&1 || :
+  %else
+    /sbin/chkconfig --add %{name}-broker || :
+%endif
+fi
+
+%post poller
+if [ $1 -eq 1 ] ; then 
+  %if %{with_systemd}
+    /bin/systemctl daemon-reload >/dev/null 2>&1 || :
+  %else
+    /sbin/chkconfig --add %{name}-poller || :
+  %endif
+fi
+
+%post reactionner
+if [ $1 -eq 1 ] ; then 
+  %if %{with_systemd}
+    /bin/systemctl daemon-reload >/dev/null 2>&1 || :
+  %else
+    /sbin/chkconfig --add %{name}-reactionner || :
+%endif
+fi
+
+%post scheduler
+if [ $1 -eq 1 ] ; then 
+  %if %{with_systemd}
+    /bin/systemctl daemon-reload >/dev/null 2>&1 || :
+  %else
+    /sbin/chkconfig --add %{name}-scheduler || :
+  %endif
+fi
+
+%post receiver
+if [ $1 -eq 1 ] ; then 
+  %if %{with_systemd}
+    /bin/systemctl daemon-reload >/dev/null 2>&1 || :
+  %else
+    /sbin/chkconfig --add %{name}-receiver || :
+  %endif
+fi
+
+%preun arbiter 
+if [ $1 -eq 0 ] ; then
+  %if %{with_systemd}
+    /bin/systemctl --no-reload disable %{name}-arbiter.service > /dev/null 2>&1 || :
+    /bin/systemctl stop %{name}-arbiter.service > /dev/null 2>&1 || :
+  %else
+    /sbin/service %{name}-arbiter stop > /dev/null 2>&1 || :
+    /sbin/chkconfig --del %{name}-arbiter || :
+  %endif
+fi
+
+%preun broker 
+if [ $1 -eq 0 ] ; then
+  %if %{with_systemd}
+    /bin/systemctl --no-reload disable %{name}-broker.service > /dev/null 2>&1 || :
+    /bin/systemctl stop %{name}-broker.service > /dev/null 2>&1 || :
+  %else
+    /sbin/service %{name}-broker stop > /dev/null 2>&1 || :
+    /sbin/chkconfig --del %{name}-broker || :
+  %endif
+fi
+
+%preun poller 
+if [ $1 -eq 0 ] ; then
+  %if %{with_systemd}
+    /bin/systemctl --no-reload disable %{name}-poller.service > /dev/null 2>&1 || :
+    /bin/systemctl stop %{name}-poller.service > /dev/null 2>&1 || :
+  %else
+    /sbin/service %{name}-poller stop > /dev/null 2>&1 || :
+    /sbin/chkconfig --del %{name}-poller || :
+  %endif
+fi
+
+%preun reactionner 
+if [ $1 -eq 0 ] ; then
+  %if %{with_systemd}
+    /bin/systemctl --no-reload disable %{name}-reactionner.service > /dev/null 2>&1 || :
+    /bin/systemctl stop %{name}-reactionner.service > /dev/null 2>&1 || :
+  %else
+    /sbin/service %{name}-reactionner stop > /dev/null 2>&1 || :
+    /sbin/chkconfig --del %{name}-reactionner || :
+  %endif
+fi
+
+%preun scheduler 
+if [ $1 -eq 0 ] ; then
+  %if %{with_systemd}
+    /bin/systemctl --no-reload disable %{name}-scheduler.service > /dev/null 2>&1 || :
+    /bin/systemctl stop %{name}-scheduler.service > /dev/null 2>&1 || :
+  %else
+    /sbin/service %{name}-scheduler stop > /dev/null 2>&1 || :
+    /sbin/chkconfig --del %{name}-scheduler || :
+  %endif
+fi
+
+%preun receiver 
+if [ $1 -eq 0 ] ; then
+  %if %{with_systemd}
+    /bin/systemctl --no-reload disable %{name}-receiver.service > /dev/null 2>&1 || :
+    /bin/systemctl stop %{name}-receiver.service > /dev/null 2>&1 || :
+  %else
+    /sbin/service %{name}-receiver stop > /dev/null 2>&1 || :
+    /sbin/chkconfig --del %{name}-receiver || :
+  %endif
+fi
+
+%postun arbiter
+%if %{with_systemd}
+  /bin/systemctl daemon-reload >/dev/null 2>&1 || :
+  if [ $1 -ge 1 ] ; then
+    /bin/systemctl try-restart %{name}-arbiter.service >/dev/null 2>&1 || :
+  fi
+%endif
+
+%postun broker
+%if %{with_systemd}
+  /bin/systemctl daemon-reload >/dev/null 2>&1 || :
+  if [ $1 -ge 1 ] ; then
+    /bin/systemctl try-restart %{name}-broker.service >/dev/null 2>&1 || :
+  fi
+%endif
+
+%postun poller
+%if %{with_systemd}
+  /bin/systemctl daemon-reload >/dev/null 2>&1 || :
+  if [ $1 -ge 1 ] ; then
+    /bin/systemctl try-restart %{name}-poller.service >/dev/null 2>&1 || :
+  fi
+%endif
+
+%postun reactionner
+%if %{with_systemd}
+  /bin/systemctl daemon-reload >/dev/null 2>&1 || :
+  if [ $1 -ge 1 ] ; then
+    /bin/systemctl try-restart %{name}-reactionner.service >/dev/null 2>&1 || :
+  fi
+%endif
+
+%postun scheduler
+%if %{with_systemd}
+  /bin/systemctl daemon-reload >/dev/null 2>&1 || :
+  if [ $1 -ge 1 ] ; then
+    /bin/systemctl try-restart %{name}-scheduler.service >/dev/null 2>&1 || :
+  fi
+%endif
+
+%postun receiver
+%if %{with_systemd}
+  /bin/systemctl daemon-reload >/dev/null 2>&1 || :
+  if [ $1 -ge 1 ] ; then
+    /bin/systemctl try-restart %{name}-receiver.service >/dev/null 2>&1 || :
+  fi
+%endif
+
+%files arbiter
+%if %{with_systemd}
+  %{_unitdir}/%{name}-arbiter.service
+%else
+  %attr(0755,root,root) %{_initrddir}/%{name}-arbiter
+%endif
+%{_sbindir}/%{name}-arbiter*
+%{_mandir}/man3/%{name}-arbiter*
+
+%files reactionner
+%if %{with_systemd}
+  %{_unitdir}/%{name}-reactionner.service
+%else
+  %attr(0755,root,root) %{_initrddir}/%{name}-reactionner
+%endif
+%{_sbindir}/%{name}-reactionner*
+%{_mandir}/man3/%{name}-reactionner*
+
+%files scheduler
+%if %{with_systemd}
+  %{_unitdir}/%{name}-scheduler.service
+%else
+  %attr(0755,root,root) %{_initrddir}/%{name}-scheduler
+%endif
+%{_sbindir}/%{name}-scheduler*
+%{_mandir}/man3/%{name}-scheduler*
+
+%files poller
+%if %{with_systemd}
+  %{_unitdir}/%{name}-poller.service
+%else
+  %attr(0755,root,root) %{_initrddir}/%{name}-poller
+%endif
+%{_sbindir}/%{name}-poller*
+%{_mandir}/man3/%{name}-poller*
+
+%files broker
+%if %{with_systemd}
+  %{_unitdir}/%{name}-broker.service
+%else
+  %attr(0755,root,root) %{_initrddir}/%{name}-broker
+%endif
+%{_sbindir}/%{name}-broker*
+%{_mandir}/man3/%{name}-broker*
+
+%files receiver
+%if %{with_systemd}
+  %{_unitdir}/%{name}-receiver.service
+%else
+  %attr(0755,root,root) %{_initrddir}/%{name}-receiver
+%endif
+%{_sbindir}/%{name}-receiver*
+%{_mandir}/man3/%{name}-receiver*
+
+%files skonf
+%if %{with_systemd}
+  %{_unitdir}/%{name}-skonf.service
+%else
+  %attr(0755,root,root) %{_initrddir}/%{name}-skonf
+%endif
+%{_sbindir}/%{name}-skonf*
+%{_mandir}/man3/%{name}-skonf*
+
+%files all
+%defattr(-,root,root)
+%doc shinken-all
+
+%files
+%{python_sitelib}/%{name}
+%{python_sitelib}/Shinken-%{version}-py*.egg-info
+%doc etc/packs README.rst COPYING Changelog THANKS db doc FROM_NAGIOS_TO_SHINKEN
+%{_sbindir}/%{name}-receiver*
+%{_sbindir}/%{name}-discovery
+%{_sbindir}/%{name}-admin
+%{_sbindir}/%{name}-hostd
+%{_sbindir}/%{name}-packs
+%{_mandir}/man3/%{name}-admin*
+%{_mandir}/man3/%{name}-discovery*
+%{_usr}/lib/%{name}/plugins
+%config(noreplace) %{_sysconfdir}/%{name}
+%config(noreplace) %{_sysconfdir}/logrotate.d/%{name}
+%config(noreplace) %{_sysconfdir}/tmpfiles.d/%{name}.conf
+%attr(-,%{shinken_user} ,%{shinken_group}) %dir %{_localstatedir}/log/%{name}
+%attr(-,%{shinken_user} ,%{shinken_group}) %dir %{_localstatedir}/lib/%{name}
+%attr(-,%{shinken_user} ,%{shinken_group}) %dir %{_localstatedir}/run/%{name}
+
 %changelog
 * Wed Jan 23 2013 Didier Fabert <dfabert@b2pweb.com> - 1.2.2-1
-- Upstream
+- Update from upstream
 
 * Wed Jun 20 2012 Didier Fabert <dfabert@b2pweb.com> - 1.0.1-1
-- Upstream
+- Update from upstream
 
 * Fri Mar 09 2012 Didier Fabert <dfabert@b2pweb.com> - 1.0-1
-- Upstream
+- Update from upstream
 
 * Wed Feb 09 2011 Didier Fabert <dfabert@b2pweb.com> - 0.5.1-1
 - Initial build.
