@@ -556,7 +556,7 @@ fi
 %attr(-,%{shinken_user} ,%{shinken_group}) %dir %{_localstatedir}/run/%{name}
 
 %changelog
-* Wed Jan 23 2013 Didier Fabert <dfabert@b2pweb.com> - 1.2.2-1
+* Tue Feb 19 2013 Didier Fabert <dfabert@b2pweb.com> - 1.2.4-1
 - Update from upstream
 
 * Wed Jun 20 2012 Didier Fabert <dfabert@b2pweb.com> - 1.0.1-1
