@@ -120,13 +120,13 @@ Requires: %{name} = %{version}-%{release}
 Shinken receiver daemon
 
 %package skonf
-Summary: Shinken WUI to configure architecture of Shinken.
+Summary: Shinken WUI to configure architecture of Shinken
 Group:   Applications/System
 Requires: %{name} = %{version}-%{release}
 Requires: python-simplejson, python-sqlite2, httpd
 
 %description skonf
-sKonf is a web interface done to configure easily the architecture of Shinken.
+sKonf is a web interface done to configure easily the architecture of Shinken
 
 %package all
 Summary: All Shinken Modules
@@ -141,7 +141,7 @@ Requires: %{name}-receiver = %{version}-%{release}
 Requires: %{name}-skonf = %{version}-%{release}
 
 %description all
-All Shinken Modules in one meta-package.
+All Shinken Modules in one meta-package
 
 
 %prep
@@ -195,6 +195,9 @@ EOF
 %install
 rm -rf %{buildroot}
 CFLAGS="$RPM_OPT_FLAGS" %{__python} setup.py install -O1 --skip-build --root %{buildroot} --install-scripts=%{_sbindir}
+
+# Remove empty files
+find %{buildroot} -size 0 -delete
 
 # Remove win files, we are not seduced by the dark side of the Force
 %{__rm} -f %{buildroot}%{_sysconfdir}/%{name}/*-windows*
