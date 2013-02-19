@@ -3,6 +3,20 @@
 %else
 %global with_systemd 0
 %endif
+
+%if 0%{?rhel} >= 6 || 0%{?fedora} >= 1
+%global __pythonname python
+%global __python /usr/bin/python
+%else
+%global __pythonname python2.6
+%global __python /usr/bin/python26
+%endif
+%global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")
+
+# Shinken process user and group
+%define shinken_user shinken
+%define shinken_group shinken
+
 Summary:      Monitoring tool compatible with Nagios configuration and plugins
 Name:         shinken
 Version:      1.2.4
@@ -12,8 +26,7 @@ Group:        Applications/System
 URL:          http://www.shinken-monitoring.org
 Source0:      http://www.shinken-monitoring.org/pub/%{name}-%{version}.tar.gz
 Patch0:       shinken-user-on-init-scripts.patch
-BuildRoot:    %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-BuildArch:    noarch
+
 %if 0%{?rhel} >= 6 || 0%{?fedora} >= 1
 Requires:      python, python-pyro < 4.0, chkconfig
 BuildRequires: python-devel, python-setuptools
@@ -36,6 +49,9 @@ Requires(post): /sbin/chkconfig
 Requires(preun): /sbin/chkconfig, /sbin/service
 Requires(postun): /sbin/service
 %endif
+
+BuildRoot:    %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+BuildArch:    noarch
 
 %description
 Shinken is a new monitoring tool in AGPLv3 written in Python and compatible
@@ -127,28 +143,17 @@ Requires: %{name}-skonf = %{version}-%{release}
 %description all
 All Shinken Modules in one meta-package.
 
-%if 0%{?rhel} >= 6 || 0%{?fedora} >= 1
-%global __pythonname python
-%global __python /usr/bin/python
-%else
-%global __pythonname python2.6
-%global __python /usr/bin/python26
-%endif
-%global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")
-
-# Shinken process user and group
-%define shinken_user shinken
-%define shinken_group shinken
 
 %prep
 %setup -q
 %patch0 -p1 -b .hcuser
+
 %if 0%{?rhel} < 6
 find -name '*.py' | xargs %{__sed} -i 's|^#!/usr/bin/python|#!/usr/bin/env python2.6|'
 find -name '*.py' | xargs %{__sed} -i 's|^#!/usr/bin/env python|#!/usr/bin/env python2.6|'
 %endif
+sed -i -e 's!./$SCRIPT!%{__python} ./$SCRIPT!' test/quick_tests.sh
 %{__sed} -i -e "s|/usr/lib/nagios/plugins|%{_libdir}/nagios/plugins|" setup.{cfg,py}
-sed -i -e 's!./$SCRIPT!python ./$SCRIPT!' test/quick_tests.sh
 find . -name '.gitignore' -exec rm -f {} \;
 chmod +rx %{name}/webui/plugins/impacts/impacts.py
 rm -rf  shinken/webui/plugins/eue 
@@ -194,26 +199,13 @@ CFLAGS="$RPM_OPT_FLAGS" %{__python} setup.py install -O1 --skip-build --root %{b
 # Remove win files, we are not seduced by the dark side of the Force
 %{__rm} -f %{buildroot}%{_sysconfdir}/%{name}/*-windows*
 # Remove void files
-find %{buildroot}%{_localstatedir} -name '*void_for_git*' -exec rm -f {} \;
+find %{buildroot}%{_localstatedir} -name '*void_for_git*' -delete
 
 %{__sed} -i -e "s|\.\./var|%{_localstatedir}/lib/%{name}|" %{buildroot}%{_sysconfdir}/%{name}/brokerd.ini
 %{__sed} -i -e "s|\.\./var|%{_localstatedir}/lib/%{name}|" %{buildroot}%{_sysconfdir}/%{name}/pollerd.ini
 %{__sed} -i -e "s|\.\./var|%{_localstatedir}/lib/%{name}|" %{buildroot}%{_sysconfdir}/%{name}/reactionnerd.ini
 %{__sed} -i -e "s|\.\./var|%{_localstatedir}/lib/%{name}|" %{buildroot}%{_sysconfdir}/%{name}/schedulerd.ini
 %{__sed} -i -e 's!%{buildroot}!!g' %{buildroot}%{_sysconfdir}/%{name}/*.{ini,cfg}
-
-
-%{__mkdir_p} %{buildroot}%{_sysconfdir}/logrotate.d/
-%{__cp} shinken.logrotate %{buildroot}%{_sysconfdir}/logrotate.d/shinken
-
-install -d -m0755 %{buildroot}%{_sysconfdir}/tmpfiles.d
-install -m0644 %{name}-tmpfiles.d.conf %{buildroot}%{_sysconfdir}/tmpfiles.d/%{name}.conf
-
-install -d -m0755 %{buildroot}%{_usr}/lib/%{name}/plugins
-install  -m0755 libexec/*{.py,.ini} %{buildroot}%{_usr}/lib/%{name}/plugins
-
-install -d -m0755 %{buildroot}%{_mandir}/man3
-install -p -m0644 doc/man/* %{buildroot}%{_mandir}/man3
 
 %if %{with_systemd}
 # Unit file
@@ -244,6 +236,17 @@ find  %{buildroot}%{python_sitelib}/%{name} -name '*.js' -exec chmod -x {} \;
 find  %{buildroot}%{python_sitelib}/%{name} -name '*.css' -exec chmod -x {} \;
 find  %{buildroot}%{python_sitelib}/%{name} -name '*.png' -exec chmod -x {} \;
 
+%{__mkdir_p} %{buildroot}%{_sysconfdir}/logrotate.d/
+%{__cp} shinken.logrotate %{buildroot}%{_sysconfdir}/logrotate.d/shinken
+
+install -d -m0755 %{buildroot}%{_sysconfdir}/tmpfiles.d
+install -m0644 %{name}-tmpfiles.d.conf %{buildroot}%{_sysconfdir}/tmpfiles.d/%{name}.conf
+
+install -d -m0755 %{buildroot}%{_usr}/lib/%{name}/plugins
+install  -m0755 libexec/*{.py,.ini} %{buildroot}%{_usr}/lib/%{name}/plugins
+
+install -d -m0755 %{buildroot}%{_mandir}/man3
+install -p -m0644 doc/man/* %{buildroot}%{_mandir}/man3
 
 %{__sed} -i -e "s|\.\./var|%{_localstatedir}/lib/%{name}|" %{buildroot}%{_sysconfdir}/%{name}/brokerd.ini
 %{__sed} -i -e "s|\.\./var|%{_localstatedir}/lib/%{name}|" %{buildroot}%{_sysconfdir}/%{name}/pollerd.ini
@@ -279,7 +282,7 @@ echo "Don't forget to install php for pnp4nagios, because it's not a shinken dep
 
 %pre
 if ! /usr/bin/id %{shinken_user} &>/dev/null; then
-    /usr/sbin/useradd -r -d %{_localstatedir}/lib/%{name} -s /bin/nologin -c "Shinken user" -p b2p2010web %{shinken_user} || \
+    /usr/sbin/useradd -r -d %{_localstatedir}/lib/%{name} -s /bin/nologin -c "Shinken user" -p shinkenpasswd %{shinken_user} || \
         echo "Unexpected error when adding user \"shinken\". Aborting installation."
 fi
 if ! /usr/bin/getent group %{shinken_group} &>/dev/null; then
