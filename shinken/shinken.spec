@@ -123,7 +123,7 @@ Shinken receiver daemon
 Summary: Shinken WUI to configure architecture of Shinken
 Group:   Applications/System
 Requires: %{name} = %{version}-%{release}
-Requires: python-simplejson, python-sqlite2, httpd
+Requires: python-simplejson, python-sqlite, httpd
 
 %description skonf
 sKonf is a web interface done to configure easily the architecture of Shinken
