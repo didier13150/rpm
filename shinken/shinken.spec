@@ -28,7 +28,7 @@ Source0:      http://www.shinken-monitoring.org/pub/%{name}-%{version}.tar.gz
 Patch0:       shinken-user-on-init-scripts.patch
 
 %if 0%{?rhel} >= 6 || 0%{?fedora} >= 1
-Requires:      python, python-pyro < 4.0, chkconfig
+Requires:      python, python-pyro, chkconfig
 BuildRequires: python-devel, python-setuptools
 %else
 Requires:      python26, python26-pyro < 4.0, chkconfig
