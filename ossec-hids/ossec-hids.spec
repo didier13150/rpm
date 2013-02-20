@@ -13,7 +13,7 @@ Summary:     An Open Source Host-based Intrusion Detection System
 Name:        ossec-hids
 Version:     2.7
 Release:     20%{?dist}
-License:     GPL
+License:     GPLv2
 Group:       Applications/System
 Source0:     http://www.ossec.net/files/%{name}-%{version}.tar.gz
 Source2:     %{name}.init
@@ -22,23 +22,15 @@ Source6:     ossec-hids.logrotate
 Source7:     zabbix-alert.sh
 Source8:     ossec-configure
 Source9:     ossec-hids-agent.conf
-Patch1:	     syscheck-increase-sleep.patch
+Patch1:      syscheck-increase-sleep.patch
 Patch4:      ossec-client-conf.patch
-Patch5:	     firewall-drop-update.patch
-Patch6:	     disable-psql.patch
-Patch9:	     ossec-client-init.patch
-Patch13:     ossec-hids-server-reload.patch
-Patch14:     ossec-hids-2.6-disable-queue-error-msg.patch
-#Patch15:     mysql-blocklist.patch
-Patch16:     mysql-newline.patch
-Patch17:     prelink-syscheck.patch
-#Patch18:     ossec-memleaks.patch
-Patch19:     ossec-hids-cmoraes-ossec-enhanced.patch
+Patch5:      firewall-drop-update.patch
+Patch6:      disable-psql.patch
 Patch20:     ossec-hids-mysql-schema-fix1.patch
 Patch21:     ossec-hids-server-init.patch
-Patch22:	ossec-hids-2.7-duplicate-suppression-revert.patch
-Patch23:	Make.patch
-Patch24:	pam-decoder-update.patch
+Patch22:     ossec-hids-2.7-duplicate-suppression-revert.patch
+Patch23:     Make.patch
+Patch24:     pam-decoder-update.patch
 
 URL:         http://www.ossec.net/
 BuildRoot:   %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
@@ -49,10 +41,10 @@ BuildRequires: mysql-devel
 %if 0%{?rhel} >= 6
 BuildRequires: inotify-tools-devel
 %endif
-BuildRequires:	libprelude-devel
+BuildRequires: libprelude-devel
 BuildRequires: zlib-devel
 
-Provides: ossec
+Provides: ossec = %{version}-%{release}
 Requires: inotify-tools
 
 %description
@@ -67,8 +59,8 @@ This package contains common files required for all packages.
 %package client
 Summary:     The OSSEC HIDS Client
 Group:       System Environment/Daemons
-Provides:    ossec-client
-Requires:    %{name} = %{version}-%{release} 
+Provides:    ossec-client = %{version}-%{release}
+Requires:    %{name} = %{version}-%{release}
 Requires(post):   /sbin/chkconfig 
 Requires(preun):  /sbin/chkconfig /sbin/service
 Requires(postun): /sbin/service 
@@ -85,7 +77,7 @@ monitored.
 %package server
 Summary:     The OSSEC HIDS Server
 Group:       System Environment/Daemons
-Provides:    ossec-server
+Provides:    ossec-server = %{version}-%{release}
 Requires:    %{name} = %{version}-%{release} 
 Conflicts:   %{name}-client
 Requires(pre):    /usr/sbin/groupadd /usr/sbin/useradd
@@ -108,18 +100,6 @@ log collection and alerting.
 %patch4 -p0
 %patch5 -p0
 %patch6 -p0
-##%patch9 -p1
-##%patch13 -p1
-
-# revisit possibly
-##%patch14 -p1
-##%patch17 -p1
-
-#%patch15 -p1
-##%patch16 -p1
-# TODO: probably needs snapshot
-#%patch18 -p1
-##%patch19 -p1
 %patch20 -p1
 %patch21 -p1
 # new
@@ -211,7 +191,7 @@ pushd contrib
 %{__install} -m 0640 *.{conf,pm,sql,txt}      ${RPM_BUILD_ROOT}%{_datadir}/ossec/contrib
 popd
 
-# create the faux ossec.conf, %ghost'ed files must exist in the buildroot
+# create an empty ossec.conf, ghost'ed files must exist in the buildroot
 touch ${RPM_BUILD_ROOT}%{_localstatedir}/ossec/etc/ossec.conf
 
 %if %{asl}
@@ -228,26 +208,26 @@ if ! id -g ossec > /dev/null 2>&1; then
   groupadd -r ossec
 fi
 if ! id -u ossec > /dev/null 2>&1; then
-  useradd -g ossec -G ossec       \
-	-d %{_localstatedir}/ossec \
-	-r -s /sbin/nologin ossec
+  useradd -g ossec -G ossec \
+    -d %{_localstatedir}/ossec \
+    -r -s /sbin/nologin ossec
 fi
 if ! id -u ossecr > /dev/null 2>&1; then
-  useradd -g ossec -G ossec       \
-	-d %{_localstatedir}/ossec \
-	-r -s /sbin/nologin ossecr
+  useradd -g ossec -G ossec \
+    -d %{_localstatedir}/ossec \
+    -r -s /sbin/nologin ossecr
 fi
 
 %pre server
 if ! id -u ossecm > /dev/null 2>&1; then
-  useradd -g ossec -G ossec       \
-	-d %{_localstatedir}/ossec \
-	-r -s /sbin/nologin ossecm
+  useradd -g ossec -G ossec \
+    -d %{_localstatedir}/ossec \
+    -r -s /sbin/nologin ossecm
 fi
 if ! id -u ossece > /dev/null 2>&1; then
-  useradd -g ossec -G ossec       \
-	-d %{_localstatedir}/ossec \
-	-r -s /sbin/nologin ossece
+  useradd -g ossec -G ossec \
+    -d %{_localstatedir}/ossec \
+    -r -s /sbin/nologin ossece
 fi
 
 %post client
@@ -295,7 +275,6 @@ ln -sf ossec-server.sh %{_localstatedir}/ossec/bin/ossec-control
 
 touch %{_localstatedir}/ossec/logs/ossec.log
 chown ossec:ossec %{_localstatedir}/ossec/logs/ossec.log
-#chmod 0664 %{_localstatedir}/ossec/logs/ossec.log
 
 # fixup for ASL 2.2 -> ASL 3.0
 if grep -q asl_rules /var/ossec/etc/ossec.conf; then
@@ -441,7 +420,6 @@ fi
 %attr(750,ossec,ossec) %dir %{_localstatedir}/ossec/queue/rootcheck
 %attr(750,ossec,ossec) %dir %{_localstatedir}/ossec/queue/syscheck
 %attr(550,root,ossec) %dir %{_localstatedir}/ossec/rules
-#%config(noreplace) %{_localstatedir}/ossec/rules/*
 %config %{_localstatedir}/ossec/rules/*
 %attr(750,ossec,ossec) %dir %{_localstatedir}/ossec/stats
 %attr(550,root,ossec) %dir %{_localstatedir}/ossec/tmp

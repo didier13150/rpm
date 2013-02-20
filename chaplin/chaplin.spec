@@ -1,7 +1,7 @@
 Name:           chaplin
 Version:        1.10
 Release:        1%{?dist}
-Summary:        A dvd chapter tool for Linux
+Summary:        A DVD chapter tool for Linux
 License:        GPLv2
 Group:          Applications/Multimedia
 URL:            http://www.lallafa.de/bp/chaplin.html
@@ -17,11 +17,11 @@ chapter of a given title. Then the total list of chapters is split into a
 user-selectable number of subsets. Each subset should have approximately
 the same duration.
 
-This is a very useful approach for multi-cd rips. You no longer simply split
+This is a very useful approach for multi-C rips. You no longer simply split
 the movie in the middle of the frame count but you choose two sets of chapters
 for both parts which both have (almost) the same length. Then the disc-break
-is not at a rather random point (concering the story telling of the movie)
-but at the end of a dvd-chapter.
+is not at a rather random point (concerning the story telling of the movie)
+but at the end of a DVD-chapter.
 
 The chapter timings and the split sets are also very useful for chapter
 navigation (even on a single disc). The normal output mode of chaplin thus
@@ -36,8 +36,8 @@ out of thumbnails extracted directly from the DVD.
 
 %package genmenu
 Requires:       %{name}
-Summary:        Port-knocking server
-Group:          Sound and Video
+Summary:        Creates the chapter menu still image MPG files
+Group:          Applications/Multimedia
 Requires:       ImageMagick, mjpegtools
 BuildArch:      noarch
 

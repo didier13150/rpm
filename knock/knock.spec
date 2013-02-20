@@ -4,31 +4,31 @@
 %global with_systemd 0
 %endif
 
-Summary:	Port-knocking tools
-Name:		knock
-Version:	0.5
-Release:	4%{?dist}
-License:	GPL
-Group:		Applications/System
-URL:		http://www.zeroflux.org
-Source0:	http://www.zeroflux.org/proj/knock/files/%{name}-%{version}.tar.gz
-Source1:	knockd.service
-Source2:	knockd.init
-Patch0:		knock-path-max.patch
-BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root
-Requires:	libpcap
-BuildRequires:	libpcap-devel
+Summary:          Port-knocking tools
+Name:             knock
+Version:          0.5
+Release:          4%{?dist}
+License:          GPLv2
+Group:            Applications/System
+URL:              http://www.zeroflux.org
+Source0:          http://www.zeroflux.org/proj/knock/files/%{name}-%{version}.tar.gz
+Source1:          knockd.service
+Source2:          knockd.init
+Patch0:           knock-path-max.patch
+BuildRoot:        %{_tmppath}/%{name}-%{version}-%{release}-root
+Requires:         libpcap
+BuildRequires:    libpcap-devel
 %if %{with_systemd}
-Requires(post): systemd
-Requires(preun): systemd
+Requires(post):   systemd
+Requires(preun):  systemd
 Requires(postun): systemd
 # For triggerun
-Requires(post): systemd-sysv
+Requires(post):   systemd-sysv
 %else
 Requires: initscripts
 Requires: libevent
-Requires(post): /sbin/chkconfig
-Requires(preun): /sbin/chkconfig, /sbin/service
+Requires(post):   /sbin/chkconfig
+Requires(preun):  /sbin/chkconfig, /sbin/service
 Requires(postun): /sbin/service
 %endif
 
@@ -38,9 +38,9 @@ on the server. This port need not be open -- since knockd listens at the link-
 layer level, it sees all traffic even if it's destined for a closed port.
 
 %package server
-Requires:	%{name}
-Summary:	Port-knocking server
-Group:		System Environment/Daemons
+Requires:         %{name}
+Summary:          Port-knocking server
+Group:            System Environment/Daemons
 
 %description server
 knockd is a port-knock server. It listens to all traffic on an ethernet
@@ -51,12 +51,12 @@ command defined in its configuration file. This can be used to open up
 holes in a firewall for quick access.
 
 %prep
-%setup
+%setup -q
 %patch0 -p0
 
 %build
 %configure \
-	--disable-schemas-install
+        --disable-schemas-install
 %{__make} %{?_smp_mflags}
 
 %install

@@ -34,7 +34,7 @@ Documentation for the fracplanet API
 %patch1 -p1
 echo "ERROR" > usage_text.h
 xsltproc -stringparam version %{version} -html htm_to_qml.xsl fracplanet.htm | \
-	sed 's/"/\\"/g' | sed 's/^/"/g' | sed 's/$/\\n"/g'> usage_text.h
+    sed 's/"/\\"/g' | sed 's/^/"/g' | sed 's/$/\\n"/g'> usage_text.h
 
 qmake-qt4 "VERSION_NUMBER=%{version}" fracplanet.pro
 doxygen -u doxygen.cfg

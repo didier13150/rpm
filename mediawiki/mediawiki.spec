@@ -8,14 +8,15 @@ URL:            http://www.mediawiki.org/
 Summary:        A wiki engine
 Source0:        http://download.wikimedia.org/mediawiki/%{majorver}/mediawiki-%{version}.tar.gz
 Source1:        mediawiki.conf
-Source10:       Cite.tgz
-Source11:       SyntaxHighlight_GeSHi.tgz
-Source12:       PdfExport.tgz
-Source13:       Mpdf.tgz
-Source14:       CategoryTree.tgz
-Source15:       Math.tgz
-Source16:       CustomTag.tgz
-Source17:       CalcBitrate.tgz
+Source10:       https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Cite.tgz
+Source11:       https://gerrit.wikimedia.org/r/p/mediawiki/extensions/SyntaxHighlight_GeSHi.tgz
+Source12:       https://gerrit.wikimedia.org/r/p/mediawiki/extensions/PdfExport.tgz
+Source13:       https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Mpdf.tgz
+Source14:       https://gerrit.wikimedia.org/r/p/mediawiki/extensions/CategoryTree.tgz
+Source15:       https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Math.tgz
+Source16:       Linux.tag.php
+Source17:       CalcBitrate.js
+Source18:       CalcBitrate.php
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root
 BuildArch:      noarch
 # to make sure the "apache" group is created before mediawiki is installed
@@ -153,8 +154,12 @@ tar -xzf %{SOURCE12} -C %{buildroot}%{_localstatedir}/www/wiki/extensions/
 tar -xzf %{SOURCE13} -C %{buildroot}%{_localstatedir}/www/wiki/extensions/
 tar -xzf %{SOURCE14} -C %{buildroot}%{_localstatedir}/www/wiki/extensions/
 tar -xzf %{SOURCE15} -C %{buildroot}%{_localstatedir}/www/wiki/extensions/
-tar -xzf %{SOURCE16} -C %{buildroot}%{_localstatedir}/www/wiki/extensions/
-tar -xzf %{SOURCE17} -C %{buildroot}%{_localstatedir}/www/wiki/extensions/
+%{__mkdir_p} %{buildroot}%{_localstatedir}/www/wiki/extensions/CalcBitrate
+%{__mkdir_p} %{buildroot}%{_localstatedir}/www/wiki/extensions/CustomTag
+%{__cp} %{SOURCE16} %{buildroot}%{_localstatedir}/www/wiki/extensions/CustomTag/
+%{__cp} %{SOURCE17} %{buildroot}%{_localstatedir}/www/wiki/extensions/CalcBitrate/
+%{__cp} %{SOURCE18} %{buildroot}%{_localstatedir}/www/wiki/extensions/CalcBitrate/
+
 
 %clean
 rm -rf %{buildroot}

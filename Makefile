@@ -23,13 +23,16 @@ srpm:
 clean:
 	@for dir in $(PKGS) ; do cd $$dir ; make clean ; cd .. ; done
 
+rpmlint:
+	@for dir in $(PKGS) ; do cd $$dir ; make rpmlint ; cd .. ; done
+
 repo:
 	@echo -e "\033[1;32mUpdating repository on $(REPODIR)\033[0m"
 	@for dir in $(PKGS) ; \
 		do mkdir -p $(REPODIR)/$$dir ; \
 		cp $$dir/*.rpm $$dir/{build,root,state}.log $(REPODIR)/$$dir/ ; \
 	done
-	@createrepo -u -d $(REPODIR)
+	@createrepo --update -d $(REPODIR)
 
 repoview:
 	repoview $(REPODIR) -o $(REPODIR)/repoview --url "http://$(HOSTNAME)/repoview" --title "RPM for $(DISTRIB) $(ARCH)"
