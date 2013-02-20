@@ -2,6 +2,7 @@
 *.tar.gz
 *.tar.bz2
 *.tgz
+*.zip
 *.rpm
 *.bak
 *.log
