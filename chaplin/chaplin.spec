@@ -3,7 +3,7 @@ Version:        1.10
 Release:        1%{?dist}
 Summary:        A dvd chapter tool for Linux
 License:        GPLv2
-Group:          Sound and Video
+Group:          Applications/Multimedia
 URL:            http://www.lallafa.de/bp/chaplin.html
 Source0:        http://www.lallafa.de/bp/files/%{name}-%{version}.tgz
 

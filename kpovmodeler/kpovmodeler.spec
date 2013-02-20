@@ -5,6 +5,7 @@ Release:        0.1.svn%{svnrevision}%{?dist}
 Summary:        KDE Graphical 3D modeler for POV-Ray
 License:        GPLv2
 URL:            http://www.kpovmodeler.org
+Group:         Applications/Multimedia
 # The source for this package was pulled from upstream's vcs.  Use the
 # following commands to generate the tarball:
 #  svn export -r 1305095 svn://anonsvn.kde.org/home/kde/trunk/extragear/graphics/kpovmodeler kpovmodeler-1.1.3

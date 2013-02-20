@@ -4,7 +4,7 @@ Version:        %{major_ver}.1
 Release:        1%{?dist}
 Summary:        A height field editor for Linux
 License:        GPLv2
-Group:          Sound and Video
+Group:          Applications/Multimedia
 URL:            http://geomorph.sourceforge.net
 Source0:        http://sourceforge.net/projects/geomorph/files/geomorph/%{major_ver}/%{name}-%{version}.tar.gz
 Source1:        geomorph.desktop

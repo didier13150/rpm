@@ -3,7 +3,7 @@ Version:        0.4.0
 Release:        2%{?dist}
 Summary:        Fractal planet and terrain generator
 License:        GPLv2
-Group:          Sound and Video
+Group:          Applications/Multimedia
 URL:            http://sourceforge.net/projects/fracplanet
 Source0:        http://sourceforge.net/projects/fracplanet/files/fracplanet/%{version}/%{name}-%{version}.tar.gz
 Source1:        %{name}.desktop

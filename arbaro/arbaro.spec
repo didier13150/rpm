@@ -4,7 +4,7 @@ Version:        1.9.8
 Release:        1%{?dist}
 Summary:        Tree generation for povray
 License:        GPLv2
-Group:          Sound and Video
+Group:          Applications/Multimedia
 URL:            http://arbaro.sourceforge.net
 Source0:        http://sourceforge.net/projects/arbaro/files/arbaro/%{version}/%{name}_%{us_ver}.zip
 Source1:        %{name}.desktop

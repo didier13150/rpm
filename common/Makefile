@@ -20,7 +20,7 @@ clean:
 
 rpmlint:
 	@echo -e "\033[1;32mChecking "$(NAME)".spec file\033[0m"
-	@rpmlint *.{spec,rpm}
+	-rpmlint *.{spec,rpm}
 
 srpm:
 	@echo -e "\033[1;32mBuilding SRPM file\033[0m"
