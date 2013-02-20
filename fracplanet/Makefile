@@ -5,4 +5,4 @@ SRCNAME := $(shell basename $(SRCDWL))
 include ../common/Makefile
 sources:
 	@echo -e "\033[1;32mDownloading sources\033[0m"
-	[ -f $(SRCNAME) ] || wget -O $(SRCNAME) $(SRCDWL)
+	@[ -f $(SRCNAME) ] || wget -O $(SRCNAME) $(SRCDWL)

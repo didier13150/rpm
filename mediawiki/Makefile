@@ -12,7 +12,3 @@ sources:
 		[ -d $$extension ] && git pull || git clone https://gerrit.wikimedia.org/r/p/mediawiki/extensions/$$extension ; \
 		tar -czf $$extension.tgz $$extension ; \
 	done
-	@for extension in CustomTag CalcBitrate ; do \
-		rm -f  $$extension.tgz ; \
-		tar -czf $$extension.tgz $$extension ; \
-	done

@@ -6,6 +6,6 @@ SRCNAME := $(shell basename $(SRCDWL))
 include ../common/Makefile
 sources:
 	@echo -e "\033[1;32mDownloading sources\033[0m"
-	[ -f $(SRCNAME) ] && exit 0 || svn export svn://anonsvn.kde.org/home/kde/trunk/extragear/graphics/kpovmodeler kpovmodeler-$(SRCVER)
-	tar -czf $(SRCNAME) kpovmodeler-$(SRCVER)
-	rm -rf kpovmodeler-$(SRCVER)
+	@[ -f $(SRCNAME) ] && exit 0 || svn export svn://anonsvn.kde.org/home/kde/trunk/extragear/graphics/kpovmodeler kpovmodeler-$(SRCVER)
+	@tar -czf $(SRCNAME) kpovmodeler-$(SRCVER)
+	@rm -rf kpovmodeler-$(SRCVER)
