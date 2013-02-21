@@ -9,11 +9,20 @@ RETVAL=$?
 function process() {
 	local service=$1
 	local cmd=$2
+	
 	if [ $SYSTEMCTL -eq 1 ]
 	then
 		systemctl ${cmd} ${service}.service
 	else
-		service ${service} ${cmd}
+		if [[ "${cmd}" == "enable" ]]
+		then
+			chkconfig ${service} on
+		elif [[ "${cmd}" == "disable" ]]
+		then
+			chkconfig ${service} off
+		else
+			service ${service} ${cmd}
+		fi
 	fi
 }
 
@@ -60,7 +69,7 @@ function servicestatus() {
 }
 
 function usage() {
-	echo "Usage: shinken [start|stop|restart|status|servicestatus]"
+	echo "Usage: shinken [start|stop|restart|status|servicestatus|enable|disable]"
 }
 
 case $cmd in
@@ -79,6 +88,12 @@ case $cmd in
 		;;
 	servicestatus)
 		servicestatus
+		;;
+	enable)
+		process_all enable
+		;;
+	disable)
+		process_all disable
 		;;
 	usage|help)
 		usage

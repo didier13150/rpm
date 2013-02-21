@@ -27,9 +27,8 @@ URL:          http://www.shinken-monitoring.org
 Source0:      http://www.shinken-monitoring.org/pub/%{name}-%{version}.tar.gz
 Source1:      shinken
 
-Patch0:       shinken-user-on-init-scripts.patch
-Patch1:       shinken-skonf-default-path.patch
-Patch2:       shinken-ini-workdir.patch
+Patch0:       shinken-fix-conf.patch
+Patch1:       shinken-eue-test-mispelling.patch
 
 %if 0%{?rhel} >= 6 || 0%{?fedora} >= 1
 Requires:      python, python-pyro, chkconfig
@@ -154,7 +153,6 @@ All Shinken Modules in one meta-package
 %setup -q
 %patch0 -p1
 %patch1 -p1
-%patch2 -p1
 
 %if 0%{?rhel} < 6
 find -name '*.py' | xargs %{__sed} -i 's|^#!/usr/bin/python|#!/usr/bin/env python2.6|'
@@ -162,9 +160,8 @@ find -name '*.py' | xargs %{__sed} -i 's|^#!/usr/bin/env python|#!/usr/bin/env p
 %endif
 sed -i -e 's!./$SCRIPT!%{__python} ./$SCRIPT!' test/quick_tests.sh
 %{__sed} -i -e "s|/usr/lib/nagios/plugins|%{_libdir}/nagios/plugins|" setup.{cfg,py}
-find . -name '.gitignore' -exec rm -f {} \;
+find . -name '.gitignore' -delete
 chmod +rx %{name}/webui/plugins/impacts/impacts.py
-rm -rf  shinken/webui/plugins/eue 
 
 %{__sed} -i -e "s#@user@:@group@#%{shinken_user}:%{shinken_group}#" for_fedora/init.d/*
 
@@ -273,7 +270,8 @@ chmod +x %{buildroot}%{python_sitelib}/%{name}/*.py
 
 %{__rm} -f %{buildroot}%{_sysconfdir}/default/%{name}
 install -d -m0755 %{buildroot}%{_localstatedir}/lib/%{name}/packs
-
+install -d -m0755 %{buildroot}%{_localstatedir}/lib/%{name}/share
+install -d -m0755 %{buildroot}%{_localstatedir}/log/%{name}/archives
 install -d -m0755 %{buildroot}%{_sbindir}
 install  -m0755 %{SOURCE1} %{buildroot}%{_sbindir}
 
@@ -290,6 +288,11 @@ echo "If you have pnp4nagios installed, change owner and permissions of its dire
 echo "chown -R %{shinken_user}:%{shinken_group} /var/{log,lib}/pnp4nagios"
 echo
 echo "Don't forget to install php for pnp4nagios, because it's not a shinken dependency, instead of nagios"
+
+if [[ "$(uname -p)" == "x86_64" ]]
+then
+  %{__sed} -i -e '/USER1/ s#lib#lib64#g' /etc/shinken/resource.cfg
+fi
 
 %pre
 if ! /usr/bin/id %{shinken_user} &>/dev/null; then
@@ -561,8 +564,10 @@ fi
 %config(noreplace) %{_sysconfdir}/logrotate.d/%{name}
 %config(noreplace) %{_sysconfdir}/tmpfiles.d/%{name}.conf
 %attr(-,%{shinken_user} ,%{shinken_group}) %dir %{_localstatedir}/log/%{name}
+%attr(-,%{shinken_user} ,%{shinken_group}) %dir %{_localstatedir}/log/%{name}/archives
 %attr(-,%{shinken_user} ,%{shinken_group}) %dir %{_localstatedir}/lib/%{name}
 %attr(-,%{shinken_user} ,%{shinken_group}) %dir %{_localstatedir}/lib/%{name}/packs
+%attr(-,%{shinken_user} ,%{shinken_group}) %dir %{_localstatedir}/lib/%{name}/share
 %attr(-,%{shinken_user} ,%{shinken_group}) %dir %{_localstatedir}/run/%{name}
 
 %changelog

@@ -1,0 +1,400 @@
+diff -U 3 -H -d -r -N -- a/etc/brokerd.ini b/etc/brokerd.ini
+--- a/etc/brokerd.ini	2013-02-11 15:08:26.000000000 +0100
++++ b/etc/brokerd.ini	2013-02-21 14:31:07.934134988 +0100
+@@ -1,16 +1,16 @@
+ [daemon]
+-#workdir=var
+ # For installation configuration:
+ # workdir should be explicitly set to an absolute directory path.
+ 
++workdir=/var/lib/shinken
+ # Using default values for following config variables value:
+ # Paths, if not absolute paths, are relative to workdir.
+ 
+ #user=shinken         ; by default it's the current user
+ #group=shinken        ; by default it's the current group
+-#pidfile=%(workdir)s/brokerd.pid
++pidfile=/var/run/shinken/brokerd.pid
+ 
+-#host=0.0.0.0
++host=127.0.0.1
+ #port=7772
+ 
+ #interval_poll=5
+diff -U 3 -H -d -r -N -- a/etc/discovery.cfg b/etc/discovery.cfg
+--- a/etc/discovery.cfg	2013-02-11 15:08:26.000000000 +0100
++++ b/etc/discovery.cfg	2013-02-21 14:32:14.380401749 +0100
+@@ -22,7 +22,7 @@
+ resource_file=resource.cfg
+ 
+ # Lock file (with pid) for Arbiterd
+-lock_file=discovery.pid
++lock_file=/var/run/shinken/discovery.pid
+ 
+ # Strip FQDN of the name ID to keep only the
+ # basename of the element
+diff -U 3 -H -d -r -N -- a/etc/hostd.cfg b/etc/hostd.cfg
+--- a/etc/hostd.cfg	2013-02-11 15:08:26.000000000 +0100
++++ b/etc/hostd.cfg	2013-02-21 14:32:57.563922917 +0100
+@@ -1,6 +1,6 @@
+ 
+ # Log file of the discovery command
+-log_file=/tmp/skonf.log
++log_file=/var/log/shinken/skonf.log
+ 
+ 
+ # Configuration files with common discovery objects
+@@ -28,7 +28,7 @@
+ resource_file=resource.cfg
+ 
+ # Lock file (with pid) for Arbiterd
+-lock_file=hostd.pid
++lock_file=/var/run/shinken/hostd.pid
+ 
+ # Strip FQDN of the name ID to keep only the
+ # basename of the element
+@@ -40,10 +40,10 @@
+ 
+ 
+ 
+-share_dir=/home/shinken/shinken/share
++share_dir=/var/lib/shinken
+ 
+ 
+-packs_home=/opt/packs
++packs_home=/var/lib/shinken/packs
+ 
+ auth_secret=NONE
+ 
+diff -U 3 -H -d -r -N -- a/etc/pollerd.ini b/etc/pollerd.ini
+--- a/etc/pollerd.ini	2013-02-11 15:08:26.000000000 +0100
++++ b/etc/pollerd.ini	2013-02-21 14:31:07.934134988 +0100
+@@ -1,6 +1,7 @@
+ [daemon]
+ 
+ #workdir=var
++workdir=/var/lib/shinken
+ # For installation configuration:
+ # workdir should be explicitely set to an absolute directory path.
+ 
+@@ -9,9 +10,9 @@
+ 
+ # user=shinken         ; if not set then by default it's the current user.
+ # group=shinken        ; if not set then by default it's the current group.
+-#pidfile=%(workdir)s/pollerd.pid
++pidfile=/var/run/shinken/pollerd.pid
+ 
+-# host=0.0.0.0
++host=127.0.0.1
+ # port=7771
+ 
+ # interval_poll=5
+diff -U 3 -H -d -r -N -- a/etc/reactionnerd.ini b/etc/reactionnerd.ini
+--- a/etc/reactionnerd.ini	2013-02-11 15:08:26.000000000 +0100
++++ b/etc/reactionnerd.ini	2013-02-21 14:31:07.934134988 +0100
+@@ -1,11 +1,12 @@
+ [daemon]
+ # Paths are relative to this config file
+ #workdir=../var
+-#pidfile=%(workdir)s/reactionnerd.pid
++workdir=/var/lib/shinken
++pidfile=/var/run/shinken/reactionnerd.pid
+ interval_poll=5
+ maxfd=1024
+ port=7769
+-#host=0.0.0.0
++host=127.0.0.1
+ #user=shinken
+ #group=shinken
+ idontcareaboutsecurity=0
+diff -U 3 -H -d -r -N -- a/etc/receiverd.ini b/etc/receiverd.ini
+--- a/etc/receiverd.ini	2013-02-11 15:08:26.000000000 +0100
++++ b/etc/receiverd.ini	2013-02-21 14:31:07.934134988 +0100
+@@ -1,11 +1,12 @@
+ [daemon]
+ # Paths are relative to this config file
+ #workdir=../var
+-#pidfile=%(workdir)s/receiverd.pid
++workdir=/var/lib/shinken
++pidfile=/var/run/shinken/receiverd.pid
+ interval_poll=5
+ maxfd=1024
+ port=7773
+-#host=0.0.0.0
++host=127.0.0.1
+ #user=shinken
+ #group=shinken
+ idontcareaboutsecurity=0
+diff -U 3 -H -d -r -N -- a/etc/resource.cfg b/etc/resource.cfg
+--- a/etc/resource.cfg	2013-02-11 15:08:26.000000000 +0100
++++ b/etc/resource.cfg	2013-02-21 14:46:33.198748638 +0100
+@@ -1,10 +1,10 @@
+ # Nagios legacy macros
+-$USER1$=/usr/local/shinken/libexec
++$USER1$=/usr/lib/nagios/plugins
+ $USER2$=public
+ 
+ 
+ #-- Location of the plugins
+-$PLUGINSDIR$=/usr/lib/nagios/plugins
++$PLUGINSDIR$=/usr/lib/shinken/plugins
+ 
+ 
+ # Active Directory and LDAP
+diff -U 3 -H -d -r -N -- a/etc/schedulerd.ini b/etc/schedulerd.ini
+--- a/etc/schedulerd.ini	2013-02-11 15:08:26.000000000 +0100
++++ b/etc/schedulerd.ini	2013-02-21 14:31:07.934134988 +0100
+@@ -1,9 +1,10 @@
+ [daemon]
+ # Paths are relative to this config file
+ #workdir=../var
+-#pidfile=%(workdir)s/schedulerd.pid
++workdir=/var/lib/shinken
++pidfile=/var/run/shinken/schedulerd.pid
+ port=7768
+-#host=0.0.0.0
++host=127.0.0.1
+ #user=shinken
+ #group=shinken
+ idontcareaboutsecurity=0
+diff -U 3 -H -d -r -N -- a/etc/shinken-specific.cfg b/etc/shinken-specific.cfg
+--- a/etc/shinken-specific.cfg	2013-02-11 15:08:26.000000000 +0100
++++ b/etc/shinken-specific.cfg	2013-02-21 14:41:29.818174676 +0100
+@@ -67,7 +67,7 @@
+     # - Collectd                = Receive collectd perfdata
+     # - SnmpBooster             = Snmp bulk polling module, configuration linker
+ 
+-    modules    	 CommandFile	  
++    modules    	 CommandFile, Mongodb, PickleRetentionArbiter
+     #modules     CommandFile, Mongodb, NSCA, VMWare_auto_linking, WS_Arbiter, Collectd, Landscape, SnmpBooster
+ 
+     ## Uncomment these lines in a HA architecture so the master and slaves know
+@@ -111,7 +111,7 @@
+     # - NagiosRetention     = Read retention info from a Nagios retention file
+     #                           (does not save, only read)
+     # - SnmpBooster             = Snmp bulk polling module
+-    modules   
++    modules     PickleRetention, MongodbRetention
+     #modules     PickleRetention
+ 
+     ## Advanced Features
+@@ -158,7 +158,7 @@
+     #                       This permits the use of distributed check_mk checks
+     #                       should you desire it.
+     # - SnmpBooster     = Snmp bulk polling module
+-    modules     
++    modules     CommandFile
+     #modules     NrpeBooster, CommandFile
+ 
+     ## Advanced Features
+@@ -206,7 +206,7 @@
+     # - WebUI                   = Shinken Web interface
+     # - glpidb                  = Save data in GLPI MySQL database
+     # - Trending		= Save perfdata into a trending database
+-    modules     Livestatus, Simple-log, WebUI
++    modules     Livestatus, Simple-log, WebUI, PickleRetentionBroker, NPCDMOD
+ 
+     ## Advanced
+     realm   All
+@@ -297,7 +297,7 @@
+     # - TSCA                    = TSCA server
+     # - WS_Arbiter              = WebService for pushing results to the arbiter
+     # - Collectd                = Receive collectd perfdata
+-    modules
++    modules        CommandFile
+ 
+     ## Advanced Feature
+     direct_routing      0   ; If enabled, it will directly send commands to the
+@@ -324,7 +324,7 @@
+     module_type     webui
+     host            0.0.0.0     ; All interfaces = 0.0.0.0
+     port            7767
+-    auth_secret     CHANGE_ME   ; CHANGE THIS or someone could forge
++    auth_secret     WhatTheFuckOnNetwork   ; CHANGE THIS or someone could forge
+                                 ; cookies!!
+     allow_html_output   0       ; Allow or not HTML chars in plugins output.
+                                 ; WARNING: Allowing can be a security issue.
+@@ -341,7 +341,7 @@
+     # - GRAPHITE_UI     = Use graphs from Graphite time series database.
+     # - Mongodb         = Save user preferences to a Mongodb database
+     # - SQLitedb        = Save user preferences to a SQLite database
+-    modules     Apache_passwd, ActiveDir_UI, Cfg_password, PNP_UI, Mongodb
++    modules     Apache_passwd, Cfg_password, PNP_UI, Mongodb
+ 
+     ## Advanced Options
+     # Don't use them as long as you don't know what you are doing!
+@@ -600,7 +600,7 @@
+ define module {
+     module_name     NPCDMOD
+     module_type     npcdmod
+-    config_file     /usr/local/pnp4nagios/etc/npcd.cfg  ; Set to your value
++    config_file     /etc/pnp4nagios/npcd.cfg  ; Set to your value
+ }
+ 
+ ## Module :    Canopsis
+@@ -735,7 +735,7 @@
+ define module {
+     module_name     SQLitedb
+     module_type     sqlitedb
+-    uri             /usr/local/shinken/var/webui.db
++    uri             /var/lib/shinken/webui.db
+ }
+ 
+ ## Module:      NSCA
+@@ -972,7 +972,7 @@
+ define module {
+     module_name     PickleRetention
+     module_type     pickle_retention_file_generic
+-    path            /tmp/retention.dat
++    path            /var/tmp/retention.dat
+ }
+ 
+ ## Module:      PickleRetentionBroker
+@@ -981,7 +981,7 @@
+ define module {
+     module_name     PickleRetentionBroker
+     module_type     pickle_retention_file_generic
+-    path            /tmp/retention_broker.dat
++    path            /var/tmp/retention_broker.dat
+ }
+ 
+ ## Module:      PickleRetentionArbiter
+@@ -990,7 +990,7 @@
+ define module {
+     module_name     PickleRetentionArbiter
+     module_type     pickle_retention_file_generic
+-    path            /tmp/retention_arbiter.dat
++    path            /var/tmp/retention_arbiter.dat
+ }
+ 
+ ## Module:      NagiosRetention
+@@ -999,7 +999,7 @@
+ define module {
+     module_name     NagiosRetention
+     module_type     nagios_retention_file
+-    path            /tmp/retention-nagios.dat
++    path            /var/tmp/retention-nagios.dat
+ }
+ 
+ ## Module:      CommandFile
+diff -U 3 -H -d -r -N -- a/etc/skonf.cfg b/etc/skonf.cfg
+--- a/etc/skonf.cfg	2013-02-11 15:08:26.000000000 +0100
++++ b/etc/skonf.cfg	2013-02-21 14:31:14.612061517 +0100
+@@ -32,10 +32,10 @@
+ resource_file=resource.cfg
+ 
+ # Lock file (with pid) for Arbiterd
+-lock_file=skonfd.pid
++lock_file=/var/run/shinken/skonfd.pid
+ 
+ # The skonf daemon can have it's own local log
+-local_log=skonfd.log
++local_log=/var/log/shinken/skonfd.log
+ 
+ # Accepted log level values= DEBUG,INFO,WARNING,ERROR,CRITICAL
+ log_level=WARNING
+@@ -73,9 +73,9 @@
+ # Listening port of sKonf
+ http_port=7766
+ # 0.0.0.0 means listen to all interfaces
+-http_host=0.0.0.0
++http_host=127.0.0.1
+ # Key for create cookie. CHANGE THIS for security reasons!
+-auth_secret=CHANGE_ME
++auth_secret=WhatTheFuckOnNetwork
+ # Hpp Backend to use between : (look at WebUI for full list)
+ http_backend=auto
+ # For SSO auth behind an Apache or Nginx, enable this
+@@ -84,7 +84,7 @@
+ 
+ 
+ # Modules to load
+-skonf_modules=Apache_passwd,ActiveDir_UI,Cfg_password,Mongodb
++skonf_modules=Apache_passwd,Cfg_password,Mongodb
+ 
+ 
+ # Module used by discovery to save objects
+diff -U 3 -H -d -r -N -- a/for_fedora/init.d/shinken-arbiter b/for_fedora/init.d/shinken-arbiter
+--- a/for_fedora/init.d/shinken-arbiter	2013-02-11 15:08:26.000000000 +0100
++++ b/for_fedora/init.d/shinken-arbiter	2013-02-21 14:31:20.907992202 +0100
+@@ -43,7 +43,7 @@
+ 
+     directory=$(dirname $pidfile)                                                                                                                                    
+     [ ! -d $directory ] && mkdir -p $directory
+-    chown nagios:root $directory
++    chown @user@:@group@ $directory
+ 
+     echo -n $"Starting $prog: "
+     $exec $daemon_args
+diff -U 3 -H -d -r -N -- a/for_fedora/init.d/shinken-broker b/for_fedora/init.d/shinken-broker
+--- a/for_fedora/init.d/shinken-broker	2013-02-11 15:08:26.000000000 +0100
++++ b/for_fedora/init.d/shinken-broker	2013-02-21 14:31:20.908992191 +0100
+@@ -44,7 +44,7 @@
+ 
+     directory=$(dirname $pidfile)                                                                                                                                    
+     [ ! -d $directory ] && mkdir -p $directory
+-    chown nagios:root $directory
++    chown @user@:@group@ $directory
+ 
+     echo -n $"Starting $prog: "
+     $exec $daemon_args
+diff -U 3 -H -d -r -N -- a/for_fedora/init.d/shinken-poller b/for_fedora/init.d/shinken-poller
+--- a/for_fedora/init.d/shinken-poller	2013-02-11 15:08:26.000000000 +0100
++++ b/for_fedora/init.d/shinken-poller	2013-02-21 14:31:20.908992191 +0100
+@@ -48,7 +48,7 @@
+ 
+     directory=$(dirname $pidfile)                                                                                                                                    
+     [ ! -d $directory ] && mkdir -p $directory
+-    chown nagios:root $directory
++    chown @user@:@group@ $directory
+ 
+     echo -n $"Starting $prog: "
+     $exec $daemon_args
+diff -U 3 -H -d -r -N -- a/for_fedora/init.d/shinken-reactionner b/for_fedora/init.d/shinken-reactionner
+--- a/for_fedora/init.d/shinken-reactionner	2013-02-11 15:08:26.000000000 +0100
++++ b/for_fedora/init.d/shinken-reactionner	2013-02-21 14:31:20.908992191 +0100
+@@ -44,7 +44,7 @@
+ 
+     directory=$(dirname $pidfile)                                                                                                                                    
+     [ ! -d $directory ] && mkdir -p $directory
+-    chown nagios:root $directory
++    chown @user@:@group@ $directory
+ 
+     echo -n $"Starting $prog: "
+     $exec $daemon_args
+diff -U 3 -H -d -r -N -- a/for_fedora/init.d/shinken-receiver b/for_fedora/init.d/shinken-receiver
+--- a/for_fedora/init.d/shinken-receiver	2013-02-11 15:08:26.000000000 +0100
++++ b/for_fedora/init.d/shinken-receiver	2013-02-21 14:31:20.908992191 +0100
+@@ -43,7 +43,7 @@
+ 
+     directory=$(dirname $pidfile)                                                                                                                                    
+     [ ! -d $directory ] && mkdir -p $directory
+-    chown nagios:root $directory
++    chown @user@:@group@ $directory
+ 
+     echo -n $"Starting $prog: "
+     $exec $daemon_args
+diff -U 3 -H -d -r -N -- a/for_fedora/init.d/shinken-scheduler b/for_fedora/init.d/shinken-scheduler
+--- a/for_fedora/init.d/shinken-scheduler	2013-02-11 15:08:26.000000000 +0100
++++ b/for_fedora/init.d/shinken-scheduler	2013-02-21 14:31:20.908992191 +0100
+@@ -44,7 +44,7 @@
+ 
+     directory=$(dirname $pidfile)                                                                                                                                    
+     [ ! -d $directory ] && mkdir -p $directory
+-    chown nagios:root $directory
++    chown @user@:@group@ $directory
+ 
+     echo -n $"Starting $prog: "
+     $exec $daemon_args
+diff -U 3 -H -d -r -N -- a/for_fedora/init.d/shinken-skonf b/for_fedora/init.d/shinken-skonf
+--- a/for_fedora/init.d/shinken-skonf	2013-02-11 15:08:26.000000000 +0100
++++ b/for_fedora/init.d/shinken-skonf	2013-02-21 14:31:20.908992191 +0100
+@@ -43,7 +43,7 @@
+ 
+     directory=$(dirname $pidfile)                                                                                                                                    
+     [ ! -d $directory ] && mkdir -p $directory
+-    chown nagios:root $directory
++    chown @user@:@group@ $directory
+ 
+     echo -n $"Starting $prog: "
+     $exec $daemon_args
