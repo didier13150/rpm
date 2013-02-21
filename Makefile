@@ -6,6 +6,7 @@ ARCH := $(shell uname -i)
 HOSTNAME := $(shell hostname --fqdn)
 
 all: clean build repo repoview
+repo: repository repoview
 
 build:
 	@rm -f $(LOGFILE)
@@ -26,7 +27,7 @@ clean:
 rpmlint:
 	@for dir in $(PKGS) ; do cd $$dir ; make rpmlint ; cd .. ; done
 
-repo:
+repository:
 	@echo -e "\033[1;32mUpdating repository on $(REPODIR)\033[0m"
 	@for dir in $(PKGS) ; \
 		do mkdir -p $(REPODIR)/$$dir ; \
