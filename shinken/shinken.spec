@@ -25,9 +25,11 @@ License:      AGPLv3+
 Group:        Applications/System
 URL:          http://www.shinken-monitoring.org
 Source0:      http://www.shinken-monitoring.org/pub/%{name}-%{version}.tar.gz
+Source1:      shinken
 
 Patch0:       shinken-user-on-init-scripts.patch
 Patch1:       shinken-skonf-default-path.patch
+Patch2:       shinken-ini-workdir.patch
 
 %if 0%{?rhel} >= 6 || 0%{?fedora} >= 1
 Requires:      python, python-pyro, chkconfig
@@ -152,6 +154,7 @@ All Shinken Modules in one meta-package
 %setup -q
 %patch0 -p1
 %patch1 -p1
+%patch2 -p1
 
 %if 0%{?rhel} < 6
 find -name '*.py' | xargs %{__sed} -i 's|^#!/usr/bin/python|#!/usr/bin/env python2.6|'
@@ -209,10 +212,6 @@ find %{buildroot} -size 0 -delete
 # Remove void files
 find %{buildroot}%{_localstatedir} -name '*void_for_git*' -delete
 
-%{__sed} -i -e "s|\.\./var|%{_localstatedir}/lib/%{name}|" %{buildroot}%{_sysconfdir}/%{name}/brokerd.ini
-%{__sed} -i -e "s|\.\./var|%{_localstatedir}/lib/%{name}|" %{buildroot}%{_sysconfdir}/%{name}/pollerd.ini
-%{__sed} -i -e "s|\.\./var|%{_localstatedir}/lib/%{name}|" %{buildroot}%{_sysconfdir}/%{name}/reactionnerd.ini
-%{__sed} -i -e "s|\.\./var|%{_localstatedir}/lib/%{name}|" %{buildroot}%{_sysconfdir}/%{name}/schedulerd.ini
 %{__sed} -i -e 's!%{buildroot}!!g' %{buildroot}%{_sysconfdir}/%{name}/*.{ini,cfg}
 
 %if %{with_systemd}
@@ -273,6 +272,10 @@ sed -i -e 's!(you can also be even more lazy and call the bin/launch_all.sh scri
 chmod +x %{buildroot}%{python_sitelib}/%{name}/*.py
 
 %{__rm} -f %{buildroot}%{_sysconfdir}/default/%{name}
+install -d -m0755 %{buildroot}%{_localstatedir}/lib/%{name}/packs
+
+install -d -m0755 %{buildroot}%{_sbindir}
+install  -m0755 %{SOURCE1} %{buildroot}%{_sbindir}
 
 %clean
 rm -rf %{buildroot}
@@ -550,6 +553,7 @@ fi
 %{_sbindir}/%{name}-admin
 %{_sbindir}/%{name}-hostd
 %{_sbindir}/%{name}-packs
+%{_sbindir}/%{name}
 %{_mandir}/man3/%{name}-admin*
 %{_mandir}/man3/%{name}-discovery*
 %{_usr}/lib/%{name}/plugins
@@ -558,6 +562,7 @@ fi
 %config(noreplace) %{_sysconfdir}/tmpfiles.d/%{name}.conf
 %attr(-,%{shinken_user} ,%{shinken_group}) %dir %{_localstatedir}/log/%{name}
 %attr(-,%{shinken_user} ,%{shinken_group}) %dir %{_localstatedir}/lib/%{name}
+%attr(-,%{shinken_user} ,%{shinken_group}) %dir %{_localstatedir}/lib/%{name}/packs
 %attr(-,%{shinken_user} ,%{shinken_group}) %dir %{_localstatedir}/run/%{name}
 
 %changelog

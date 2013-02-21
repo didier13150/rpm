@@ -1,0 +1,131 @@
+diff -U 3 -H -d -r -N -- a/etc/brokerd.ini b/etc/brokerd.ini
+--- a/etc/brokerd.ini	2013-02-11 15:08:26.000000000 +0100
++++ b/etc/brokerd.ini	2013-02-21 11:30:34.382687356 +0100
+@@ -1,16 +1,16 @@
+ [daemon]
+-#workdir=var
+ # For installation configuration:
+ # workdir should be explicitly set to an absolute directory path.
+ 
++workdir=/var/lib/shinken
+ # Using default values for following config variables value:
+ # Paths, if not absolute paths, are relative to workdir.
+ 
+ #user=shinken         ; by default it's the current user
+ #group=shinken        ; by default it's the current group
+-#pidfile=%(workdir)s/brokerd.pid
++pidfile=/var/run/shinken/brokerd.pid
+ 
+-#host=0.0.0.0
++host=127.0.0.1
+ #port=7772
+ 
+ #interval_poll=5
+diff -U 3 -H -d -r -N -- a/etc/hostd.cfg b/etc/hostd.cfg
+--- a/etc/hostd.cfg	2013-02-11 15:08:26.000000000 +0100
++++ b/etc/hostd.cfg	2013-02-21 11:26:10.552816264 +0100
+@@ -1,6 +1,6 @@
+ 
+ # Log file of the discovery command
+-log_file=/tmp/skonf.log
++log_file=/var/lib/shinken/skonf.log
+ 
+ 
+ # Configuration files with common discovery objects
+@@ -28,7 +28,7 @@
+ resource_file=resource.cfg
+ 
+ # Lock file (with pid) for Arbiterd
+-lock_file=hostd.pid
++lock_file=/var/run/shinken/hostd.pid
+ 
+ # Strip FQDN of the name ID to keep only the
+ # basename of the element
+@@ -40,10 +40,10 @@
+ 
+ 
+ 
+-share_dir=/home/shinken/shinken/share
++share_dir=/var/lib/shinken
+ 
+ 
+-packs_home=/opt/packs
++packs_home=/var/lib/shinken/packs
+ 
+ auth_secret=NONE
+ 
+diff -U 3 -H -d -r -N -- a/etc/pollerd.ini b/etc/pollerd.ini
+--- a/etc/pollerd.ini	2013-02-11 15:08:26.000000000 +0100
++++ b/etc/pollerd.ini	2013-02-21 11:30:34.422686882 +0100
+@@ -1,6 +1,7 @@
+ [daemon]
+ 
+ #workdir=var
++workdir=/var/lib/shinken
+ # For installation configuration:
+ # workdir should be explicitely set to an absolute directory path.
+ 
+@@ -9,9 +10,9 @@
+ 
+ # user=shinken         ; if not set then by default it's the current user.
+ # group=shinken        ; if not set then by default it's the current group.
+-#pidfile=%(workdir)s/pollerd.pid
++pidfile=/var/run/shinken/pollerd.pid
+ 
+-# host=0.0.0.0
++host=127.0.0.1
+ # port=7771
+ 
+ # interval_poll=5
+diff -U 3 -H -d -r -N -- a/etc/reactionnerd.ini b/etc/reactionnerd.ini
+--- a/etc/reactionnerd.ini	2013-02-11 15:08:26.000000000 +0100
++++ b/etc/reactionnerd.ini	2013-02-21 11:30:34.465686374 +0100
+@@ -1,11 +1,12 @@
+ [daemon]
+ # Paths are relative to this config file
+ #workdir=../var
+-#pidfile=%(workdir)s/reactionnerd.pid
++workdir=/var/lib/shinken
++pidfile=/var/run/shinken/reactionnerd.pid
+ interval_poll=5
+ maxfd=1024
+ port=7769
+-#host=0.0.0.0
++host=127.0.0.1
+ #user=shinken
+ #group=shinken
+ idontcareaboutsecurity=0
+diff -U 3 -H -d -r -N -- a/etc/receiverd.ini b/etc/receiverd.ini
+--- a/etc/receiverd.ini	2013-02-11 15:08:26.000000000 +0100
++++ b/etc/receiverd.ini	2013-02-21 11:30:34.498685984 +0100
+@@ -1,11 +1,12 @@
+ [daemon]
+ # Paths are relative to this config file
+ #workdir=../var
+-#pidfile=%(workdir)s/receiverd.pid
++workdir=/var/lib/shinken
++pidfile=/var/run/shinken/receiverd.pid
+ interval_poll=5
+ maxfd=1024
+ port=7773
+-#host=0.0.0.0
++host=127.0.0.1
+ #user=shinken
+ #group=shinken
+ idontcareaboutsecurity=0
+diff -U 3 -H -d -r -N -- a/etc/schedulerd.ini b/etc/schedulerd.ini
+--- a/etc/schedulerd.ini	2013-02-11 15:08:26.000000000 +0100
++++ b/etc/schedulerd.ini	2013-02-21 11:30:34.544685440 +0100
+@@ -1,9 +1,10 @@
+ [daemon]
+ # Paths are relative to this config file
+ #workdir=../var
+-#pidfile=%(workdir)s/schedulerd.pid
++workdir=/var/lib/shinken
++pidfile=/var/run/shinken/schedulerd.pid
+ port=7768
+-#host=0.0.0.0
++host=127.0.0.1
+ #user=shinken
+ #group=shinken
+ idontcareaboutsecurity=0
