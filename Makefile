@@ -1,4 +1,4 @@
-PKGS := arbaro chaplin fracplanet geomorph knock kpovmodeler mediawiki ossec-hids pam_usb povray shinken
+PKGS := arbaro chaplin fracplanet geomorph knock kpovmodeler mediawiki ossec-hids pam_usb povray shinken nagios-plugins-shinken
 REPODIR := /var/www/html/fedora-repo
 LOGFILE := build.log
 DISTRIB := $(shell source /etc/os-release && echo $${ID}-$${VERSION_ID})
