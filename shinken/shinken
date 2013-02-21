@@ -1,0 +1,92 @@
+#!/bin/bash
+
+cmd=$1
+
+which systemctl 1>/dev/null 2>&1
+RETVAL=$?
+[ $RETVAL -eq 0 ] && SYSTEMCTL=1 || SYSTEMCTL=0
+
+function process() {
+	local service=$1
+	local cmd=$2
+	if [ $SYSTEMCTL -eq 1 ]
+	then
+		systemctl ${cmd} ${service}.service
+	else
+		service ${service} ${cmd}
+	fi
+}
+
+function process_all() {
+	local cmd=$1
+	echo "${cmd} all shinken element"
+	echo
+	echo -n "${cmd} arbiter:"
+	process shinken-arbiter ${cmd}
+	echo '...Done.'
+	echo -n "${cmd} broker:"
+	process shinken-broker ${cmd}
+	echo '...Done.'
+	echo -n "${cmd} poller:"
+	process shinken-poller ${cmd}
+	echo '...Done.'
+	echo -n "${cmd} reactionner:"
+	process shinken-reactionner ${cmd}
+	echo '...Done.'
+	echo -n "${cmd} receiver:"
+	process shinken-receiver ${cmd}
+	echo '...Done.'
+	echo -n "${cmd} scheduler:"
+	process shinken-scheduler ${cmd}
+	echo '...Done.'
+	echo -n "${cmd} skonf:"
+	process shinken-skonf ${cmd}
+	echo '...Done.'
+}
+
+function status() {
+	echo "Get Status of all shinken element"
+	echo
+	echo -e "status\nquit" | shinken-admin | grep -v '^#' | grep -v 'Available functions'
+}
+
+function servicestatus() {
+	if [ $SYSTEMCTL -eq 1 ]
+	then
+		systemctl status shinken-{arbiter,broker,poller,reactionner,receiver,scheduler,skonf}.service
+	else
+		service shinken-{arbiter,broker,poller,reactionner,receiver,scheduler,skonf}.service status
+	fi
+}
+
+function usage() {
+	echo "Usage: shinken [start|stop|restart|status|servicestatus]"
+}
+
+case $cmd in
+	start)
+		process_all start
+		;;
+	stop)
+		process_all stop
+		;;
+	restart)
+		process_all stop
+		process_all start
+		;;
+	status)
+		status
+		;;
+	servicestatus)
+		servicestatus
+		;;
+	usage|help)
+		usage
+		;;
+	*)
+		echo Unknow syntax: $cmd
+		usage
+		exit 1
+		;;
+esac
+exit 0
