@@ -25,6 +25,7 @@ Requires:       php-common >= 5, php-xml
 Conflicts:      php-common = 5.3.1
 Requires:       php-mysql, php-pgsql
 Requires:       diffutils, ImageMagick, php-gd
+Obsoletes:      mediawiki-nomath, mediawiki-math
 
 %description
 MediaWiki is the software used for Wikipedia and the other Wikimedia
