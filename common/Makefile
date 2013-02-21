@@ -20,7 +20,7 @@ clean:
 
 rpmlint:
 	@echo -e "\033[1;32mChecking "$(NAME)".spec file\033[0m"
-	-rpmlint *.{spec,rpm}
+	-rpmlint $(NAME).spec $(NAME)*.rpm
 
 srpm:
 	@echo -e "\033[1;32mBuilding SRPM file\033[0m"
@@ -28,7 +28,7 @@ srpm:
 
 build: srpm
 	@echo -e "\033[1;32mBuilding RPMs files\033[0m"
-	-mock -r '$(TARGET)' rebuild *.src.rpm
+	-mock -r '$(TARGET)' rebuild $(NAME)*.src.rpm
 	-mv /var/lib/mock/$(TARGET)/result/*.rpm $(SRCDIR)
 
 log:
