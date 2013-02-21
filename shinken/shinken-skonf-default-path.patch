@@ -1,0 +1,16 @@
+diff -U 3 -H -d -r -N -- a/etc/skonf.cfg b/etc/skonf.cfg
+--- a/etc/skonf.cfg	2013-02-11 15:08:26.000000000 +0100
++++ b/etc/skonf.cfg	2013-02-21 08:46:28.936039177 +0100
+@@ -32,10 +32,10 @@
+ resource_file=resource.cfg
+ 
+ # Lock file (with pid) for Arbiterd
+-lock_file=skonfd.pid
++lock_file=/var/run/shinken/skonfd.pid
+ 
+ # The skonf daemon can have it's own local log
+-local_log=skonfd.log
++local_log=/var/log/shinken/skonfd.log
+ 
+ # Accepted log level values= DEBUG,INFO,WARNING,ERROR,CRITICAL
+ log_level=WARNING

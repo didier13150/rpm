@@ -20,12 +20,14 @@
 Summary:      Monitoring tool compatible with Nagios configuration and plugins
 Name:         shinken
 Version:      1.2.4
-Release:      1%{?dist}
+Release:      2%{?dist}
 License:      AGPLv3+
 Group:        Applications/System
 URL:          http://www.shinken-monitoring.org
 Source0:      http://www.shinken-monitoring.org/pub/%{name}-%{version}.tar.gz
+
 Patch0:       shinken-user-on-init-scripts.patch
+Patch1:       shinken-skonf-default-path.patch
 
 %if 0%{?rhel} >= 6 || 0%{?fedora} >= 1
 Requires:      python, python-pyro, chkconfig
@@ -37,16 +39,16 @@ BuildRequires: python26-devel, python26-setuptools
 Requires(post): httpd-tools
 
 %if %{with_systemd}
-Requires(post): systemd
-Requires(preun): systemd
+Requires(post):  systemd
+Requires(preun):  systemd
 Requires(postun): systemd
 # For triggerun
 Requires(post): systemd-sysv
 %else
 Requires: initscripts
 Requires: libevent
-Requires(post): /sbin/chkconfig
-Requires(preun): /sbin/chkconfig, /sbin/service
+Requires(post):   /sbin/chkconfig
+Requires(preun):  /sbin/chkconfig, /sbin/service
 Requires(postun): /sbin/service
 %endif
 
@@ -91,6 +93,8 @@ Shinken scheduler daemon
 Summary: Shinken Poller
 Group:   Applications/System
 Requires: %{name} = %{version}-%{release}
+Requires: nagios-plugins-all
+Requires: perl-Net-SNMP
 
 %description poller
 Shinken poller daemon
@@ -123,7 +127,7 @@ Shinken receiver daemon
 Summary: Shinken WUI to configure architecture of Shinken
 Group:   Applications/System
 Requires: %{name} = %{version}-%{release}
-Requires: python-simplejson, python-sqlite, httpd
+Requires: python-simplejson, python-sqlite, httpd, python-pymongo
 
 %description skonf
 sKonf is a web interface done to configure easily the architecture of Shinken
@@ -146,7 +150,8 @@ All Shinken Modules in one meta-package
 
 %prep
 %setup -q
-%patch0 -p1 -b .hcuser
+%patch0 -p1
+%patch1 -p1
 
 %if 0%{?rhel} < 6
 find -name '*.py' | xargs %{__sed} -i 's|^#!/usr/bin/python|#!/usr/bin/env python2.6|'
@@ -556,6 +561,9 @@ fi
 %attr(-,%{shinken_user} ,%{shinken_group}) %dir %{_localstatedir}/run/%{name}
 
 %changelog
+* Thu Feb 21 2013 Didier Fabert <dfabert@b2pweb.com> - 1.2.4-2
+- Fix skonf pid and log file path
+
 * Tue Feb 19 2013 Didier Fabert <dfabert@b2pweb.com> - 1.2.4-1
 - Update from upstream
 
