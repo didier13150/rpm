@@ -46,8 +46,15 @@ rm -rf $RPM_BUILD_ROOT
 %{__install} -d -m0755 %{buildroot}%{_libdir}/nagios/plugins
 make DESTDIR=%{buildroot} install
 
+# Workaround for 
+%{__sed} -i \
+    -e 's/use snmp v2c/-use- snmp v2c/' \
+    -e 's/use it as/-use- it as/' \
+    %{SOURCE1}
+
 %{__install} -m0755 %{SOURCE1} %{buildroot}%{_libdir}/nagios/plugins/
 %{__install} -m0755 %{SOURCE2} %{buildroot}%{_libdir}/nagios/plugins/
+
 
 %files
 %defattr(-,root,root,-)
