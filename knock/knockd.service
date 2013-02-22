@@ -4,7 +4,7 @@ After=network.target
 
 [Service]
 Type=simple
-EnvironmentFile=-/etc/sysconfig/knockd
+EnvironmentFile=/etc/sysconfig/knockd
 ExecStart=/usr/sbin/knockd -d $OPTIONS
 
 [Install]

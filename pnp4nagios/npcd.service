@@ -4,7 +4,7 @@ After=network.target
 
 [Service]
 Type=simple
-EnvironmentFile=-/etc/sysconfig/npcd
+EnvironmentFile=/etc/sysconfig/npcd
 ExecStart=/usr/sbin/npcd -d -f /etc/pnp4nagios/npcd.cfg $OPTIONS
 
 [Install]
