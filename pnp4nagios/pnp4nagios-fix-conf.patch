@@ -1,0 +1,46 @@
+diff -U 3 -H -d -r -N -- a/sample-config/pnp/config.php.in b/sample-config/pnp/config.php.in
+--- a/sample-config/pnp/config.php.in	2012-09-01 18:43:40.000000000 +0200
++++ b/sample-config/pnp/config.php.in	2013-02-22 13:03:14.665693977 +0100
+@@ -110,8 +110,8 @@
+ #
+ # Livestatus socket path
+ # 
+-#$conf['livestatus_socket'] = "tcp:localhost:6557";
+-$conf['livestatus_socket'] = "unix:/usr/local/nagios/var/rw/live";
++#$conf['livestatus_socket'] = "tcp:localhost:50000";
++$conf['livestatus_socket'] = "unix:/var/lib/shinken/rw/live";
+ 
+ #
+ # Which user is allowed to see all services or all hosts?
+diff -U 3 -H -d -r -N -- a/sample-config/pnp/npcd.cfg-sample.in b/sample-config/pnp/npcd.cfg-sample.in
+--- a/sample-config/pnp/npcd.cfg-sample.in	2012-09-01 18:43:40.000000000 +0200
++++ b/sample-config/pnp/npcd.cfg-sample.in	2013-02-22 12:47:54.677993105 +0100
+@@ -30,8 +30,8 @@
+ # log_type = <value>
+ #
+ 
+-#log_type = file
+-log_type = syslog
++log_type = file
++#log_type = syslog
+ 
+ 
+ # log_file - define a path to your logfile
+@@ -40,7 +40,7 @@
+ # log_file = </path/to/logpath/filename>
+ #
+ 
+-log_file = @localstatedir@/npcd.log
++log_file = @localstatedir@/log/pnp4nagios/npcd.log
+ 
+ 
+ # max_logfile_size - defines the maximum filesize (bytes)
+@@ -163,7 +163,7 @@
+ # perfdata_file = </path/to/file>
+ #
+ 
+-perfdata_file = @localstatedir@/perfdata.dump
++perfdata_file = @localstatedir@/lib/pnp4nagios/perfdata.dump
+ 
+ 
+ # perfdata_spool_filename - declare the destination
