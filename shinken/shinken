@@ -9,57 +9,45 @@ RETVAL=$?
 function process() {
 	local service=$1
 	local cmd=$2
+	local RETVAL=255
 	
+	echo -n "${cmd} ${service}"
 	if [ $SYSTEMCTL -eq 1 ]
 	then
-		systemctl ${cmd} ${service}.service
+		systemctl ${cmd} ${service}.service 1>/dev/null 2>&1
+		RETVAL=$?
 	else
 		if [[ "${cmd}" == "enable" ]]
 		then
-			chkconfig ${service} on
+			chkconfig ${service} on 1>/dev/null 2>&1
+			RETVAL=$?
 		elif [[ "${cmd}" == "disable" ]]
 		then
-			chkconfig ${service} off
+			chkconfig ${service} off 1>/dev/null 2>&1
+			RETVAL=$?
 		else
-			service ${service} ${cmd}
+			service ${service} ${cmd} 1>/dev/null 2>&1
+			RETVAL=$?
 		fi
 	fi
+	[ $RETVAL -eq 0 ] && echo '...Done.' || echo '...Failure'
+	return $RETVAL
 }
 
 function process_all() {
 	local cmd=$1
 	echo "${cmd} all shinken element"
 	echo
-	echo -n "${cmd} arbiter:"
 	process shinken-arbiter ${cmd}
-	echo '...Done.'
-	echo -n "${cmd} broker:"
 	process shinken-broker ${cmd}
-	echo '...Done.'
-	echo -n "${cmd} poller:"
 	process shinken-poller ${cmd}
-	echo '...Done.'
-	echo -n "${cmd} reactionner:"
 	process shinken-reactionner ${cmd}
-	echo '...Done.'
-	echo -n "${cmd} receiver:"
 	process shinken-receiver ${cmd}
-	echo '...Done.'
-	echo -n "${cmd} scheduler:"
 	process shinken-scheduler ${cmd}
-	echo '...Done.'
-	echo -n "${cmd} skonf:"
 	process shinken-skonf ${cmd}
-	echo '...Done.'
 }
 
 function status() {
-	echo "Get Status of all shinken element"
-	echo
-	echo -e "status\nquit" | shinken-admin | grep -v '^#' | grep -v 'Available functions'
-}
-
-function servicestatus() {
 	if [ $SYSTEMCTL -eq 1 ]
 	then
 		systemctl status shinken-{arbiter,broker,poller,reactionner,receiver,scheduler,skonf}.service
@@ -68,8 +56,14 @@ function servicestatus() {
 	fi
 }
 
+function admin() {
+	echo "Get Status of all shinken element"
+	echo
+	echo -e "status\nquit" | shinken-admin | grep -v '^#' | grep -v 'Available functions'
+}
+
 function usage() {
-	echo "Usage: shinken [start|stop|restart|status|servicestatus|enable|disable]"
+	echo "Usage: shinken [start|stop|restart|status|admin|enable|disable]"
 }
 
 case $cmd in
@@ -86,8 +80,8 @@ case $cmd in
 	status)
 		status
 		;;
-	servicestatus)
-		servicestatus
+	admin)
+		admin
 		;;
 	enable)
 		process_all enable
