@@ -11,6 +11,7 @@ License:       GPLv2
 URL:           http://pnp4nagios.org
 Source0:       http://sourceforge.net/projects/pnp4nagios/files/PNP-0.6/%{name}-%{version}.tar.gz
 Source1:       npcd.service
+Patch0:        pnp4nagios-fix-conf.patch
 Group:         Applications/Productivity
 BuildRoot:     %{_tmppath}/%{name}-%{version}-root-%(%{__id_u} -n)
 Summary:       A performance data graphing solution
@@ -45,6 +46,7 @@ RRD Tool).
 %prep
 echo %{_arch}
 %setup -q
+%patch0 -p1
 %{__sed} -i -e 's/MANDIR=@mandir@/MANDIR=\/usr\/share\/man/' man/Makefile.in
 
 %build
@@ -83,6 +85,10 @@ install -Dp -m0644 %{SOURCE1} %{buildroot}%{_unitdir}/npcd.service
 %{__rm} %{buildroot}%{_initrddir}/pnp_gearman_worker
 %{__mkdir_p} %{buildroot}%{_libdir}/%{name}
 %{__mv} %{buildroot}%{_datadir}/%{name}/npcdmod.o %{buildroot}%{_libdir}/%{name}/
+%{__mv} %{buildroot}%{_datadir}/%{name}/install.php %{buildroot}%{_datadir}/%{name}/install.php.bak
+%{__mkdir_p} %{buildroot}%{_sbindir}
+%{__mv} %{buildroot}%{_bindir}/npcd %{buildroot}%{_sbindir}/
+%{__rm} -rf %{buildroot}%{_bindir}
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -140,7 +146,7 @@ exit 0
 %endif
 %endif
 
-%triggerun -- npcd
+%triggerun -- pnp4nagios
 %if %{with_systemd}
 if [ -f /etc/rc.d/init.d/npcd ]; then
 # Save the current service runlevel info
@@ -178,7 +184,7 @@ fi
 %else
 %attr(0755,root,root) %{_initrddir}/npcd
 %endif
-%{_bindir}/npcd
+%{_sbindir}/npcd
 %{_libdir}/%{name}/npcdmod.o
 %{_libexecdir}/check_pnp_rrds.pl
 %{_libexecdir}/rrd_modify.pl
