@@ -1,6 +1,6 @@
 diff -U 3 -H -d -r -N -- a/etc/brokerd.ini b/etc/brokerd.ini
 --- a/etc/brokerd.ini	2013-02-11 15:08:26.000000000 +0100
-+++ b/etc/brokerd.ini	2013-02-21 14:31:07.934134988 +0100
++++ b/etc/brokerd.ini	2013-02-22 13:05:12.171231922 +0100
 @@ -1,16 +1,16 @@
  [daemon]
 -#workdir=var
@@ -23,7 +23,7 @@ diff -U 3 -H -d -r -N -- a/etc/brokerd.ini b/etc/brokerd.ini
  #interval_poll=5
 diff -U 3 -H -d -r -N -- a/etc/discovery.cfg b/etc/discovery.cfg
 --- a/etc/discovery.cfg	2013-02-11 15:08:26.000000000 +0100
-+++ b/etc/discovery.cfg	2013-02-21 14:32:14.380401749 +0100
++++ b/etc/discovery.cfg	2013-02-22 13:05:12.171231922 +0100
 @@ -22,7 +22,7 @@
  resource_file=resource.cfg
  
@@ -35,7 +35,7 @@ diff -U 3 -H -d -r -N -- a/etc/discovery.cfg b/etc/discovery.cfg
  # basename of the element
 diff -U 3 -H -d -r -N -- a/etc/hostd.cfg b/etc/hostd.cfg
 --- a/etc/hostd.cfg	2013-02-11 15:08:26.000000000 +0100
-+++ b/etc/hostd.cfg	2013-02-21 14:32:57.563922917 +0100
++++ b/etc/hostd.cfg	2013-02-22 13:05:12.172231910 +0100
 @@ -1,6 +1,6 @@
  
  # Log file of the discovery command
@@ -66,9 +66,21 @@ diff -U 3 -H -d -r -N -- a/etc/hostd.cfg b/etc/hostd.cfg
  
  auth_secret=NONE
  
+diff -U 3 -H -d -r -N -- a/etc/packs/os/linux/commands.cfg b/etc/packs/os/linux/commands.cfg
+--- a/etc/packs/os/linux/commands.cfg	2013-02-11 15:08:26.000000000 +0100
++++ b/etc/packs/os/linux/commands.cfg	2013-02-22 13:08:30.756731274 +0100
+@@ -23,7 +23,7 @@
+ 
+ define command {
+         command_name     check_linux_network_usage
+-        command_line     $PLUGINSDIR$/check_netint.pl -H $HOSTADDRESS$ -C $_HOSTSNMPCOMMUNITY$ -n "eth\d+|em\d+" -f -e -w $_HOSTNET_WARN$ -c $_HOSTNET_CRIT$ -q -k -y -M -B -m -P "$SERVICEPERFDATA$" -T "$LASTSERVICECHECK$" 
++        command_line     $PLUGINSDIR$/check_netint.pl -H $HOSTADDRESS$ -C $_HOSTSNMPCOMMUNITY$ -n "eth\d+|em\d+|p\d+p\d+" -f -e -w $_HOSTNET_WARN$ -c $_HOSTNET_CRIT$ -q -k -y -M -B -m -P "$SERVICEPERFDATA$" -T "$LASTSERVICECHECK$" 
+ }
+ 
+ define command {
 diff -U 3 -H -d -r -N -- a/etc/pollerd.ini b/etc/pollerd.ini
 --- a/etc/pollerd.ini	2013-02-11 15:08:26.000000000 +0100
-+++ b/etc/pollerd.ini	2013-02-21 14:31:07.934134988 +0100
++++ b/etc/pollerd.ini	2013-02-22 13:05:12.172231910 +0100
 @@ -1,6 +1,7 @@
  [daemon]
  
@@ -91,7 +103,7 @@ diff -U 3 -H -d -r -N -- a/etc/pollerd.ini b/etc/pollerd.ini
  # interval_poll=5
 diff -U 3 -H -d -r -N -- a/etc/reactionnerd.ini b/etc/reactionnerd.ini
 --- a/etc/reactionnerd.ini	2013-02-11 15:08:26.000000000 +0100
-+++ b/etc/reactionnerd.ini	2013-02-21 14:31:07.934134988 +0100
++++ b/etc/reactionnerd.ini	2013-02-22 13:05:12.172231910 +0100
 @@ -1,11 +1,12 @@
  [daemon]
  # Paths are relative to this config file
@@ -109,7 +121,7 @@ diff -U 3 -H -d -r -N -- a/etc/reactionnerd.ini b/etc/reactionnerd.ini
  idontcareaboutsecurity=0
 diff -U 3 -H -d -r -N -- a/etc/receiverd.ini b/etc/receiverd.ini
 --- a/etc/receiverd.ini	2013-02-11 15:08:26.000000000 +0100
-+++ b/etc/receiverd.ini	2013-02-21 14:31:07.934134988 +0100
++++ b/etc/receiverd.ini	2013-02-22 13:05:12.173231897 +0100
 @@ -1,11 +1,12 @@
  [daemon]
  # Paths are relative to this config file
@@ -127,7 +139,7 @@ diff -U 3 -H -d -r -N -- a/etc/receiverd.ini b/etc/receiverd.ini
  idontcareaboutsecurity=0
 diff -U 3 -H -d -r -N -- a/etc/resource.cfg b/etc/resource.cfg
 --- a/etc/resource.cfg	2013-02-11 15:08:26.000000000 +0100
-+++ b/etc/resource.cfg	2013-02-21 14:46:33.198748638 +0100
++++ b/etc/resource.cfg	2013-02-22 13:05:12.173231897 +0100
 @@ -1,10 +1,10 @@
  # Nagios legacy macros
 -$USER1$=/usr/local/shinken/libexec
@@ -143,7 +155,7 @@ diff -U 3 -H -d -r -N -- a/etc/resource.cfg b/etc/resource.cfg
  # Active Directory and LDAP
 diff -U 3 -H -d -r -N -- a/etc/schedulerd.ini b/etc/schedulerd.ini
 --- a/etc/schedulerd.ini	2013-02-11 15:08:26.000000000 +0100
-+++ b/etc/schedulerd.ini	2013-02-21 14:31:07.934134988 +0100
++++ b/etc/schedulerd.ini	2013-02-22 13:05:12.173231897 +0100
 @@ -1,9 +1,10 @@
  [daemon]
  # Paths are relative to this config file
@@ -159,7 +171,7 @@ diff -U 3 -H -d -r -N -- a/etc/schedulerd.ini b/etc/schedulerd.ini
  idontcareaboutsecurity=0
 diff -U 3 -H -d -r -N -- a/etc/shinken-specific.cfg b/etc/shinken-specific.cfg
 --- a/etc/shinken-specific.cfg	2013-02-11 15:08:26.000000000 +0100
-+++ b/etc/shinken-specific.cfg	2013-02-21 14:41:29.818174676 +0100
++++ b/etc/shinken-specific.cfg	2013-02-22 13:06:01.397608486 +0100
 @@ -67,7 +67,7 @@
      # - Collectd                = Receive collectd perfdata
      # - SnmpBooster             = Snmp bulk polling module, configuration linker
@@ -223,6 +235,17 @@ diff -U 3 -H -d -r -N -- a/etc/shinken-specific.cfg b/etc/shinken-specific.cfg
  
      ## Advanced Options
      # Don't use them as long as you don't know what you are doing!
+@@ -537,8 +537,8 @@
+     module_name     Livestatus
+     module_type     livestatus
+     host            *           ; * = listen on all configured IP addresses
+-    port            50000       ; port to listen
+-    #socket          /usr/local/shinken/var/rw/live  ; If a Unix socket is required
++    #port            50000       ; port to listen
++    socket          /var/lib/shinken/rw/live  ; If a Unix socket is required
+     ## Available modules:
+     # - logsqlite: send historical logs to a local sqlite database
+     # - mongologs: send historical logs to a mongodb database
 @@ -600,7 +600,7 @@
  define module {
      module_name     NPCDMOD
@@ -279,7 +302,7 @@ diff -U 3 -H -d -r -N -- a/etc/shinken-specific.cfg b/etc/shinken-specific.cfg
  ## Module:      CommandFile
 diff -U 3 -H -d -r -N -- a/etc/skonf.cfg b/etc/skonf.cfg
 --- a/etc/skonf.cfg	2013-02-11 15:08:26.000000000 +0100
-+++ b/etc/skonf.cfg	2013-02-21 14:31:14.612061517 +0100
++++ b/etc/skonf.cfg	2013-02-22 13:05:12.174231884 +0100
 @@ -32,10 +32,10 @@
  resource_file=resource.cfg
  
@@ -316,7 +339,7 @@ diff -U 3 -H -d -r -N -- a/etc/skonf.cfg b/etc/skonf.cfg
  # Module used by discovery to save objects
 diff -U 3 -H -d -r -N -- a/for_fedora/init.d/shinken-arbiter b/for_fedora/init.d/shinken-arbiter
 --- a/for_fedora/init.d/shinken-arbiter	2013-02-11 15:08:26.000000000 +0100
-+++ b/for_fedora/init.d/shinken-arbiter	2013-02-21 14:31:20.907992202 +0100
++++ b/for_fedora/init.d/shinken-arbiter	2013-02-22 13:05:12.175231872 +0100
 @@ -43,7 +43,7 @@
  
      directory=$(dirname $pidfile)                                                                                                                                    
@@ -328,7 +351,7 @@ diff -U 3 -H -d -r -N -- a/for_fedora/init.d/shinken-arbiter b/for_fedora/init.d
      $exec $daemon_args
 diff -U 3 -H -d -r -N -- a/for_fedora/init.d/shinken-broker b/for_fedora/init.d/shinken-broker
 --- a/for_fedora/init.d/shinken-broker	2013-02-11 15:08:26.000000000 +0100
-+++ b/for_fedora/init.d/shinken-broker	2013-02-21 14:31:20.908992191 +0100
++++ b/for_fedora/init.d/shinken-broker	2013-02-22 13:05:12.175231872 +0100
 @@ -44,7 +44,7 @@
  
      directory=$(dirname $pidfile)                                                                                                                                    
@@ -340,7 +363,7 @@ diff -U 3 -H -d -r -N -- a/for_fedora/init.d/shinken-broker b/for_fedora/init.d/
      $exec $daemon_args
 diff -U 3 -H -d -r -N -- a/for_fedora/init.d/shinken-poller b/for_fedora/init.d/shinken-poller
 --- a/for_fedora/init.d/shinken-poller	2013-02-11 15:08:26.000000000 +0100
-+++ b/for_fedora/init.d/shinken-poller	2013-02-21 14:31:20.908992191 +0100
++++ b/for_fedora/init.d/shinken-poller	2013-02-22 13:05:12.176231859 +0100
 @@ -48,7 +48,7 @@
  
      directory=$(dirname $pidfile)                                                                                                                                    
@@ -352,7 +375,7 @@ diff -U 3 -H -d -r -N -- a/for_fedora/init.d/shinken-poller b/for_fedora/init.d/
      $exec $daemon_args
 diff -U 3 -H -d -r -N -- a/for_fedora/init.d/shinken-reactionner b/for_fedora/init.d/shinken-reactionner
 --- a/for_fedora/init.d/shinken-reactionner	2013-02-11 15:08:26.000000000 +0100
-+++ b/for_fedora/init.d/shinken-reactionner	2013-02-21 14:31:20.908992191 +0100
++++ b/for_fedora/init.d/shinken-reactionner	2013-02-22 13:05:12.176231859 +0100
 @@ -44,7 +44,7 @@
  
      directory=$(dirname $pidfile)                                                                                                                                    
@@ -364,7 +387,7 @@ diff -U 3 -H -d -r -N -- a/for_fedora/init.d/shinken-reactionner b/for_fedora/in
      $exec $daemon_args
 diff -U 3 -H -d -r -N -- a/for_fedora/init.d/shinken-receiver b/for_fedora/init.d/shinken-receiver
 --- a/for_fedora/init.d/shinken-receiver	2013-02-11 15:08:26.000000000 +0100
-+++ b/for_fedora/init.d/shinken-receiver	2013-02-21 14:31:20.908992191 +0100
++++ b/for_fedora/init.d/shinken-receiver	2013-02-22 13:05:12.176231859 +0100
 @@ -43,7 +43,7 @@
  
      directory=$(dirname $pidfile)                                                                                                                                    
@@ -376,7 +399,7 @@ diff -U 3 -H -d -r -N -- a/for_fedora/init.d/shinken-receiver b/for_fedora/init.
      $exec $daemon_args
 diff -U 3 -H -d -r -N -- a/for_fedora/init.d/shinken-scheduler b/for_fedora/init.d/shinken-scheduler
 --- a/for_fedora/init.d/shinken-scheduler	2013-02-11 15:08:26.000000000 +0100
-+++ b/for_fedora/init.d/shinken-scheduler	2013-02-21 14:31:20.908992191 +0100
++++ b/for_fedora/init.d/shinken-scheduler	2013-02-22 13:05:12.176231859 +0100
 @@ -44,7 +44,7 @@
  
      directory=$(dirname $pidfile)                                                                                                                                    
@@ -388,7 +411,7 @@ diff -U 3 -H -d -r -N -- a/for_fedora/init.d/shinken-scheduler b/for_fedora/init
      $exec $daemon_args
 diff -U 3 -H -d -r -N -- a/for_fedora/init.d/shinken-skonf b/for_fedora/init.d/shinken-skonf
 --- a/for_fedora/init.d/shinken-skonf	2013-02-11 15:08:26.000000000 +0100
-+++ b/for_fedora/init.d/shinken-skonf	2013-02-21 14:31:20.908992191 +0100
++++ b/for_fedora/init.d/shinken-skonf	2013-02-22 13:05:12.176231859 +0100
 @@ -43,7 +43,7 @@
  
      directory=$(dirname $pidfile)                                                                                                                                    
