@@ -35,6 +35,8 @@ Requires:         perl(Gearman::Worker), perl(Crypt::Rijndael)
 Requires:         rrdtool
 Requires:         perl(Time::HiRes)
 Requires:         shinken
+Requires(post):   httpd-tools
+
 %description
 PNP is an add-on to Nagios which analyzes performance data provided by plugins
 and stores them automatically into RRD-databases (Round Robin Databases, see
@@ -99,6 +101,8 @@ if [ $1 = 1 ]; then
 fi
 %endif
 /sbin/ldconfig
+echo "Setup /etc/pnp4nagios/pnp4nagios.htpasswd file with default account: admin, password: admin"
+htpasswd -b -c /etc/pnp4nagios/pnp4nagios.htpasswd admin admin
 
 %preun
 %if 0%{?systemd_preun:1}
