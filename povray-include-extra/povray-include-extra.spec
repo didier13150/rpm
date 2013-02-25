@@ -56,6 +56,24 @@ Source47:       http://www.dylanbeattie.net/starwars/download/bwing.zip
 Source48:       http://www.dylanbeattie.net/starwars/download/c_city.zip
 Source49:       http://tofbouf.free.fr/download/fern.zip
 Source50:       http://tofbouf.free.fr/download/explose.zip
+Source51:       http://objects.povworld.org/binaries/earth.pov
+Source52:       http://objects.povworld.org/binaries/columns.zip
+Source53:       http://objects.povworld.org/binaries/lighthouse.zip
+Source54:       http://objects.povworld.org/binaries/waterfall.pov
+Source55:       http://objects.povworld.org/binaries/tintinrocket.zip
+Source56:       http://objects.povworld.org/binaries/boat.pov
+Source57:       http://objects.povworld.org/binaries/sunboat.pov
+Source58:       http://runevision.com/3d/include/particles/particle101.zip
+Source59:       http://runevision.com/3d/include/electric.zip
+Source60:       http://runevision.com/3d/include/illusion.zip
+Source61:       http://www.travelnotes.de/rays/seaplane/b317.include
+Source62:       http://www.travelnotes.de/rays/seaplane/palms.include
+Source63:       http://www.f-lohmueller.de/pov_tut/objects/plants/Palm_1.inc
+Source64:       http://www.f-lohmueller.de/pov_tut/objects/plants/Palm_2.inc
+Source65:       http://www.f-lohmueller.de/pov_tut/objects/plants/Palm_1quadro.inc
+Source66:       http://www.f-lohmueller.de/pov_tut/objects/plants/Reeds_0.inc
+Source67:       http://downloads.sourceforge.net/project/jpatch/jpatch/JPatch%200.4%20PREVIEW%201/jpatch0_4preview1.zip
+
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Requires:       povray

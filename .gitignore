@@ -24,3 +24,6 @@ nagios-plugins-shinken/check_netint.pl
 nagios-plugins-snmp
 /povray/povray-3.7.0.RC6
 
+povray-include-extra/*.pov
+povray-include-extra/*.inc
+povray-include-extra/*.c
