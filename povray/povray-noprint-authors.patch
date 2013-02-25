@@ -1,0 +1,14 @@
+diff -U 3 -H -b -w -B -E -d -r -N -- a/source/frontend/renderfrontend.cpp b/source/frontend/renderfrontend.cpp
+--- a/source/frontend/renderfrontend.cpp	2012-02-05 21:54:17.000000000 +0100
++++ b/source/frontend/renderfrontend.cpp	2013-02-24 12:31:46.799751429 +0100
+@@ -219,8 +219,8 @@
+ 	if(resultobj != NULL)
+ 		*resultobj = result;
+ 
+-	if(console != NULL)
+-		Message2Console::InitInfo(result, console.get());
++	/*if(console != NULL)
++		Message2Console::InitInfo(result, console.get());*/
+ }
+ 
+ void RenderFrontendBase::DisconnectFromBackend(POVMSAddress backendaddress)

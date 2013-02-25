@@ -1,13 +1,14 @@
 %define majorver 3.7
 Name:          povray
 Version:       %{majorver}.0.RC6
-Release:       2%{?dist}
+Release:       3%{?dist}
 License:       Freeware
 Summary:       Persistence of Vision Raytracer
 URL:           http://www.povray.org
 Source0:       http://www.povray.org/redirect/www.povray.org/beta/source/%{name}-%{version}.tar.gz
 Patch0:        povray-boost-1.50.patch
 Patch1:        povray-print-cmdline.patch
+Patch2:        povray-noprint-authors.patch
 Group:         Applications/Multimedia
 BuildRoot:     %{_tmppath}/%{name}-%{version}-root
 BuildRequires: autoconf, automake, binutils, sed, grep, gcc-c++, libXpm
@@ -27,6 +28,7 @@ to do their own ports.
 %setup -q
 %patch0 -p1
 %patch1 -p1
+%patch2 -p1
 find . -name '*.sh' -exec dos2unix {} \;
 
 %build
@@ -58,6 +60,9 @@ rm -rf %{buildroot}
 %doc AUTHORS COPYING ChangeLog NEWS README VERSION changes.txt revision.txt
 
 %changelog
+* Sun Feb 17 2013 Didier Fabert <didier.fabert@gmail.com> 3.7.0.RC6-3
+- No Print about authors, contributors ans libs
+
 * Sun Feb 17 2013 Didier Fabert <didier.fabert@gmail.com> 3.7.0.RC6-2
 - Print command line on stdout
 
