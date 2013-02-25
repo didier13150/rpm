@@ -1,4 +1,3 @@
-%define us_ver %(echo %{version} | sed -e 's/\\\./_/g')
 Name:           hfc
 Version:        1.9.8
 Release:        1%{?dist}
@@ -6,9 +5,13 @@ Summary:        Grass covered areas in POV-Ray
 License:        GPLv2
 Group:          Applications/Multimedia
 URL:            http://www.wozzeck.net/images/hfcomp/gazon-en.html
-Source0:        http://www.wozzeck.net/images/hfcomp/hfc.jar
+Source0:        http://www.wozzeck.net/images/hfcomp/%{name}.jar
 Source1:        %{name}.desktop
 Source2:        %{name}
+Source3:        %{name}.html
+Source4:        herbe.css
+Source5:        scrinechotte.png
+Source6:        demo.jpg
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires:  java-devel
@@ -19,14 +22,16 @@ Requires:       java3d
 
 
 %description
-Arbaro is an implementation of the tree generating algorithm described in
-Jason Weber & Joseph Penn: Creation and Rendering of Realistic Trees
+The principle used in this software is to extend the principle of
+Gille Tran's macros, to cover any height field.
 
 %prep
 
 %build
-%{__rm} -f build.xml
-%{__rm} -rf src test
+%{__cp} %{SOURCE3} .
+%{__cp} %{SOURCE4} .
+%{__cp} %{SOURCE5} .
+%{__cp} %{SOURCE6} .
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -51,6 +56,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_javadocdir}/%{name}
 %{_datadir}/%{name}
 %{_datadir}/applications/%{name}.desktop
+%doc hfc.html herbe.css scrinechotte.png demo.jpg
 
 %changelog
 * Sat Feb 16 2013 Didier Fabert <didier.fabert@gmail.com> 1.9.8-1
