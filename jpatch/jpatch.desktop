@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Name=jPatch
+Exec=jpatch
+Icon=system-run
+Type=Application
+GenericName=Spline based 3D modeling tool
+GenericName[fr]=Modéliseur 3D basé sur les Splines
+Terminal=false
+Categories=Graphics;3DGraphics;
+StartupNotify=true
