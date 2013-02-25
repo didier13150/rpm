@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Name=High Fields Covered
+Exec=hfc
+Icon=system-run
+Type=Application
+GenericName=Grass covered areas in POV-Ray
+GenericName[fr]=Couverture d'herbe pour POV-Ray
+Terminal=false
+Categories=Graphics;3DGraphics;
+StartupNotify=true
