@@ -72,7 +72,7 @@ Source63:       http://www.f-lohmueller.de/pov_tut/objects/plants/Palm_1.inc
 Source64:       http://www.f-lohmueller.de/pov_tut/objects/plants/Palm_2.inc
 Source65:       http://www.f-lohmueller.de/pov_tut/objects/plants/Palm_1quadro.inc
 Source66:       http://www.f-lohmueller.de/pov_tut/objects/plants/Reeds_0.inc
-Source67:       http://downloads.sourceforge.net/project/jpatch/jpatch/JPatch%200.4%20PREVIEW%201/jpatch0_4preview1.zip
+Source67:       http://web.archive.org/web/20071101052625/propro.ru/go/Wshop/povtree/tomtree-1.5.zip
 
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
