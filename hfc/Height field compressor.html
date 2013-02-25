@@ -1,0 +1,222 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+
+  
+  
+  <title>Height field compressor</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+
+  
+  <link rel="stylesheet" href="Height%20field%20compressor_files/herbe.css" type="text/css">
+</head>
+
+
+<body style="background-image: url(file:///mnt/doktor/francois/Web/WOZZECK.NET/MIRROR/images/hfcomp/natfl014clair.jpg);">
+
+<div id="Layer1" class="mylayer">
+<h1>Height field compressor</h1>
+
+<p align="center">
+<img src="Height%20field%20compressor_files/demo.jpg" alt="" height="600" width="800">
+</p>
+
+<p><br>
+
+<a href="#Quel_est_le_probleme_">What is it about?</a><br>
+
+<a href="#Une_couverture_adaptative_dun_">Adaptive coverage
+of a height_field</a><br>
+
+<a href="#Couverture_des_plaques_export_Pov-Ray">Block coverage, export to POV-Ray</a><br>
+
+<a href="#Telechargement">Download</a>
+&lt;----------------------- <big style="color: rgb(255, 0, 0);"><big>If
+you're in a hurry, it's there!</big></big><br>
+
+<a href="http://www.wozzeck.net/images/hfcomp/tutorial/index.html">Documentation</a><br>
+
+<a href="#Documentation">Screenshot</a><br>
+
+<a href="#historique">History</a></p>
+
+<h2><a name="Quel_est_le_probleme_"></a>What is it about ?</h2>
+
+<p>
+Creating grass covered areas in POV-Ray meets one major problem:
+memory footprint. It is quite usual to use millions of grass blades
+to cover a not-so-wide area. Till now, two solutions have been available,
+that minimize the problem:</p>
+
+<ul>
+
+  <li>using a grass-looking texture. One of the best work in this area is
+probably <a href="http://runevision.com/show.asp?page=include&amp;data=grasstex">
+Rune Johannson's</a>. Despite its Van Gogh look, it gives acceptable results
+for uniform, undulating areas, which do not exhibit important crests, as long as a close
+view is not needed.</li>
+
+  <li>using a grass patch which is duplicated to cover a plane.
+This is the principle used in <a href="http://www.oyonale.com/ressources/english/sources01.htm">a
+set of macros written by Gilles Tran</a>, which uses the fact that copying
+a mash only needs a very small amount of memory in POV-Ray. It gives
+very good results on flat areas, but might lead to long parsing times.</li>
+
+</ul>
+
+<h2><a name="Une_couverture_adaptative_dun_"></a>
+Adaptive coverage of a height_field </h2>
+
+<p>The principle used in this software is to extend the principle of
+Gille Tran's macros, to cover any height field. The original method
+cannot be directly used, since a bumped area cannot be precisely
+covered with big, flat patches.
+The height_field is divided into a set of small square blocks, which
+can be approximated by a reduced subset of bumped blocks, simply
+by applying symmetries, rotations and vertical translations.
+This method falls in the category of the "dictionary" data compression
+algorithms, the most famous element of which is the Lempel-Ziv-Welch
+algorithm, once pattented by Unisys, but which is now public domain,
+putting an end to the kind of complete messes software pattents can lead to ;-)</p>
+
+<p>
+This software takes as input a greyscale image, in PNG (highly recommended), GIF
+(if needed) or JPEG (to be avoided) formats, in 8-bit depth. It also accepts
+16-bit images encoded using red and green.</p>
+
+
+<p>Image dimension is practically limited to a bit less than 1024x1024. It is possible
+to use bigger images, but it can be necessary to increase the memory
+available to the Java virtual machine, for instance using
+<code>java -Xmx256m -jar hfc.jar</code>, which extends the default
+64 MB to 256. However, do not forget that the aim is to place grass leaves, not to draw an accurate HF.
+If HFC seems not to do anything when loading an image, you should
+probably guess that the image is too big. First try using a smaller
+scale version, and only increase the available memory if you
+really need it.<br>
+
+</p>
+
+<p>
+Two parameters are necessary to build the dictionnary: block size,
+and the threshold under which two blocks will be considered similar.
+Generally speaking:</p>
+
+<ul>
+
+  <li>The bigger the blocks, the lower the compression ratio, as
+it is likely that it will be more difficult to assimilate two
+blocks. The same is true if the threshold is too small, except
+on very flat lands.</li>
+
+  <li>Small blocks will often lead to a reduced dictionary, but might
+exhibit repetitive patterns.</li>
+
+  <li>Too high a threshold might lead to underground or flying
+grass blades. A compromise should be found between dictionary
+shrinking and realism.</li>
+
+</ul>
+
+<p>Practically, 8x8 pixels often lead to good looking results,
+combined with a threshold around one quarter the height of the
+blades.<br>
+
+</p>
+
+<p>The result of this first step is internal, and features a
+dictionnary of the blocks needed to rebuild the HF, and a
+conversion table giving, for each block of the HF, the corresponding
+block in the dictionary, and the transformations to be performed to
+convert between each other.<br>
+
+</p>
+
+<p>The software reports the nomber of blocks of the main "grid",
+the dictionary size, and the amount of blocks used only once
+in the building process: if this number is too high, it can be
+useful to increase the threshold.</p>
+
+
+<h2><a name="Couverture_des_plaques_export_Pov-Ray"></a>Block coverage,
+POV-Ray export</h2>
+
+<p>The second phase consists in covering each block of the dictionary,
+and copying this block wherever it is needed.<br>
+
+</p>
+
+<p>Several algorithms are available, and new ones can easilly be added
+using Java programming. One system allows basic export using a pair
+of crossed triangles for each blade. A second system uses the same ideas
+as Gille Tran's makeblade macro.
+Both generate POV-Ray files using the mesh2 syntax, thus reducing the
+parsing time to a minimum: a cliff covered with 3 million basic blades
+will be parsed in 7 seconds.<br>
+
+</p>
+
+<p>An estimation of the output file size is provided before exporting</p>
+
+<h2><a name="Telechargement"></a>Download</h2>
+
+<p>For portability and development speed reasons, this software is
+written in Java. Computing time is usually reasonnable, a few minutes
+being a maximum. You will need a
+<a href="http://java.sun.com/j2se/1.4.2/download.html">full Java VM (version 1.4)</a>, and
+<a href="http://java.sun.com/products/java-media/3D/download.html">Java3D</a>
+extension (any version). If you still use windows, it is strongly
+recommended to upgrade to a working JVM, such as Sun's one.<br>
+
+</p>
+
+<p>This is free software, available under the terms of the
+GNU General Public License, version 2 or higher at your option.</p>
+
+<p>It's here: <a href="http://www.wozzeck.net/images/hfcomp/hfc.jar">hfc.jar</a>. Download the archive
+(~75 k), do not uncompress it,
+and double-click on its icon or type <code>java -jar hfc.jar</code> to run
+the software. </p>
+
+<p>The source files are also available for those interested:
+<a href="http://www.wozzeck.net/images/hfcomp/hfc_src.zip">hfc_src.zip</a>
+</p>
+
+<h2><a name="Documentation"></a>Screenshot (French)</h2>
+
+<p>
+Don't worry: the screenshot is in French, but the default GUI is in English.
+A Japanese version should follow soon.
+</p>
+
+<p style="text-align: center; margin-left: 0pt; text-indent: 0pt; margin-right: 0pt;">
+<img src="Height%20field%20compressor_files/scrinechotte.png" title="" alt="Scrinechotte [16k]" style="height: 634px; width: 720px;" align="middle">
+<br>
+
+</p>
+
+<h3><a name="Historique"></a>History (extremely short)</h3>
+
+<dl>
+
+  <dt>0.1.0-0.1.7</dt>
+
+  <dd>Initial versions, only announced and shared between French speaking users</dd>
+  <dt>0.1.8</dt>
+  <dd>Initial international release.</dd>
+  <dt>0.1.9</dt>
+  <dd>Minor bugfixes, Dutch translation (thanks Thomas!).</dd>
+</dl>
+
+<p>&nbsp;</p>
+
+<hr width="70%" align="center">
+<p style="" align="center">© <a href="mailto:wozzeck@club-internet.fr?subject=gazon">François
+Dispot</a> 2003-2007</p>
+
+<p>&nbsp;</p>
+
+</div>
+
+
+
+</body></html>
