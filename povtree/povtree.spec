@@ -29,8 +29,6 @@ save it either as an include file or as a mesh file.
 %setup -qc %{name}%{version}
 
 %build
-%{__rm} -f build.xml
-%{__rm} -rf src test
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -38,14 +36,12 @@ rm -rf $RPM_BUILD_ROOT
 %{__mkdir_p} $RPM_BUILD_ROOT%{_datadir}/applications
 %{__mkdir_p} $RPM_BUILD_ROOT%{_datadir}/%{name}
 %{__mkdir_p} $RPM_BUILD_ROOT%{_javadir}/%{name}
-%{__mkdir_p} $RPM_BUILD_ROOT%{_javadocdir}/%{name}
-%{__install} *.jar $RPM_BUILD_ROOT%{_javadir}/%{name}
+%{__install} %{name}.jar $RPM_BUILD_ROOT%{_javadir}/%{name}
+%{__install} TOMTREE-1.5.inc $RPM_BUILD_ROOT%{_javadir}/%{name}
+%{__install} help.jpg $RPM_BUILD_ROOT%{_javadir}/%{name}
 %{__install} %{SOURCE1} $RPM_BUILD_ROOT%{_datadir}/applications
 %{__install} %{SOURCE2} $RPM_BUILD_ROOT%{_bindir}
-%{__install} %{SOURCE3} $RPM_BUILD_ROOT%{_bindir}
-%{__cp} -r doc/* $RPM_BUILD_ROOT%{_javadocdir}/%{name}
-%{__cp} -r pov $RPM_BUILD_ROOT%{_datadir}/%{name}
-%{__cp} -r trees $RPM_BUILD_ROOT%{_datadir}/%{name}
+%{__cp} -r de en fr it ja ru $RPM_BUILD_ROOT%{_javadir}/%{name}/
 
 sed -i -e 's#@datadir@#%{_javadir}/%{name}#' $RPM_BUILD_ROOT%{_bindir}/%{name}
 
@@ -54,13 +50,11 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root,-)
-%{_bindir}/%{name}*
+%{_bindir}/%{name}
 %{_javadir}/%{name}
-%{_javadocdir}/%{name}
 %{_datadir}/%{name}
 %{_datadir}/applications/%{name}.desktop
-%doc COPYING README
 
 %changelog
-* Sat Feb 16 2013 Didier Fabert <didier.fabert@gmail.com> 1.9.8-1
+* Mon Feb 25 2013 Didier Fabert <didier.fabert@gmail.com> 1.5-1
 - First Release
