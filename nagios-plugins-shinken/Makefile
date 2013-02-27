@@ -8,6 +8,8 @@ SRCDWL3 := $(shell rpmspec -P $(NAME).spec | grep -i '^source2' | awk -F ':' '{p
 SRCNAME3 := $(shell basename $(SRCDWL3))
 SRCDWL4 := $(shell rpmspec -P $(NAME).spec | grep -i '^source3' | awk -F ':' '{print $$2":"$$3}' | tr -d ' ')
 SRCNAME4 := $(shell basename $(SRCDWL4))
+SRCDWL5 := $(shell rpmspec -P $(NAME).spec | grep -i '^source4' | awk -F ':' '{print $$2":"$$3}' | tr -d ' ')
+SRCNAME5 := $(shell basename $(SRCDWL5))
 include ../common/Makefile
 sources:
 	@echo -e "\033[1;32mDownloading sources\033[0m"
@@ -15,3 +17,4 @@ sources:
 	@[ -f $(SRCNAME2) ] || wget -O $(SRCNAME2) $(SRCDWL2) ; chmod 0644 $(SRCNAME2)
 	@[ -f $(SRCNAME3) ] || wget -O $(SRCNAME3) $(SRCDWL3) ; chmod 0644 $(SRCNAME3)
 	@[ -f $(SRCNAME4) ] || wget -O $(SRCNAME4) $(SRCDWL4)
+	@[ -f $(SRCNAME5) ] || wget -O $(SRCNAME5) $(SRCDWL5) ; chmod 0644 $(SRCNAME5)

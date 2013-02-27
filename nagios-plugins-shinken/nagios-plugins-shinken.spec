@@ -10,6 +10,7 @@ Source0:        http://sourceforge.net/projects/nagios-snmp/files/nagios-plugins
 Source1:        https://raw.github.com/willixix/WL-NagiosPlugins/master/check_netint.pl
 Source2:        https://raw.github.com/justintime/nagios-plugins/master/check_mem/check_mem.pl
 Source3:        http://nagios.manubulon.com/nagios-snmp-plugins.1.1.1.tgz
+Source4:        http://bucardo.org/downloads/check_postgres.tar.gz
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}
 
@@ -36,12 +37,14 @@ Nagios Plugins needed by default shinken install
 %prep
 %setup -qn nagios-plugins-snmp
 %{__tar} -xzf %{SOURCE3}
+%{__tar} -xzf %{SOURCE4}
 
 %build
 %configure \
     --libexecdir=%{_libdir}/nagios/plugins \
     --disable-nls
 make %{?_smp_mflags}
+find . -name '*.pl' -exec sed -i -e 's#/usr/local/nagios/libexec#/usr/lib64/nagios/plugins#g' {} \;
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -56,6 +59,7 @@ make DESTDIR=%{buildroot} install
 
 %{__install} -m0755 %{SOURCE1} %{buildroot}%{_libdir}/nagios/plugins/
 %{__install} -m0755 %{SOURCE2} %{buildroot}%{_libdir}/nagios/plugins/
+%{__install} -m0755 check_postgres*/check_postgres.pl %{buildroot}%{_libdir}/nagios/plugins/
 %{__install} -m0755 nagios_plugins/check_snmp_boostedge.pl %{buildroot}%{_libdir}/nagios/plugins/
 %{__install} -m0755 nagios_plugins/check_snmp_cpfw.pl %{buildroot}%{_libdir}/nagios/plugins/
 %{__install} -m0755 nagios_plugins/check_snmp_css.pl %{buildroot}%{_libdir}/nagios/plugins/
@@ -92,6 +96,7 @@ make DESTDIR=%{buildroot} install
 %{_libdir}/nagios/plugins/check_snmp_storage.pl
 %{_libdir}/nagios/plugins/check_snmp_vrrp.pl
 %{_libdir}/nagios/plugins/check_snmp_win.pl
+%{_libdir}/nagios/plugins/check_postgres.pl
 %doc AUTHORS COPYING ChangeLog NEWS README nagios_plugins/doc/
 
 
