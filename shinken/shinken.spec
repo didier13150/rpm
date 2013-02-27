@@ -291,7 +291,7 @@ echo "Don't forget to install php for pnp4nagios, because it's not a shinken dep
 
 if [[ "$(uname -p)" == "x86_64" ]]
 then
-  %{__sed} -i -e '/USER1/ s#lib#lib64#g' /etc/shinken/resource.cfg
+  %{__sed} -i -e '/USER1/ s#/lib/#/lib64/#g' /etc/shinken/resource.cfg
 fi
 
 %pre

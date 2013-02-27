@@ -1,6 +1,6 @@
 diff -U 3 -H -d -r -N -- a/etc/brokerd.ini b/etc/brokerd.ini
 --- a/etc/brokerd.ini	2013-02-11 15:08:26.000000000 +0100
-+++ b/etc/brokerd.ini	2013-02-22 13:05:12.171231922 +0100
++++ b/etc/brokerd.ini	2013-02-27 15:36:04.974551692 +0100
 @@ -1,16 +1,16 @@
  [daemon]
 -#workdir=var
@@ -21,9 +21,18 @@ diff -U 3 -H -d -r -N -- a/etc/brokerd.ini b/etc/brokerd.ini
  #port=7772
  
  #interval_poll=5
+@@ -32,7 +32,7 @@
+ # Enabled by default to ease troubleshooting
+ use_local_log=1
+ 
+-#local_log=%(workdir)s/brokerd.log
++local_log=/var/log/shinken/brokerd.log
+ 
+ # accepted log level values= DEBUG,INFO,WARNING,ERROR,CRITICAL
+ log_level=WARNING
 diff -U 3 -H -d -r -N -- a/etc/discovery.cfg b/etc/discovery.cfg
 --- a/etc/discovery.cfg	2013-02-11 15:08:26.000000000 +0100
-+++ b/etc/discovery.cfg	2013-02-22 13:05:12.171231922 +0100
++++ b/etc/discovery.cfg	2013-02-27 15:33:16.180553173 +0100
 @@ -22,7 +22,7 @@
  resource_file=resource.cfg
  
@@ -35,7 +44,7 @@ diff -U 3 -H -d -r -N -- a/etc/discovery.cfg b/etc/discovery.cfg
  # basename of the element
 diff -U 3 -H -d -r -N -- a/etc/hostd.cfg b/etc/hostd.cfg
 --- a/etc/hostd.cfg	2013-02-11 15:08:26.000000000 +0100
-+++ b/etc/hostd.cfg	2013-02-22 13:05:12.172231910 +0100
++++ b/etc/hostd.cfg	2013-02-27 15:33:16.181553159 +0100
 @@ -1,6 +1,6 @@
  
  # Log file of the discovery command
@@ -68,7 +77,7 @@ diff -U 3 -H -d -r -N -- a/etc/hostd.cfg b/etc/hostd.cfg
  
 diff -U 3 -H -d -r -N -- a/etc/packs/os/linux/commands.cfg b/etc/packs/os/linux/commands.cfg
 --- a/etc/packs/os/linux/commands.cfg	2013-02-11 15:08:26.000000000 +0100
-+++ b/etc/packs/os/linux/commands.cfg	2013-02-22 13:08:30.756731274 +0100
++++ b/etc/packs/os/linux/commands.cfg	2013-02-27 15:33:16.210552780 +0100
 @@ -23,7 +23,7 @@
  
  define command {
@@ -80,7 +89,7 @@ diff -U 3 -H -d -r -N -- a/etc/packs/os/linux/commands.cfg b/etc/packs/os/linux/
  define command {
 diff -U 3 -H -d -r -N -- a/etc/pollerd.ini b/etc/pollerd.ini
 --- a/etc/pollerd.ini	2013-02-11 15:08:26.000000000 +0100
-+++ b/etc/pollerd.ini	2013-02-22 13:05:12.172231910 +0100
++++ b/etc/pollerd.ini	2013-02-27 15:36:07.015526959 +0100
 @@ -1,6 +1,7 @@
  [daemon]
  
@@ -101,9 +110,18 @@ diff -U 3 -H -d -r -N -- a/etc/pollerd.ini b/etc/pollerd.ini
  # port=7771
  
  # interval_poll=5
+@@ -33,7 +34,7 @@
+ # Enabled by default to ease troubleshooting
+ use_local_log=1
+ 
+-#local_log=%(workdir)s/pollerd.log
++local_log=/var/log/shinken/pollerd.log
+ 
+ # accepted log level values= DEBUG,INFO,WARNING,ERROR,CRITICAL
+ log_level=WARNING
 diff -U 3 -H -d -r -N -- a/etc/reactionnerd.ini b/etc/reactionnerd.ini
 --- a/etc/reactionnerd.ini	2013-02-11 15:08:26.000000000 +0100
-+++ b/etc/reactionnerd.ini	2013-02-22 13:05:12.172231910 +0100
++++ b/etc/reactionnerd.ini	2013-02-27 15:36:07.046526583 +0100
 @@ -1,11 +1,12 @@
  [daemon]
  # Paths are relative to this config file
@@ -119,9 +137,18 @@ diff -U 3 -H -d -r -N -- a/etc/reactionnerd.ini b/etc/reactionnerd.ini
  #user=shinken
  #group=shinken
  idontcareaboutsecurity=0
+@@ -23,7 +24,7 @@
+ #-- Local log management --
+ # Enabled by default to ease troubleshooting
+ use_local_log=1
+-#local_log=%(workdir)s/reactionnerd.log
++local_log=/var/log/shinken/reactionnerd.log
+ 
+ # accepted log level values= DEBUG,INFO,WARNING,ERROR,CRITICAL
+ log_level=WARNING
 diff -U 3 -H -d -r -N -- a/etc/receiverd.ini b/etc/receiverd.ini
 --- a/etc/receiverd.ini	2013-02-11 15:08:26.000000000 +0100
-+++ b/etc/receiverd.ini	2013-02-22 13:05:12.173231897 +0100
++++ b/etc/receiverd.ini	2013-02-27 15:36:07.080526170 +0100
 @@ -1,11 +1,12 @@
  [daemon]
  # Paths are relative to this config file
@@ -137,9 +164,18 @@ diff -U 3 -H -d -r -N -- a/etc/receiverd.ini b/etc/receiverd.ini
  #user=shinken
  #group=shinken
  idontcareaboutsecurity=0
+@@ -23,7 +24,7 @@
+ #-- Local log management --
+ # Enabled by default to ease troubleshooting
+ use_local_log=1
+-#local_log=%(workdir)s/receiverd.log
++local_log=/var/log/shinken/receiverd.log
+ 
+ # accepted log level values= DEBUG,INFO,WARNING,ERROR,CRITICAL
+ log_level=WARNING
 diff -U 3 -H -d -r -N -- a/etc/resource.cfg b/etc/resource.cfg
 --- a/etc/resource.cfg	2013-02-11 15:08:26.000000000 +0100
-+++ b/etc/resource.cfg	2013-02-22 13:05:12.173231897 +0100
++++ b/etc/resource.cfg	2013-02-27 15:33:16.216552701 +0100
 @@ -1,10 +1,10 @@
  # Nagios legacy macros
 -$USER1$=/usr/local/shinken/libexec
@@ -155,7 +191,7 @@ diff -U 3 -H -d -r -N -- a/etc/resource.cfg b/etc/resource.cfg
  # Active Directory and LDAP
 diff -U 3 -H -d -r -N -- a/etc/schedulerd.ini b/etc/schedulerd.ini
 --- a/etc/schedulerd.ini	2013-02-11 15:08:26.000000000 +0100
-+++ b/etc/schedulerd.ini	2013-02-22 13:05:12.173231897 +0100
++++ b/etc/schedulerd.ini	2013-02-27 15:36:07.113525770 +0100
 @@ -1,9 +1,10 @@
  [daemon]
  # Paths are relative to this config file
@@ -169,9 +205,18 @@ diff -U 3 -H -d -r -N -- a/etc/schedulerd.ini b/etc/schedulerd.ini
  #user=shinken
  #group=shinken
  idontcareaboutsecurity=0
+@@ -21,7 +22,7 @@
+ #-- Local log management --
+ # Enabled by default to ease troubleshooting
+ use_local_log=1
+-#local_log=%(workdir)s/schedulerd.log
++local_log=/var/log/shinken/schedulerd.log
+ 
+ # accepted log level values= DEBUG,INFO,WARNING,ERROR,CRITICAL
+ log_level=INFO
 diff -U 3 -H -d -r -N -- a/etc/shinken-specific.cfg b/etc/shinken-specific.cfg
 --- a/etc/shinken-specific.cfg	2013-02-11 15:08:26.000000000 +0100
-+++ b/etc/shinken-specific.cfg	2013-02-22 13:06:01.397608486 +0100
++++ b/etc/shinken-specific.cfg	2013-02-27 15:47:36.000000000 +0100
 @@ -67,7 +67,7 @@
      # - Collectd                = Receive collectd perfdata
      # - SnmpBooster             = Snmp bulk polling module, configuration linker
@@ -195,7 +240,7 @@ diff -U 3 -H -d -r -N -- a/etc/shinken-specific.cfg b/etc/shinken-specific.cfg
      #                       should you desire it.
      # - SnmpBooster     = Snmp bulk polling module
 -    modules     
-+    modules     CommandFile
++    modules     CommandFile, NrpeBooster
      #modules     NrpeBooster, CommandFile
  
      ## Advanced Features
@@ -302,7 +347,7 @@ diff -U 3 -H -d -r -N -- a/etc/shinken-specific.cfg b/etc/shinken-specific.cfg
  ## Module:      CommandFile
 diff -U 3 -H -d -r -N -- a/etc/skonf.cfg b/etc/skonf.cfg
 --- a/etc/skonf.cfg	2013-02-11 15:08:26.000000000 +0100
-+++ b/etc/skonf.cfg	2013-02-22 13:05:12.174231884 +0100
++++ b/etc/skonf.cfg	2013-02-27 15:33:16.217552688 +0100
 @@ -32,10 +32,10 @@
  resource_file=resource.cfg
  
@@ -339,7 +384,7 @@ diff -U 3 -H -d -r -N -- a/etc/skonf.cfg b/etc/skonf.cfg
  # Module used by discovery to save objects
 diff -U 3 -H -d -r -N -- a/for_fedora/init.d/shinken-arbiter b/for_fedora/init.d/shinken-arbiter
 --- a/for_fedora/init.d/shinken-arbiter	2013-02-11 15:08:26.000000000 +0100
-+++ b/for_fedora/init.d/shinken-arbiter	2013-02-22 13:05:12.175231872 +0100
++++ b/for_fedora/init.d/shinken-arbiter	2013-02-27 15:33:16.218552675 +0100
 @@ -43,7 +43,7 @@
  
      directory=$(dirname $pidfile)                                                                                                                                    
@@ -351,7 +396,7 @@ diff -U 3 -H -d -r -N -- a/for_fedora/init.d/shinken-arbiter b/for_fedora/init.d
      $exec $daemon_args
 diff -U 3 -H -d -r -N -- a/for_fedora/init.d/shinken-broker b/for_fedora/init.d/shinken-broker
 --- a/for_fedora/init.d/shinken-broker	2013-02-11 15:08:26.000000000 +0100
-+++ b/for_fedora/init.d/shinken-broker	2013-02-22 13:05:12.175231872 +0100
++++ b/for_fedora/init.d/shinken-broker	2013-02-27 15:33:16.218552675 +0100
 @@ -44,7 +44,7 @@
  
      directory=$(dirname $pidfile)                                                                                                                                    
@@ -363,7 +408,7 @@ diff -U 3 -H -d -r -N -- a/for_fedora/init.d/shinken-broker b/for_fedora/init.d/
      $exec $daemon_args
 diff -U 3 -H -d -r -N -- a/for_fedora/init.d/shinken-poller b/for_fedora/init.d/shinken-poller
 --- a/for_fedora/init.d/shinken-poller	2013-02-11 15:08:26.000000000 +0100
-+++ b/for_fedora/init.d/shinken-poller	2013-02-22 13:05:12.176231859 +0100
++++ b/for_fedora/init.d/shinken-poller	2013-02-27 15:33:16.218552675 +0100
 @@ -48,7 +48,7 @@
  
      directory=$(dirname $pidfile)                                                                                                                                    
@@ -375,7 +420,7 @@ diff -U 3 -H -d -r -N -- a/for_fedora/init.d/shinken-poller b/for_fedora/init.d/
      $exec $daemon_args
 diff -U 3 -H -d -r -N -- a/for_fedora/init.d/shinken-reactionner b/for_fedora/init.d/shinken-reactionner
 --- a/for_fedora/init.d/shinken-reactionner	2013-02-11 15:08:26.000000000 +0100
-+++ b/for_fedora/init.d/shinken-reactionner	2013-02-22 13:05:12.176231859 +0100
++++ b/for_fedora/init.d/shinken-reactionner	2013-02-27 15:33:16.218552675 +0100
 @@ -44,7 +44,7 @@
  
      directory=$(dirname $pidfile)                                                                                                                                    
@@ -387,7 +432,7 @@ diff -U 3 -H -d -r -N -- a/for_fedora/init.d/shinken-reactionner b/for_fedora/in
      $exec $daemon_args
 diff -U 3 -H -d -r -N -- a/for_fedora/init.d/shinken-receiver b/for_fedora/init.d/shinken-receiver
 --- a/for_fedora/init.d/shinken-receiver	2013-02-11 15:08:26.000000000 +0100
-+++ b/for_fedora/init.d/shinken-receiver	2013-02-22 13:05:12.176231859 +0100
++++ b/for_fedora/init.d/shinken-receiver	2013-02-27 15:33:16.219552662 +0100
 @@ -43,7 +43,7 @@
  
      directory=$(dirname $pidfile)                                                                                                                                    
@@ -399,7 +444,7 @@ diff -U 3 -H -d -r -N -- a/for_fedora/init.d/shinken-receiver b/for_fedora/init.
      $exec $daemon_args
 diff -U 3 -H -d -r -N -- a/for_fedora/init.d/shinken-scheduler b/for_fedora/init.d/shinken-scheduler
 --- a/for_fedora/init.d/shinken-scheduler	2013-02-11 15:08:26.000000000 +0100
-+++ b/for_fedora/init.d/shinken-scheduler	2013-02-22 13:05:12.176231859 +0100
++++ b/for_fedora/init.d/shinken-scheduler	2013-02-27 15:33:16.219552662 +0100
 @@ -44,7 +44,7 @@
  
      directory=$(dirname $pidfile)                                                                                                                                    
@@ -411,7 +456,7 @@ diff -U 3 -H -d -r -N -- a/for_fedora/init.d/shinken-scheduler b/for_fedora/init
      $exec $daemon_args
 diff -U 3 -H -d -r -N -- a/for_fedora/init.d/shinken-skonf b/for_fedora/init.d/shinken-skonf
 --- a/for_fedora/init.d/shinken-skonf	2013-02-11 15:08:26.000000000 +0100
-+++ b/for_fedora/init.d/shinken-skonf	2013-02-22 13:05:12.176231859 +0100
++++ b/for_fedora/init.d/shinken-skonf	2013-02-27 15:33:16.219552662 +0100
 @@ -43,7 +43,7 @@
  
      directory=$(dirname $pidfile)                                                                                                                                    
@@ -421,3 +466,49 @@ diff -U 3 -H -d -r -N -- a/for_fedora/init.d/shinken-skonf b/for_fedora/init.d/s
  
      echo -n $"Starting $prog: "
      $exec $daemon_args
+diff -U 3 -H -d -r -N -- a/shinken/objects/config.py b/shinken/objects/config.py
+--- a/shinken/objects/config.py	2013-02-11 15:08:26.000000000 +0100
++++ b/shinken/objects/config.py	2013-02-27 15:45:36.898089521 +0100
+@@ -98,8 +98,8 @@
+     #  in Shinken
+     # *usage_text: if present, will print it to explain why it's no more useful
+     properties = {
+-        'prefix':                   StringProp(default='/usr/local/shinken/'),
+-        'workdir':                  StringProp(default=''),
++        'prefix':                   StringProp(default='/usr'),
++        'workdir':                  StringProp(default='/var/lib/shinken'),
+         'config_base_dir':          StringProp(default=''), # will be set when we will load a file
+         'use_local_log':            BoolProp(default='1'),
+         'log_level':                LogLevelProp(default='WARNING'),
+@@ -120,7 +120,7 @@
+         'accept_passive_host_checks': BoolProp(default='1', class_inherit=[(Host, 'accept_passive_checks')]),
+         'enable_event_handlers':    BoolProp(default='1', class_inherit=[(Host, None), (Service, None)]),
+         'log_rotation_method':      CharProp(default='d'),
+-        'log_archive_path':         StringProp(default='/usr/local/shinken/var/archives'),
++        'log_archive_path':         StringProp(default='/var/log/shinken/archives'),
+         'check_external_commands':  BoolProp(default='1'),
+         'command_check_interval':   UnusedProp(text='another value than look always the file is useless, so we fix it.'),
+         'command_file':             StringProp(default=''),
+diff -U 3 -H -d -r -N -- a/shinken/webui/plugins/eue/test.py b/shinken/webui/plugins/eue/test.py
+--- a/shinken/webui/plugins/eue/test.py	2013-02-11 15:08:26.000000000 +0100
++++ b/shinken/webui/plugins/eue/test.py	2013-02-27 15:33:10.328629732 +0100
+@@ -5,8 +5,8 @@
+ con = Connection('localhost')
+ db = con.shinken
+ if not db:
+-    message = "Error : Unable to connect to mongo database"
+-    return {'app': app, 'eue_data': {}, 'message': message }
++    print "Error : Unable to connect to mongo database"
++    sys.exit(2)
+ 
+ parts = eueid.split(".")
+ parts.pop(0)
+@@ -21,7 +21,7 @@
+     for scenario,scenario_data in feature["scenarios"].items():
+         if scenario_data["status"] == 0:
+             succeed += 1
+-        else
++        else:
+             failed += 1
+ 
+     total = succeed + failed
