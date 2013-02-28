@@ -19,11 +19,11 @@ shinken-fc19.txt
 tree
 shinken-1.2.4
 kpovmodeler/kpovmodeler-1.1.3
-nagios-plugins-shinken/check_mem.pl
-nagios-plugins-shinken/check_netint.pl
-nagios-plugins-snmp
+shinken-plugins/nagios*
+shinken-plugins/check*
+shinken-plugins/
 /povray/povray-3.7.0.RC6
 
 povray-include-extra/*.pov
-povray-include-extra/*.inc
+povray-include-extra/*.inc*
 povray-include-extra/*.c
