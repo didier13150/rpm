@@ -62,8 +62,21 @@ function admin() {
 	echo -e "status\nquit" | shinken-admin | grep -v '^#' | grep -v 'Available functions'
 }
 
+function reload() {
+	check
+	local RETVAL=$?
+	[ $RETVAL -eq 0 ] && process shinken-arbiter restart || exit 3
+}
+
+function check() {
+	local RETVAL=3
+	shinken-arbiter -v -c /etc/shinken/nagios.cfg -c /etc/shinken/shinken-specific.cfg
+	local RETVAL=$?
+	return $RETVAL
+}
+
 function usage() {
-	echo "Usage: shinken [start|stop|restart|status|admin|enable|disable]"
+	echo "Usage: shinken [start|stop|restart|status|admin|enable|disable|reload|check]"
 }
 
 case $cmd in
@@ -88,6 +101,12 @@ case $cmd in
 		;;
 	disable)
 		process_all disable
+		;;
+	reload)
+		reload
+		;;
+	check)
+		check
 		;;
 	usage|help)
 		usage
