@@ -73,7 +73,7 @@ Source64:       http://www.f-lohmueller.de/pov_tut/objects/plants/Palm_2.inc
 Source65:       http://www.f-lohmueller.de/pov_tut/objects/plants/Palm_1quadro.inc
 Source66:       http://www.f-lohmueller.de/pov_tut/objects/plants/Reeds_0.inc
 Source67:       http://web.archive.org/web/20071101052625/propro.ru/go/Wshop/povtree/tomtree-1.5.zip
-
+Source68:       http://www.weblearn.hs-bremen.de/risse/GCG/AG_GCG/AG_GCG/POV.POV/sonne/NKFlare/nkflare.inc
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Requires:       povray
