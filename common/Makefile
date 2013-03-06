@@ -9,7 +9,7 @@ SRCDEFINES := --define "_source_filedigest_algorithm 1" \
 ARCH := $(shell uname -i)
 DISTRIB := $(shell source /etc/os-release && echo $${ID}-$${VERSION_ID})
 TARGET := $(DISTRIB)-$(ARCH)
-URIS := $(shell rpmspec -P $(NAME).spec | grep -i '^source' | awk -F ':' '{print $$2":"$$3}' | tr -d ' ')
+SRCURIS := $(shell rpmspec -P $(NAME).spec | grep -i '^source' | awk -F ':' '{print $$2":"$$3}' | tr -d ' ')
 
 all: fedora
 
@@ -47,9 +47,9 @@ help:
 
 sources: prepare
 	@echo -e "\033[1;32mDownloading sources\033[0m"
-	@for url in $(shell echo $(URIS) | tr ' ' '\n') ; do \
-		valid=`echo "$$url" | grep '://'` ; \
-		if [ ! -z $$valid ] ; then \
+	@for url in $(shell echo $(SRCURIS) | tr ' ' '\n') ; do \
+		remote=`echo "$$url" | grep '://'` ; \
+		if [ ! -z $$remote ] ; then \
 			pkgsrc=`basename "$${url}" | awk -F '?' '{print $$1}'` ; \
 			[ -f $$pkgsrc ] || wget -O $$pkgsrc $$url ; \
 			[ $$? -eq 0 ] && chmod 0644 $$pkgsrc || rm -f $$pkgsrc ; \
