@@ -27,3 +27,4 @@ nagios-plugins-snmp
 povray-include-extra/*.pov
 povray-include-extra/*.inc
 povray-include-extra/*.c
+*.include
