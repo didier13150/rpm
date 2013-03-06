@@ -20,7 +20,7 @@
 Summary:      Monitoring tool compatible with Nagios configuration and plugins
 Name:         shinken
 Version:      1.2.4
-Release:      2%{?dist}
+Release:      3%{?dist}
 License:      AGPLv3+
 Group:        Applications/System
 URL:          http://www.shinken-monitoring.org
@@ -574,6 +574,9 @@ fi
 %attr(-,%{shinken_user} ,%{shinken_group}) %dir %{_localstatedir}/run/%{name}
 
 %changelog
+* Thu Feb 28 2013 Didier Fabert <dfabert@b2pweb.com> - 1.2.4-3
+- Fix path for element log file to /var/log/shinken
+
 * Thu Feb 21 2013 Didier Fabert <dfabert@b2pweb.com> - 1.2.4-2
 - Fix skonf pid and log file path
 
