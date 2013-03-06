@@ -21,10 +21,12 @@ shinken-1.2.4
 kpovmodeler/kpovmodeler-1.1.3
 shinken-plugins/nagios*
 shinken-plugins/check*
-shinken-plugins/
+shinken-plugins/shinken-plugins*
 /povray/povray-3.7.0.RC6
 
 povray-include-extra/*.pov
 povray-include-extra/*.inc*
 povray-include-extra/*.c
 *.include
+*/a/
+*/b/
