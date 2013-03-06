@@ -1,7 +1,7 @@
-Name:           nagios-plugins-shinken
+Name:           shinken-plugins
 Version:        1.0.0
-Release:        1%{?dist}
-Summary:        Nagios Plugins needed by default shinken install
+Release:        2%{?dist}
+Summary:        Plugins needed by default shinken install
 License:        GPLv2+
 
 Group:          Applications/Productivity
@@ -11,9 +11,9 @@ Source1:        https://raw.github.com/willixix/WL-NagiosPlugins/master/check_ne
 Source2:        https://raw.github.com/justintime/nagios-plugins/master/check_mem/check_mem.pl
 Source3:        http://nagios.manubulon.com/nagios-snmp-plugins.1.1.1.tgz
 Source4:        http://bucardo.org/downloads/check_postgres.tar.gz
+Source5:        http://labs.consol.de/download/shinken-nagios-plugins/check_mysql_health-2.1.8.2.tar.gz
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}
-
 
 Requires:       nagios-plugins-all
 Requires:       perl
@@ -30,14 +30,34 @@ Requires:       httping
 Requires:       net-snmp
 BuildRequires:  sed
 BuildRequires:  net-snmp-devel
+Obsoletes:      nagios-plugins-shinken
 
 %description
-Nagios Plugins needed by default shinken install
+Shinken Plugins needed by default install
+
+%package mysql
+Requires:         %{name}
+Requires:         perl-DBD-MySQL
+Summary:          Shinken MySQL plugin
+Group:            Applications/Productivity
+
+%description mysql
+Shinken Plugins to monitore a MySQL database
+
+%package postgresql
+Requires:         %{name}
+Requires:         perl-DBD-Pg
+Summary:          Shinken PostgreSQL plugin
+Group:            Applications/Productivity
+
+%description postgresql
+Shinken Plugins to monitore a PostgreSQL database
 
 %prep
 %setup -qn nagios-plugins-snmp
-%{__tar} -xzf %{SOURCE3}
-%{__tar} -xzf %{SOURCE4}
+tar -xzf %{SOURCE3}
+tar -xzf %{SOURCE4}
+tar -xzf %{SOURCE5}
 
 %build
 %configure \
@@ -45,6 +65,21 @@ Nagios Plugins needed by default shinken install
     --disable-nls
 make %{?_smp_mflags}
 find . -name '*.pl' -exec sed -i -e 's#/usr/local/nagios/libexec#/usr/lib64/nagios/plugins#g' {} \;
+
+pushd check_postgres-2.19.0
+perl Makefile.PL
+make %{?_smp_mflags}
+popd
+
+pushd check_mysql_health-2.1.8.2
+%configure \
+  --with-nagios-user=shinken \
+  --with-nagios-group=shinken \
+  --with-statefiles-dir=/var/tmp/check_mysql_health \
+  --with-mymodules-dir=%{libdir}/nagios/plugins \
+  --with-mymodules-dyn-dir=%{libdir}/nagios/plugins
+make %{?_smp_mflags}
+popd
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -59,21 +94,31 @@ make DESTDIR=%{buildroot} install
 
 %{__install} -m0755 %{SOURCE1} %{buildroot}%{_libdir}/nagios/plugins/
 %{__install} -m0755 %{SOURCE2} %{buildroot}%{_libdir}/nagios/plugins/
-%{__install} -m0755 check_postgres*/check_postgres.pl %{buildroot}%{_libdir}/nagios/plugins/
-%{__install} -m0755 nagios_plugins/check_snmp_boostedge.pl %{buildroot}%{_libdir}/nagios/plugins/
-%{__install} -m0755 nagios_plugins/check_snmp_cpfw.pl %{buildroot}%{_libdir}/nagios/plugins/
-%{__install} -m0755 nagios_plugins/check_snmp_css.pl %{buildroot}%{_libdir}/nagios/plugins/
-%{__install} -m0755 nagios_plugins/check_snmp_css_main.pl %{buildroot}%{_libdir}/nagios/plugins/
-%{__install} -m0755 nagios_plugins/check_snmp_env.pl %{buildroot}%{_libdir}/nagios/plugins/
-%{__install} -m0755 nagios_plugins/check_snmp_int.pl %{buildroot}%{_libdir}/nagios/plugins/
-%{__install} -m0755 nagios_plugins/check_snmp_linkproof_nhr.pl %{buildroot}%{_libdir}/nagios/plugins/
-%{__install} -m0755 nagios_plugins/check_snmp_load.pl %{buildroot}%{_libdir}/nagios/plugins/
-%{__install} -m0755 nagios_plugins/check_snmp_mem.pl %{buildroot}%{_libdir}/nagios/plugins/
-%{__install} -m0755 nagios_plugins/check_snmp_nsbox.pl %{buildroot}%{_libdir}/nagios/plugins/
-%{__install} -m0755 nagios_plugins/check_snmp_process.pl %{buildroot}%{_libdir}/nagios/plugins/
-%{__install} -m0755 nagios_plugins/check_snmp_storage.pl %{buildroot}%{_libdir}/nagios/plugins/
-%{__install} -m0755 nagios_plugins/check_snmp_vrrp.pl %{buildroot}%{_libdir}/nagios/plugins/
-%{__install} -m0755 nagios_plugins/check_snmp_win.pl %{buildroot}%{_libdir}/nagios/plugins/
+
+pushd nagios_plugins
+%{__install} -m0755 check_snmp_boostedge.pl %{buildroot}%{_libdir}/nagios/plugins/
+%{__install} -m0755 check_snmp_cpfw.pl %{buildroot}%{_libdir}/nagios/plugins/
+%{__install} -m0755 check_snmp_css.pl %{buildroot}%{_libdir}/nagios/plugins/
+%{__install} -m0755 check_snmp_css_main.pl %{buildroot}%{_libdir}/nagios/plugins/
+%{__install} -m0755 check_snmp_env.pl %{buildroot}%{_libdir}/nagios/plugins/
+%{__install} -m0755 check_snmp_int.pl %{buildroot}%{_libdir}/nagios/plugins/
+%{__install} -m0755 check_snmp_linkproof_nhr.pl %{buildroot}%{_libdir}/nagios/plugins/
+%{__install} -m0755 check_snmp_load.pl %{buildroot}%{_libdir}/nagios/plugins/
+%{__install} -m0755 check_snmp_mem.pl %{buildroot}%{_libdir}/nagios/plugins/
+%{__install} -m0755 check_snmp_nsbox.pl %{buildroot}%{_libdir}/nagios/plugins/
+%{__install} -m0755 check_snmp_process.pl %{buildroot}%{_libdir}/nagios/plugins/
+%{__install} -m0755 check_snmp_storage.pl %{buildroot}%{_libdir}/nagios/plugins/
+%{__install} -m0755 check_snmp_vrrp.pl %{buildroot}%{_libdir}/nagios/plugins/
+%{__install} -m0755 check_snmp_win.pl %{buildroot}%{_libdir}/nagios/plugins/
+popd
+
+pushd check_postgres-2.19.0
+%{__install} -m0755 check_postgres.pl %{buildroot}%{_libdir}/nagios/plugins/
+popd
+
+pushd check_mysql_health-2.1.8.2
+%{__install} -m0755 plugins-scripts/check_mysql_health %{buildroot}%{_libdir}/nagios/plugins/
+popd
 
 %files
 %defattr(-,root,root,-)
@@ -99,7 +144,17 @@ make DESTDIR=%{buildroot} install
 %{_libdir}/nagios/plugins/check_postgres.pl
 %doc AUTHORS COPYING ChangeLog NEWS README nagios_plugins/doc/
 
+%files mysql
+%defattr(-,root,root,-)
+%{_libdir}/nagios/plugins/check_mysql_health
+
+%files postgresql
+%defattr(-,root,root,-)
+%{_libdir}/nagios/plugins/check_postgres.pl
 
 %changelog
+* Thu Feb 28 2013 Didier Fabert <dfabert@b2pweb.com> - 1.0.0-2
+- Add MySQL and PostgreSQL plugins (sub-packages)
+
 * Thu Feb 21 2013 Didier Fabert <dfabert@b2pweb.com> - 1.0.0-1
 - First release
