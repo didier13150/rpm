@@ -506,26 +506,3 @@ diff -U 3 -H -d -r -N -- a/shinken/objects/config.py b/shinken/objects/config.py
          'check_external_commands':  BoolProp(default='1'),
          'command_check_interval':   UnusedProp(text='another value than look always the file is useless, so we fix it.'),
          'command_file':             StringProp(default=''),
-diff -U 3 -H -d -r -N -- a/shinken/webui/plugins/eue/test.py b/shinken/webui/plugins/eue/test.py
---- a/shinken/webui/plugins/eue/test.py	2013-02-11 15:08:26.000000000 +0100
-+++ b/shinken/webui/plugins/eue/test.py	2013-02-28 10:46:59.991839357 +0100
-@@ -5,8 +5,8 @@
- con = Connection('localhost')
- db = con.shinken
- if not db:
--    message = "Error : Unable to connect to mongo database"
--    return {'app': app, 'eue_data': {}, 'message': message }
-+    print "Error : Unable to connect to mongo database"
-+    sys.exit(2)
- 
- parts = eueid.split(".")
- parts.pop(0)
-@@ -21,7 +21,7 @@
-     for scenario,scenario_data in feature["scenarios"].items():
-         if scenario_data["status"] == 0:
-             succeed += 1
--        else
-+        else:
-             failed += 1
- 
-     total = succeed + failed
