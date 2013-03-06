@@ -37,7 +37,7 @@ Source28:       http://www.f-lohmueller.de/pov_tut/down/pov_objects1.zip
 Source29:       http://www.f-lohmueller.de/pov_tut/modelling/dwn/RT_System.zip
 Source30:       http://www.f-lohmueller.de/pov_tut/down/shapes_lo.inc
 Source31:       http://runevision.com/3d/include/mouth.zip
-Source32:       http://news.povray.org/povray.binaries.scene-files/attachment/%3C3d06c6c4%40news.povray.org%3E/starship_enterprise_v1.00.zip?ttop=346850&toff=650
+Source32:       http://news.povray.org/povray.binaries.scene-files/attachment/%3C3d06c6c4%40news.povray.org%3E/starship_enterprise_v1.00.zip?ttop=346850%26toff=650
 Source33:       http://brannigan.emporia.edu/courses/2008/cs220f08/hand63/ncc1701.zip
 Source34:       http://www.dylanbeattie.net/starwars/download/stdest.zip
 Source35:       http://www.dylanbeattie.net/starwars/download/tie_def.zip
