@@ -23,7 +23,6 @@ shinken-plugins/nagios*
 shinken-plugins/check*
 shinken-plugins/shinken-plugins*
 /povray/povray-3.7.0.RC6
-
 povray-include-extra/*.pov
 povray-include-extra/*.inc*
 povray-include-extra/*.c
@@ -31,3 +30,9 @@ povray-include-extra/*.c
 */a/
 */b/
 shinken-plugins/extra
+povray-include-extra/bin
+povray-include-extra/include
+hfc
+java-sun
+java3d
+planetgenesis
