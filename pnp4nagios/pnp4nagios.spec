@@ -34,6 +34,7 @@ BuildRequires:    rrdtool-perl
 BuildRequires:    perl(Time::HiRes)
 Requires:         perl(Gearman::Worker), perl(Crypt::Rijndael)
 Requires:         rrdtool
+Requires:         rrdtool-perl
 Requires:         perl(Time::HiRes)
 Requires:         shinken
 Requires(post):   httpd-tools
