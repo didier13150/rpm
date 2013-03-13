@@ -13,7 +13,8 @@ SRCURIS := $(shell rpmspec -P $(NAME).spec | grep -i '^source' | awk -F ':' '{pr
 
 all: fedora
 
-fedora: clean sources srpm rpmlint build log
+#fedora: clean sources srpm rpmlint build log
+fedora: clean sources srpm rpmlint build
 
 clean:
 	@echo -e "\033[1;32mCleaning" $(shell basename $(SRCDIR) ) "directory \033[0m"
@@ -29,12 +30,12 @@ srpm:
 
 build: srpm
 	@echo -e "\033[1;32mBuilding RPMs files\033[0m"
-	-mock -r '$(TARGET)' rebuild $(NAME)*.src.rpm
-	-mv /var/lib/mock/$(TARGET)/result/*.rpm $(SRCDIR)
+	-mock -r '$(TARGET)' --resultdir=$(SRCDIR) rebuild $(NAME)*.src.rpm
+#	-mv /var/lib/mock/$(TARGET)/result/*.rpm $(SRCDIR)
 
-log:
-	@echo -e "\033[1;32mCopying mock log files\033[0m"
-	@mv /var/lib/mock/$(TARGET)/result/{build,root,state}.log $(SRCDIR)
+#log:
+#	@echo -e "\033[1;32mCopying mock log files\033[0m"
+#	@mv /var/lib/mock/$(TARGET)/result/{build,root,state}.log $(SRCDIR)
 
 help:
 	@echo -e "\033[1;32mAvailable targets:\033[0m"
