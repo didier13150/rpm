@@ -211,9 +211,9 @@ find %{buildroot}%{_localstatedir} -name '*void_for_git*' -delete
 
 %{__sed} -i -e 's!%{buildroot}!!g' %{buildroot}%{_sysconfdir}/%{name}/*.{ini,cfg}
 
+rm -rf %{buildroot}%{_sysconfdir}/init.d
 %if %{with_systemd}
 # Unit file
- rm -rf %{buildroot}%{_sysconfdir}/init.d
 %{__mkdir_p} %{buildroot}%{_unitdir}/
 %{__cp} for_fedora/systemd/shinken-arbiter.service %{buildroot}%{_unitdir}/shinken-arbiter.service
 %{__cp} for_fedora/systemd/shinken-broker.service %{buildroot}%{_unitdir}/shinken-broker.service
