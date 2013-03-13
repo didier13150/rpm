@@ -5,7 +5,7 @@
 %endif
 
 Name:          pnp4nagios
-Version:       0.6.19
+Version:       0.6.20
 Release:       1%{?dist}
 License:       GPLv2
 URL:           http://pnp4nagios.org
@@ -197,5 +197,8 @@ fi
 %{_localstatedir}/log/%{name}
 
 %changelog
+* Wed Mar 13 2013 Didier Fabert <didier.fabert@gmail.com> 0.6.20-1
+- Update to 0.6.20
+
 * Thu Feb 21 2013 Didier Fabert <didier.fabert@gmail.com> 0.6.19-1
 - First release
