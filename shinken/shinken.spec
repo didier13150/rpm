@@ -20,7 +20,7 @@
 Summary:      Monitoring tool compatible with Nagios configuration and plugins
 Name:         shinken
 Version:      1.2.4
-Release:      3%{?dist}
+Release:      4%{?dist}
 License:      AGPLv3+
 Group:        Applications/System
 URL:          http://www.shinken-monitoring.org
@@ -101,7 +101,7 @@ Requires: perl-Net-SNMP
 Shinken poller daemon
 
 %package broker
-Summary: Shinken Poller
+Summary: Shinken Broker
 Group:   Applications/System
 Requires: %{name} = %{version}-%{release}
 %if 0%{?rhel} <= 6
@@ -117,7 +117,7 @@ Requires: python-memcached
 Shinken broker daemon
 
 %package receiver
-Summary: Shinken Poller
+Summary: Shinken Receiver
 Group:   Applications/System
 Requires: %{name} = %{version}-%{release}
 
@@ -574,6 +574,9 @@ fi
 %attr(-,%{shinken_user} ,%{shinken_group}) %dir %{_localstatedir}/run/%{name}
 
 %changelog
+* Thu Feb 28 2013 Didier Fabert <dfabert@b2pweb.com> - 1.2.4-4
+- Fix summary for broker and receiver
+
 * Thu Feb 28 2013 Didier Fabert <dfabert@b2pweb.com> - 1.2.4-3
 - Fix path for element log file to /var/log/shinken
 
