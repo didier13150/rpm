@@ -1,6 +1,6 @@
 RPMDEFINES := --define "_sourcedir $(SRCDIR)" \
               --define "_specdir $(SRCDIR)" \
-              --define "_srcrpmdir $(SRCDIR)" \
+              --define "_srcrpmdir $(SRCDIR)/result" \
               --define "_rpmdir $(SRCDIR)"
 
 SRCDEFINES := --define "_source_filedigest_algorithm 1" \
@@ -21,7 +21,7 @@ clean:
 
 rpmlint:
 	@echo -e "\033[1;32mChecking "$(NAME)".spec file\033[0m"
-	-rpmlint $(NAME).spec $(NAME)*.rpm
+	-rpmlint $(NAME).spec result/$(NAME)*.src.rpm
 
 srpm:
 	@echo -e "\033[1;32mBuilding SRPM file\033[0m"
@@ -30,7 +30,7 @@ srpm:
 build: srpm
 	@echo -e "\033[1;32mBuilding RPMs files\033[0m"
 	@mkdir -p $(SRCDIR)/result
-	-mock -r '$(TARGET)' --resultdir=$(SRCDIR)/result rebuild $(NAME)*.src.rpm
+	-mock -r '$(TARGET)' --resultdir=$(SRCDIR)/result rebuild $(SRCDIR)/result/$(NAME)*.src.rpm
 
 help:
 	@echo -e "\033[1;32mAvailable targets:\033[0m"
