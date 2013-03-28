@@ -7,6 +7,7 @@
 *.bak
 *.log
 doc
+*/output/*
 .directory
 mediawiki/CategoryTree
 mediawiki/Cite
@@ -36,3 +37,9 @@ hfc
 java-sun
 java3d
 planetgenesis
+50-300mm.txt
+coil.txt
+coilexample.txt
+rolandmas.txt
+spweb.txt
+*/result/*
