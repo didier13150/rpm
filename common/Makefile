@@ -16,7 +16,8 @@ fedora: clean sources srpm rpmlint build
 
 clean:
 	@echo -e "\033[1;32mCleaning" $(shell basename $(SRCDIR) ) "directory \033[0m"
-	@rm -rfv *~ {build,root,state}.log *.rpm
+	@rm -rfv *~ $(SRCDIR)/{build,root,state,available_pkgs,installed_pkgs}.log $(SRCDIR)/*.rpm
+	@rm -rf $(SRCDIR)/result
 
 rpmlint:
 	@echo -e "\033[1;32mChecking "$(NAME)".spec file\033[0m"
@@ -28,7 +29,8 @@ srpm:
 
 build: srpm
 	@echo -e "\033[1;32mBuilding RPMs files\033[0m"
-	-mock -r '$(TARGET)' --resultdir=$(SRCDIR) rebuild $(NAME)*.src.rpm
+	@mkdir -p $(SRCDIR)/result
+	-mock -r '$(TARGET)' --resultdir=$(SRCDIR)/result rebuild $(NAME)*.src.rpm
 
 help:
 	@echo -e "\033[1;32mAvailable targets:\033[0m"
