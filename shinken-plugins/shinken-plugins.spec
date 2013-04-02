@@ -161,7 +161,7 @@ popd
 
 %changelog
 * Tue Apr 02 2013 Didier Fabert <didier.fabert@gmail.com> - 1.0.0-3
-- Define global var for source versions
+- Define global var for all source versions
 - Add BuildRequires: perl-Test-Simple
 
 * Thu Feb 28 2013 Didier Fabert <didier.fabert@gmail.com> - 1.0.0-2
