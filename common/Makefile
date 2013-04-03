@@ -44,8 +44,8 @@ help:
 sources: prepare
 	@echo -e "\033[1;32mDownloading sources\033[0m"
 	@for url in $(shell echo $(SRCURIS) | tr ' ' '\n') ; do \
-		remote=`echo "$$url" | grep '://'` ; \
-		if [ ! -z $$remote ] ; then \
+		mustBeDownloaded=`echo "$$url" | grep '://'` ; \
+		if [ ! -z $$mustBeDownloaded ] ; then \
 			pkgsrc=`basename "$${url}" | awk -F '?' '{print $$1}'` ; \
 			[ -f $$pkgsrc ] || wget -O $$pkgsrc $$url ; \
 			[ $$? -eq 0 ] && chmod 0644 $$pkgsrc || rm -f $$pkgsrc ; \
