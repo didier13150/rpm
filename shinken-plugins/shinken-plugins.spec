@@ -61,6 +61,56 @@ BuildRequires:  radiusclient-ng-devel
 BuildRequires:  qstat
 Obsoletes:      nagios-plugins-shinken < 1.0.0-3
 Provides:       nagios-plugins = %{nagios_plugins_ver}
+Conflicts:      nagios-plugins-breeze
+Conflicts:      nagios-plugins-by_ssh
+Conflicts:      nagios-plugins-dhcp
+Conflicts:      nagios-plugins-dig
+Conflicts:      nagios-plugins-disk
+Conflicts:      nagios-plugins-disk_smb
+Conflicts:      nagios-plugins-dns
+Conflicts:      nagios-plugins-dummy
+Conflicts:      nagios-plugins-file_age
+Conflicts:      nagios-plugins-flexlm
+Conflicts:      nagios-plugins-fping
+Conflicts:      nagios-plugins-hpjd
+Conflicts:      nagios-plugins-http
+Conflicts:      nagios-plugins-icmp
+Conflicts:      nagios-plugins-ide_smart
+Conflicts:      nagios-plugins-ircd
+Conflicts:      nagios-plugins-ldap
+Conflicts:      nagios-plugins-load
+Conflicts:      nagios-plugins-log
+Conflicts:      nagios-plugins-mailq
+Conflicts:      nagios-plugins-mrtg
+Conflicts:      nagios-plugins-mrtgtraf
+Conflicts:      nagios-plugins-mysql
+Conflicts:      nagios-plugins-nagios
+Conflicts:      nagios-plugins-nt
+Conflicts:      nagios-plugins-ntp
+Conflicts:      nagios-plugins-ntp-perl
+Conflicts:      nagios-plugins-nwstat
+Conflicts:      nagios-plugins-oracle
+Conflicts:      nagios-plugins-overcr
+Conflicts:      nagios-plugins-pgsql
+Conflicts:      nagios-plugins-ping
+Conflicts:      nagios-plugins-procs
+Conflicts:      nagios-plugins-game
+Conflicts:      nagios-plugins-real
+Conflicts:      nagios-plugins-rpc
+Conflicts:      nagios-plugins-smtp
+Conflicts:      nagios-plugins-snmp
+Conflicts:      nagios-plugins-ssh
+Conflicts:      nagios-plugins-swap
+Conflicts:      nagios-plugins-tcp
+Conflicts:      nagios-plugins-time
+Conflicts:      nagios-plugins-ups
+Conflicts:      nagios-plugins-users
+Conflicts:      nagios-plugins-wave
+Conflicts:      nagios-plugins-cluster
+Conflicts:      nagios-plugins-all
+%ifnarch ppc ppc64 sparc sparc64
+Conflicts:      nagios-plugins-sensors
+%endif
 
 %description
 Shinken Plugins needed by default install. It contains official Nagios plugins.
@@ -68,48 +118,48 @@ Shinken Plugins needed by default install. It contains official Nagios plugins.
 %package snmp
 Summary: Shinken SNMP Plugins
 Group: Applications/System
-Requires: %{name} = %{version}-%{release}
-Requires: %{_bindir}/snmpgetnext
-Requires: %{_bindir}/snmpget
+Requires:       %{name} = %{version}-%{release}
+Requires:       %{_bindir}/snmpgetnext
+Requires:       %{_bindir}/snmpget
 
 %description snmp
 Shinken Plugins to monitore host by SNMP
 
 %package mysql
-Requires:        %{name} = %{version}-%{release}
-Requires:        perl-DBD-MySQL
-Summary:         Shinken MySQL plugin
-Group:           Applications/Productivity
+Requires:       %{name} = %{version}-%{release}
+Requires:       perl-DBD-MySQL
+Summary:        Shinken MySQL plugin
+Group:          Applications/Productivity
 
 %description mysql
 Shinken Plugins to monitore a MySQL database
 
 %package postgresql
-Requires:        %{name} = %{version}-%{release}
-Requires:        perl-DBD-Pg
-Summary:         Shinken PostgreSQL plugin
-Group:           Applications/Productivity
+Requires:       %{name} = %{version}-%{release}
+Requires:       perl-DBD-Pg
+Summary:        Shinken PostgreSQL plugin
+Group:          Applications/Productivity
 
 %description postgresql
 Shinken Plugins to monitore a PostgreSQL database
 
 %package oracle
-Requires:        %{name} = %{version}-%{release}
-Summary:         Shinken Oracle plugin
-Group:           Applications/Productivity
+Requires:       %{name} = %{version}-%{release}
+Summary:        Shinken Oracle plugin
+Group:          Applications/Productivity
 
 %description oracle
 Shinken Plugins to monitore an Oracle database
 
 %package all
-Summary:         Shinken All Plugins
-Group:           Applications/System
-Requires:        %{name} = %{version}-%{release}
-Requires:        %{name}-snmp = %{version}-%{release}
-Requires:        %{name}-mysql = %{version}-%{release}
-Requires:        %{name}-postgresql = %{version}-%{release}
-Requires:        %{name}-oracle = %{version}-%{release}
-Provides:        nagios-plugins-all = %{nagios_plugins_ver}
+Summary:        Shinken All Plugins
+Group:          Applications/System
+Requires:       %{name} = %{version}-%{release}
+Requires:       %{name}-snmp = %{version}-%{release}
+Requires:       %{name}-mysql = %{version}-%{release}
+Requires:       %{name}-postgresql = %{version}-%{release}
+Requires:       %{name}-oracle = %{version}-%{release}
+Provides:       nagios-plugins-all = %{nagios_plugins_ver}
 
 %description all
 This package provides all Shinken plugins.
