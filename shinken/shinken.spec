@@ -20,7 +20,7 @@
 Summary:      Monitoring tool compatible with Nagios configuration and plugins
 Name:         shinken
 Version:      1.2.4
-Release:      4%{?dist}
+Release:      5%{?dist}
 License:      AGPLv3+
 Group:        Applications/System
 URL:          http://www.shinken-monitoring.org
@@ -94,7 +94,7 @@ Shinken scheduler daemon
 Summary: Shinken Poller
 Group:   Applications/System
 Requires: %{name} = %{version}-%{release}
-Requires: nagios-plugins-all
+Requires: shinken-plugins-all
 Requires: perl-Net-SNMP
 
 %description poller
@@ -316,7 +316,7 @@ if ! /usr/bin/getent group %{shinken_group} &>/dev/null; then
 fi
 
 %post arbiter
-if [ $1 -eq 1 ] ; then 
+if [ $1 -eq 1 ] ; then
   %if %{with_systemd}
     /bin/systemctl daemon-reload >/dev/null 2>&1 || :
   %else
@@ -325,7 +325,7 @@ if [ $1 -eq 1 ] ; then
 fi
 
 %post broker
-if [ $1 -eq 1 ] ; then 
+if [ $1 -eq 1 ] ; then
   %if %{with_systemd}
     /bin/systemctl daemon-reload >/dev/null 2>&1 || :
   %else
@@ -334,7 +334,7 @@ if [ $1 -eq 1 ] ; then
 fi
 
 %post poller
-if [ $1 -eq 1 ] ; then 
+if [ $1 -eq 1 ] ; then
   %if %{with_systemd}
     /bin/systemctl daemon-reload >/dev/null 2>&1 || :
   %else
@@ -343,7 +343,7 @@ if [ $1 -eq 1 ] ; then
 fi
 
 %post reactionner
-if [ $1 -eq 1 ] ; then 
+if [ $1 -eq 1 ] ; then
   %if %{with_systemd}
     /bin/systemctl daemon-reload >/dev/null 2>&1 || :
   %else
@@ -352,7 +352,7 @@ if [ $1 -eq 1 ] ; then
 fi
 
 %post scheduler
-if [ $1 -eq 1 ] ; then 
+if [ $1 -eq 1 ] ; then
   %if %{with_systemd}
     /bin/systemctl daemon-reload >/dev/null 2>&1 || :
   %else
@@ -361,7 +361,7 @@ if [ $1 -eq 1 ] ; then
 fi
 
 %post receiver
-if [ $1 -eq 1 ] ; then 
+if [ $1 -eq 1 ] ; then
   %if %{with_systemd}
     /bin/systemctl daemon-reload >/dev/null 2>&1 || :
   %else
@@ -369,7 +369,7 @@ if [ $1 -eq 1 ] ; then
   %endif
 fi
 
-%preun arbiter 
+%preun arbiter
 if [ $1 -eq 0 ] ; then
   %if %{with_systemd}
     /bin/systemctl --no-reload disable %{name}-arbiter.service > /dev/null 2>&1 || :
@@ -380,7 +380,7 @@ if [ $1 -eq 0 ] ; then
   %endif
 fi
 
-%preun broker 
+%preun broker
 if [ $1 -eq 0 ] ; then
   %if %{with_systemd}
     /bin/systemctl --no-reload disable %{name}-broker.service > /dev/null 2>&1 || :
@@ -391,7 +391,7 @@ if [ $1 -eq 0 ] ; then
   %endif
 fi
 
-%preun poller 
+%preun poller
 if [ $1 -eq 0 ] ; then
   %if %{with_systemd}
     /bin/systemctl --no-reload disable %{name}-poller.service > /dev/null 2>&1 || :
@@ -402,7 +402,7 @@ if [ $1 -eq 0 ] ; then
   %endif
 fi
 
-%preun reactionner 
+%preun reactionner
 if [ $1 -eq 0 ] ; then
   %if %{with_systemd}
     /bin/systemctl --no-reload disable %{name}-reactionner.service > /dev/null 2>&1 || :
@@ -413,7 +413,7 @@ if [ $1 -eq 0 ] ; then
   %endif
 fi
 
-%preun scheduler 
+%preun scheduler
 if [ $1 -eq 0 ] ; then
   %if %{with_systemd}
     /bin/systemctl --no-reload disable %{name}-scheduler.service > /dev/null 2>&1 || :
@@ -424,7 +424,7 @@ if [ $1 -eq 0 ] ; then
   %endif
 fi
 
-%preun receiver 
+%preun receiver
 if [ $1 -eq 0 ] ; then
   %if %{with_systemd}
     /bin/systemctl --no-reload disable %{name}-receiver.service > /dev/null 2>&1 || :
@@ -574,6 +574,10 @@ fi
 %attr(-,%{shinken_user} ,%{shinken_group}) %dir %{_localstatedir}/run/%{name}
 
 %changelog
+* Wed Mar 03 2013 Didier Fabert <dfabert@b2pweb.com> - 1.2.4-5
+- Remove nagios-plugins dependency for poller
+- Add shinken-plugins dependency for poller
+
 * Thu Feb 28 2013 Didier Fabert <dfabert@b2pweb.com> - 1.2.4-4
 - Fix summary for broker and receiver
 
