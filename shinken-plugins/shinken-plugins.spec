@@ -146,12 +146,12 @@ tar -xzf %{SOURCE6}
     --with-ps-varlist='procstat,&procuid,&procpid,&procppid,&procvsz,&procrss,&procpcpu,procetime,procprog,&pos'
 make %{?_smp_mflags}
 
-pushd plugins
-make check_ide_smart
-make check_ldap
-make check_radius
-make check_pgsql
-popd
+#pushd plugins
+#make check_ide_smart
+#make check_ldap
+#make check_radius
+#make check_pgsql
+#popd
 
 gawk -f plugins-scripts/subst contrib/check_linux_raid.pl > contrib/check_linux_raid
 mv plugins-scripts/check_ntp.pl plugins-scripts/check_ntp.pl.in
@@ -207,7 +207,7 @@ popd
 %{__sed} -i \
     -e 's/use snmp v2c/-use- snmp v2c/' \
     -e 's/use it as/-use- it as/' \
-    %{SOURCE1}
+    %{SOURCE2}
 
 %{__install} -m0755 %{SOURCE2} %{buildroot}%{_libdir}/nagios/plugins/
 %{__install} -m0755 %{SOURCE3} %{buildroot}%{_libdir}/nagios/plugins/
