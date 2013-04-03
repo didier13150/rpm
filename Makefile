@@ -31,7 +31,7 @@ repository:
 	@echo -e "\033[1;32mUpdating repository on $(REPODIR)\033[0m"
 	@for dir in $(PKGS) ; \
 		do mkdir -p $(REPODIR)/$$dir ; \
-		cp $$dir/*.rpm $$dir/{build,root,state}.log $(REPODIR)/$$dir/ ; \
+		cp $$dir/result/*.rpm $(REPODIR)/$$dir/ ; \
 	done
 	@createrepo --update -d $(REPODIR)
 
