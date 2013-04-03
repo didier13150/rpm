@@ -16,7 +16,10 @@ fedora: clean sources srpm rpmlint build
 
 clean:
 	@echo -e "\033[1;32mCleaning" $(shell basename $(SRCDIR) ) "directory \033[0m"
-	@rm -rfv *~ $(SRCDIR)/{build,root,state,available_pkgs,installed_pkgs}.log $(SRCDIR)/*.rpm
+	@rm -rfv \
+		*~ \
+		$(SRCDIR)/{build,root,state,available_pkgs,installed_pkgs}.log \
+		$(SRCDIR)/*.rpm \
 	@rm -rf $(SRCDIR)/result
 
 rpmlint:
@@ -30,7 +33,7 @@ srpm:
 build: srpm
 	@echo -e "\033[1;32mBuilding RPMs files\033[0m"
 	@mkdir -p $(SRCDIR)/result
-	-mock -r '$(TARGET)' --resultdir=$(SRCDIR)/result rebuild $(SRCDIR)/result/$(NAME)*.src.rpm
+	@mock -r '$(TARGET)' --resultdir=$(SRCDIR)/result rebuild $(SRCDIR)/result/$(NAME)*.src.rpm
 
 help:
 	@echo -e "\033[1;32mAvailable targets:\033[0m"
