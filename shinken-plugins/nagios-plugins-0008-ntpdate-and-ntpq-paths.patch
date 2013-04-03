@@ -1,0 +1,13 @@
+diff -ruN nagios-plugins-1.4.16-orig/plugins-scripts/utils.pm.in nagios-plugins-1.4.16/plugins-scripts/utils.pm.in
+--- nagios-plugins-1.4.16-orig/plugins-scripts/utils.pm.in	2012-06-27 18:32:47.000000000 +0100
++++ nagios-plugins-1.4.16/plugins-scripts/utils.pm.in	2012-08-17 13:24:32.112169647 +0100
+@@ -22,6 +22,9 @@
+ $PATH_TO_SMBCLIENT = "@PATH_TO_SMBCLIENT@" ;
+ $PATH_TO_MAILQ   = "@PATH_TO_MAILQ@";
+ $PATH_TO_QMAIL_QSTAT = "@PATH_TO_QMAIL_QSTAT@";
++# Hardcoded values (autotools patch will be provided to the uptream project)
++$PATH_TO_NTPDATE = "/usr/sbin/ntpdate";
++$PATH_TO_NTPQ =  "/usr/sbin/ntpq";
+ 
+ ## common variables
+ $TIMEOUT = 15;

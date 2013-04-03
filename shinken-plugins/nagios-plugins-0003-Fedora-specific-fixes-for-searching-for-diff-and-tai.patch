@@ -1,0 +1,27 @@
+From 8b87821cd7c6df328ec60662047720bba0673889 Mon Sep 17 00:00:00 2001
+From: Peter Lemenkov <lemenkov@gmail.com>
+Date: Wed, 10 Mar 2010 12:10:16 +0300
+Subject: [PATCH 3/6] Fedora-specific fixes for searching for diff and tail
+
+---
+ plugins-scripts/check_log.sh |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/plugins-scripts/check_log.sh b/plugins-scripts/check_log.sh
+index a1bfb48..20fc2b2 100755
+--- a/plugins-scripts/check_log.sh
++++ b/plugins-scripts/check_log.sh
+@@ -62,8 +62,8 @@
+ 
+ ECHO="/bin/echo"
+ GREP="/bin/egrep"
+-DIFF="/bin/diff"
+-TAIL="/bin/tail"
++DIFF="/usr/bin/diff"
++TAIL="/usr/bin/tail"
+ CAT="/bin/cat"
+ RM="/bin/rm"
+ CHMOD="/bin/chmod"
+-- 
+1.7.2.3
+
