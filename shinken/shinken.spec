@@ -40,11 +40,12 @@ BuildRequires: python26-devel, python26-setuptools
 Requires(post): httpd-tools
 
 %if %{with_systemd}
-Requires(post):  systemd
+BuildRequires:    systemd
+Requires(post):   systemd
 Requires(preun):  systemd
 Requires(postun): systemd
 # For triggerun
-Requires(post): systemd-sysv
+Requires(post):   systemd-sysv
 %else
 Requires: initscripts
 Requires: libevent
@@ -574,9 +575,9 @@ fi
 %attr(-,%{shinken_user} ,%{shinken_group}) %dir %{_localstatedir}/run/%{name}
 
 %changelog
-* Wed Mar 03 2013 Didier Fabert <dfabert@b2pweb.com> - 1.2.4-5
+* Sun Mar 03 2013 Didier Fabert <dfabert@b2pweb.com> - 1.2.4-5
 - Remove nagios-plugins dependency for poller
-- Add shinken-plugins dependency for poller
+- Add shinken-plugins-all dependency for poller
 
 * Thu Feb 28 2013 Didier Fabert <dfabert@b2pweb.com> - 1.2.4-4
 - Fix summary for broker and receiver
