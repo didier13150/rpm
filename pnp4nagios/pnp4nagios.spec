@@ -17,6 +17,7 @@ BuildRoot:     %{_tmppath}/%{name}-%{version}-root-%(%{__id_u} -n)
 Summary:       A performance data graphing solution
 
 %if %{with_systemd}
+BuildRequires:    systemd
 Requires(post):   systemd
 Requires(preun):  systemd
 Requires(postun): systemd
