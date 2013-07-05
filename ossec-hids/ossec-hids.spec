@@ -327,7 +327,6 @@ fi
 %files
 %defattr(-,root,root)
 %doc BUGS CONFIG INSTALL* README
-%doc %dir doc
 %attr(550,root,ossec) %dir %{_localstatedir}/ossec
 %attr(550,root,ossec) %dir %{_localstatedir}/ossec/active-response
 %attr(550,root,ossec) %{_localstatedir}/ossec/active-response/bin
@@ -489,7 +488,7 @@ fi
 - Update to 0801 snapshot
 - Update asl-shun.pl to log to active-responses.log, blocks now go to the named chain ASL-ACTIVE-RESPONSE, and delete events are more redundant.
 
-* Tue Jul 25 2011 Support <support@atomicorp.com> - 2.6-1
+* Mon Jul 25 2011 Support <support@atomicorp.com> - 2.6-1
 - Update to OSSEC 2.6 Final
 
 * Mon Jul 11 2011 Support <support@atomicorp.com> - 2.6.0-0.10
@@ -508,7 +507,7 @@ fi
 * Tue May 31 2011 Support <support@atomicorp.com> - 2.6.0-0.6
 - Update to snapshot 110531
 
-* Wed May 26 2011 Support <support@atomicorp.com> - 2.6.0-0.5
+* Thu May 26 2011 Support <support@atomicorp.com> - 2.6.0-0.5
 - Update to snapshot 110526
 
 * Wed May 4 2011 Support <support@atomicorp.com> - 2.6.0-0.4
@@ -517,7 +516,7 @@ fi
 * Wed Apr 20 2011 Support <support@atomicorp.com> - 2.6.0-0.3
 - Bugfix #536, Increase the default sleep time for syscheck
 
-* Mon Apr 12 2011 Support <support@atomicorp.com> - 2.6.0-0.1
+* Tue Apr 12 2011 Support <support@atomicorp.com> - 2.6.0-0.1
 - Renamed to 2.6 branch
 
 * Wed Apr 6 2011 Support <support@atomicorp.com> - 2.5.1-10
@@ -562,10 +561,10 @@ fi
 * Sat Sep 25 2010 Support <support@atomicorp.com> - 2.5-0.8
 - Extended no_ar into ossec-dbd
 
-* Wed Sep 23 2010 Support <support@atomicorp.com> - 2.5-0.7
+* Thu Sep 23 2010 Support <support@atomicorp.com> - 2.5-0.7
 - Add no_ar option to disable active response per rule
 
-* Wed Sep 20 2010 Support <support@atomicorp.com> - 2.5-0.6
+* Mon Sep 20 2010 Support <support@atomicorp.com> - 2.5-0.6
 - Update to snapshot 100920
 
 * Wed Sep 8 2010 Support <support@atomicorp.com> - 2.5-0.1
@@ -586,7 +585,7 @@ fi
 * Tue Aug 10 2010 Support <support@atomicorp.com> - 2.4.1-8
 - Relink against native mysql
 
-* Wed Jul 30 2010 Support <support@atomicorp.com> - 2.4.1-7
+* Fri Jul 30 2010 Support <support@atomicorp.com> - 2.4.1-7
 - Add minicon decoder from les fenison
 
 * Wed Jul 7 2010 Support <support@atomicorp.com> - 2.4.1-6
@@ -613,7 +612,7 @@ fi
 * Tue Mar 23 2010 Scott R. Shinn <scott@atomicrocketturtle.com> - 2.4-1
 - Rebuilt for atomic repo
 
-* Thu Mar 22 2010 Scott R. Shinn <scott@atomicrocketturtle.com> - 2.4-0.2
+* Mon Mar 22 2010 Scott R. Shinn <scott@atomicrocketturtle.com> - 2.4-0.2
 - Update to CVS 100317
 
 * Thu Mar 11 2010 Scott R. Shinn <scott@atomicrocketturtle.com> - 2.4-0.1
@@ -659,19 +658,19 @@ fi
 * Wed Aug 12 2009 Scott R. Shinn <scott@atomicrocketturtle.com> - 2.1.1-5
 - Update to 090812 snapshot
 
-* Thu Jul 28 2009 Scott R. Shinn <scott@atomicrocketturtle.com> - 2.1.1-3
+* Tue Jul 28 2009 Scott R. Shinn <scott@atomicrocketturtle.com> - 2.1.1-3
 - Rebuild agent daemons with -DCLIENT, added symlink trickery
 
 * Thu Jul 2 2009 Scott R. Shinn <scott@atomicrocketturtle.com> - 2.1.1-1
 - update to 2.1.1
 
-* Wed Jun 30 2009 Scott R. Shinn <scott@atomicrocketturtle.com> - 2.1-3
+* Tue Jun 30 2009 Scott R. Shinn <scott@atomicrocketturtle.com> - 2.1-3
 - update to 090630 snapshot, this has fixes for CentOS/RHEL 4 64-bit environments
 
-* Wed Jun 12 2009 Scott R. Shinn <scott@atomicrocketturtle.com> - 2.1-1
+* Fri Jun 12 2009 Scott R. Shinn <scott@atomicrocketturtle.com> - 2.1-1
 - update to 2.1 final
 
-* Wed Jun 12 2009 Scott R. Shinn <scott@atomicrocketturtle.com> - 2.0-11
+* Fri Jun 12 2009 Scott R. Shinn <scott@atomicrocketturtle.com> - 2.0-11
 - update to snapshot 090612
 
 * Wed Jun 10 2009 Scott R. Shinn <scott@atomicrocketturtle.com> - 2.0-10
@@ -683,13 +682,13 @@ fi
 * Mon Apr 27 2009 Scott R. Shinn <scott@atomicrocketturtle.com> - 2.0-8
 - Disable postgresql support, to get around an undesirable dependency on EL4
 
-* Mon Apr 17 2009 Scott R. Shinn <scott@atomicrocketturtle.com> - 2.0-7
+* Fri Apr 17 2009 Scott R. Shinn <scott@atomicrocketturtle.com> - 2.0-7
 - Update to snapshot 090417
 
 * Mon Apr 13 2009 Scott R. Shinn <scott@atomicrocketturtle.com> - 2.0-6
 - Update to snapshot 090413 (this adds in inotify support)
 
-* Wed Apr 10 2009 Scott R. Shinn <scott@atomicrocketturtle.com> - 2.0-5
+* Fri Apr 10 2009 Scott R. Shinn <scott@atomicrocketturtle.com> - 2.0-5
 - Update to snapshot 090410 (this adds in inotify support)
 
 * Wed Apr 8 2009 Scott R. Shinn <scott@atomicrocketturtle.com> - 2.0-4
@@ -705,13 +704,13 @@ fi
 * Thu Feb 26 2009 Scott R. Shinn <scott@atomicrocketturtle.com> - 2.0.0-0.090225.1
 - update to snapshot 090225
 
-* Sun Feb 20 2009 Scott R. Shinn <scott@atomicrocketturtle.com> - 2.0.0-0.090220.1
+* Fri Feb 20 2009 Scott R. Shinn <scott@atomicrocketturtle.com> - 2.0.0-0.090220.1
 - update to snapshot 090220
 
 * Fri Feb 6 2009 Scott R. Shinn <scott@atomicrocketturtle.com> - 2.0.0-0.090206.1
 - update to snapshot 090206
 
-* Mon Feb 5 2009 Scott R. Shinn <scott@atomicrocketturtle.com> - 2.0.0-0.090205.1
+* Thu Feb 5 2009 Scott R. Shinn <scott@atomicrocketturtle.com> - 2.0.0-0.090205.1
 - update to snapshot 090205
 
 * Fri Jan 30 2009 Scott R. Shinn <scott@atomicrocketturtle.com> - 1.99-2
