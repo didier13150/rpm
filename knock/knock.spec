@@ -15,9 +15,22 @@ Source0:          http://www.zeroflux.org/proj/knock/files/%{name}-%{version}.ta
 Source1:          knockd.service
 Source2:          knockd.init
 Patch0:           knock-path-max.patch
-BuildRoot:        %{_tmppath}/%{name}-%{version}-%{release}-root
+BuildRoot:        %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Requires:         libpcap
 BuildRequires:    libpcap-devel
+%if %{with_systemd}
+BuildRequires:    systemd
+%endif
+
+%description
+A knock client makes the port-hits by sending a TCP (or UDP) packet to a port
+on the server. This port need not be open -- since knockd listens at the link-
+layer level, it sees all traffic even if it's destined for a closed port.
+
+%package server
+Requires:         %{name} = %{version}-%{release}
+Summary:          Port-knocking server
+Group:            System Environment/Daemons
 %if %{with_systemd}
 Requires(post):   systemd
 Requires(preun):  systemd
@@ -31,16 +44,6 @@ Requires(post):   /sbin/chkconfig
 Requires(preun):  /sbin/chkconfig, /sbin/service
 Requires(postun): /sbin/service
 %endif
-
-%description
-A knock client makes the port-hits by sending a TCP (or UDP) packet to a port
-on the server. This port need not be open -- since knockd listens at the link-
-layer level, it sees all traffic even if it's destined for a closed port.
-
-%package server
-Requires:         %{name}
-Summary:          Port-knocking server
-Group:            System Environment/Daemons
 
 %description server
 knockd is a port-knock server. It listens to all traffic on an ethernet
@@ -61,11 +64,11 @@ holes in a firewall for quick access.
 
 %install
 %{__rm} -rf %{buildroot}
-%{__make} install DESTDIR="%{buildroot}"
+%{__make} install DESTDIR=%{buildroot}
 %{__mkdir_p} %{buildroot}%{_sysconfdir}/sysconfig
 %if %{with_systemd}
 # Unit file
-%{__mkdir_p} %{buildroot}%{_unitdir}/
+%{__mkdir_p} %{buildroot}%{_unitdir}
 install -Dp -m0644 %{SOURCE1} %{buildroot}%{_unitdir}/%{name}d.service
 %else
 # Init script
