@@ -6,7 +6,7 @@
 
 Name:           shinken-plugins
 Version:        1.0.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Plugins needed by default shinken install
 License:        GPLv2+
 
@@ -107,7 +107,6 @@ Conflicts:      nagios-plugins-ups
 Conflicts:      nagios-plugins-users
 Conflicts:      nagios-plugins-wave
 Conflicts:      nagios-plugins-cluster
-Conflicts:      nagios-plugins-all
 %ifnarch ppc ppc64 sparc sparc64
 Conflicts:      nagios-plugins-sensors
 %endif
@@ -230,6 +229,10 @@ pushd check_mysql_health-%{check_mysql_health_ver}
 make %{?_smp_mflags}
 popd
 
+cat << 'EOF' > shinken-plugins-all
+This meta package contains all plugins
+EOF
+
 %install
 sed -i 's,^MKINSTALLDIRS.*,MKINSTALLDIRS = ../mkinstalldirs,' po/Makefile
 rm -rf %{buildroot}
@@ -286,30 +289,6 @@ popd
 pushd check_mysql_health-%{check_mysql_health_ver}
 %{__install} -m0755 plugins-scripts/check_mysql_health %{buildroot}%{_libdir}/nagios/plugins/
 popd
-
-%files snmp
-%defattr(-,root,root,-)
-# Official plugins
-%{_libdir}/nagios/plugins/check_snmp
-# Extra Plugins
-%{_libdir}/nagios/plugins/check_snmp_int
-%{_libdir}/nagios/plugins/check_snmp_process
-%{_libdir}/nagios/plugins/check_snmp_storage
-%{_libdir}/nagios/plugins/check_snmp_boostedge.pl
-%{_libdir}/nagios/plugins/check_snmp_cpfw.pl
-%{_libdir}/nagios/plugins/check_snmp_css.pl
-%{_libdir}/nagios/plugins/check_snmp_css_main.pl
-%{_libdir}/nagios/plugins/check_snmp_env.pl
-%{_libdir}/nagios/plugins/check_snmp_int.pl
-%{_libdir}/nagios/plugins/check_snmp_linkproof_nhr.pl
-%{_libdir}/nagios/plugins/check_snmp_load.pl
-%{_libdir}/nagios/plugins/check_snmp_mem.pl
-%{_libdir}/nagios/plugins/check_snmp_nsbox.pl
-%{_libdir}/nagios/plugins/check_snmp_process.pl
-%{_libdir}/nagios/plugins/check_snmp_storage.pl
-%{_libdir}/nagios/plugins/check_snmp_vrrp.pl
-%{_libdir}/nagios/plugins/check_snmp_win.pl
-%doc AUTHORS COPYING ChangeLog NEWS README nagios_plugins/doc/
 
 %files
 %defattr(-,root,root,-)
@@ -388,6 +367,30 @@ popd
 %{_libdir}/nagios/plugins/check_sensors
 %endif
 
+%files snmp
+%defattr(-,root,root,-)
+# Official plugins
+%{_libdir}/nagios/plugins/check_snmp
+# Extra Plugins
+%{_libdir}/nagios/plugins/check_snmp_int
+%{_libdir}/nagios/plugins/check_snmp_process
+%{_libdir}/nagios/plugins/check_snmp_storage
+%{_libdir}/nagios/plugins/check_snmp_boostedge.pl
+%{_libdir}/nagios/plugins/check_snmp_cpfw.pl
+%{_libdir}/nagios/plugins/check_snmp_css.pl
+%{_libdir}/nagios/plugins/check_snmp_css_main.pl
+%{_libdir}/nagios/plugins/check_snmp_env.pl
+%{_libdir}/nagios/plugins/check_snmp_int.pl
+%{_libdir}/nagios/plugins/check_snmp_linkproof_nhr.pl
+%{_libdir}/nagios/plugins/check_snmp_load.pl
+%{_libdir}/nagios/plugins/check_snmp_mem.pl
+%{_libdir}/nagios/plugins/check_snmp_nsbox.pl
+%{_libdir}/nagios/plugins/check_snmp_process.pl
+%{_libdir}/nagios/plugins/check_snmp_storage.pl
+%{_libdir}/nagios/plugins/check_snmp_vrrp.pl
+%{_libdir}/nagios/plugins/check_snmp_win.pl
+%doc AUTHORS COPYING ChangeLog NEWS README nagios_plugins/doc/
+
 %files mysql
 %defattr(-,root,root,-)
 # Official plugins
@@ -408,7 +411,14 @@ popd
 # Official plugins
 %{_libdir}/nagios/plugins/check_oracle
 
+%files all
+%defattr(-,root,root,-)
+%doc shinken-plugins-all
+
 %changelog
+* Fri Apr 05 2013 Didier Fabert <didier.fabert@gmail.com> - 1.0.0-5
+- Add Missing shinken-plugins-all meta-package
+
 * Wed Apr 03 2013 Didier Fabert <didier.fabert@gmail.com> - 1.0.0-4
 - Add nagios plugins
 
