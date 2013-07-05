@@ -2,6 +2,11 @@
 # generate ssl cert for authd: 
 # openssl genrsa -out /var/ossec/etc/sslmanager.key 2048
 # openssl req -new -x509 -key /var/ossec/etc/sslmanager.key -out /var/ossec/etc/sslmanager.cert -days 365 
+%if 0%{?fedora} >= 17 || 0%{?rhel} >= 7
+%global with_systemd 1
+%else
+%global with_systemd 0
+%endif
 
 %define asl 1
 %define _default_patch_fuzz 2
@@ -16,6 +21,7 @@ Release:     20%{?dist}
 License:     GPLv2
 Group:       Applications/System
 Source0:     http://www.ossec.net/files/%{name}-%{version}.tar.gz
+Source1:     %{name}.service
 Source2:     %{name}.init
 Source5:     asl-shun.pl
 Source6:     ossec-hids.logrotate
@@ -61,9 +67,20 @@ Summary:     The OSSEC HIDS Client
 Group:       System Environment/Daemons
 Provides:    ossec-client = %{version}-%{release}
 Requires:    %{name} = %{version}-%{release}
-Requires(post):   /sbin/chkconfig 
-Requires(preun):  /sbin/chkconfig /sbin/service
-Requires(postun): /sbin/service 
+%if %{with_systemd}
+BuildRequires:    systemd
+Requires(post):   systemd
+Requires(preun):  systemd
+Requires(postun): systemd
+# For triggerun
+Requires(post):   systemd-sysv
+%else
+Requires:         initscripts
+Requires:         libevent
+Requires(post):   /sbin/chkconfig
+Requires(preun):  /sbin/chkconfig, /sbin/service
+Requires(postun): /sbin/service
+%endif
 Conflicts:   %{name}-server
 %if %{asl}
 Requires:    perl-DBD-SQLite
@@ -81,9 +98,19 @@ Provides:    ossec-server = %{version}-%{release}
 Requires:    %{name} = %{version}-%{release} 
 Conflicts:   %{name}-client
 Requires(pre):    /usr/sbin/groupadd /usr/sbin/useradd
-Requires(post):   /sbin/chkconfig 
-Requires(preun):  /sbin/chkconfig /sbin/service
-Requires(postun): /sbin/service 
+%if %{with_systemd}
+Requires(post):   systemd
+Requires(preun):  systemd
+Requires(postun): systemd
+# For triggerun
+Requires(post):   systemd-sysv
+%else
+Requires:         initscripts
+Requires:         libevent
+Requires(post):   /sbin/chkconfig
+Requires(preun):  /sbin/chkconfig, /sbin/service
+Requires(postun): /sbin/service
+%endif
 %if %{asl}
 Requires:    perl-DBD-SQLite
 %endif
@@ -146,7 +173,6 @@ echo "DATE=\"`date`\""                        >> ossec-init.conf
 %install
 [ -n "${RPM_BUILD_ROOT}" -a "${RPM_BUILD_ROOT}" != "/" ] && rm -rf ${RPM_BUILD_ROOT}
 #fixup
-mkdir -p ${RPM_BUILD_ROOT}%{_initrddir}
 %{__mkdir_p} ${RPM_BUILD_ROOT}%{_sysconfdir}
 %{__mkdir_p} ${RPM_BUILD_ROOT}%{_datadir}/ossec/contrib
 %{__mkdir_p} ${RPM_BUILD_ROOT}%{_localstatedir}/{log,run}
@@ -167,7 +193,6 @@ mkdir -p ${RPM_BUILD_ROOT}%{_initrddir}
 %{__mkdir_p} ${RPM_BUILD_ROOT}%{_localstatedir}/ossec/var/run
 %{__mkdir_p} ${RPM_BUILD_ROOT}%{_localstatedir}/ossec/.ssh
 
-%{__install} -m 0755 %{SOURCE2} ${RPM_BUILD_ROOT}%{_initrddir}/%{name}
 install -m 0600 ossec-init.conf ${RPM_BUILD_ROOT}%{_sysconfdir}
 
 install -m 0644 etc/ossec.conf ${RPM_BUILD_ROOT}%{_localstatedir}/ossec/etc/ossec.conf.sample
@@ -203,6 +228,16 @@ install -m 0755 %{SOURCE8} ${RPM_BUILD_ROOT}%{_localstatedir}/ossec/bin/ossec-co
 install -m 0644 %{SOURCE9} ${RPM_BUILD_ROOT}%{_localstatedir}/ossec/etc/shared/agent.conf
 %endif
 
+%if %{with_systemd}
+# Unit file
+%{__mkdir_p} %{buildroot}%{_unitdir}/
+install -Dp -m0644 %{SOURCE1} %{buildroot}%{_unitdir}/ossec-hids.service
+%{__rm} -f %{buildroot}%{_initrddir}/ossec-hids
+%else
+mkdir -p ${RPM_BUILD_ROOT}%{_initrddir}
+%{__install} -m 0755 %{SOURCE2} ${RPM_BUILD_ROOT}%{_initrddir}/%{name}
+%endif
+
 %pre
 if ! id -g ossec > /dev/null 2>&1; then
   groupadd -r ossec
@@ -231,10 +266,19 @@ if ! id -u ossece > /dev/null 2>&1; then
 fi
 
 %post client
+%if 0%{?systemd_post:1}
+%systemd_post %{name}.service
+%else
 if [ $1 = 1 ]; then
-  chkconfig --add %{name}
-  chkconfig %{name} on
+# Initial installation
+%if %{with_systemd}
+    /bin/systemctl daemon-reload >/dev/null 2>&1 || :
+%else
+    /sbin/chkconfig --add %{name}
+    chkconfig %{name} on
+%endif
 fi
+%endif
 
 echo "TYPE=\"agent\"" >> %{_sysconfdir}/ossec-init.conf
 
@@ -260,11 +304,19 @@ if [ -f %{_localstatedir}/lock/subsys/%{name} ]; then
 fi
 
 %post server
+%if 0%{?systemd_post:1}
+%systemd_post %{name}.service
+%else
 if [ $1 = 1 ]; then
-  chkconfig --add %{name}
-  chkconfig %{name} on
+# Initial installation
+%if %{with_systemd}
+    /bin/systemctl daemon-reload >/dev/null 2>&1 || :
+%else
+    /sbin/chkconfig --add %{name}
+    chkconfig %{name} on
+%endif
 fi
-
+%endif
 echo "TYPE=\"server\"" >> %{_sysconfdir}/ossec-init.conf
 
 if [ ! -f %{_localstatedir}/ossec/etc/ossec.conf ]; then
@@ -289,34 +341,90 @@ if [ -f %{_localstatedir}/lock/subsys/%{name} ]; then
 fi
 
 %preun client
-if [ $1 = 0 ]; then
-  chkconfig %{name} off
-  chkconfig --del %{name}
-
-  if [ -f %{_localstatedir}/lock/subsys/%{name} ]; then
-    %{_initrddir}/%{name} stop
-  fi
-
-  rm -f %{_localstatedir}/ossec/etc/localtime
-  rm -f %{_localstatedir}/ossec/etc/ossec.conf
-  rm -f %{_localstatedir}/ossec/bin/ossec-control
-  rm -f %{_localstatedir}/ossec/bin/ossec-logcollector 
-  rm -f %{_localstatedir}/ossec/bin/ossec-syscheckd 
+%if 0%{?systemd_preun:1}
+%systemd_preun %{name}.service
+%else
+if [ "$1" = 0 ] ; then
+# Package removal, not upgrade
+%if %{with_systemd}
+    /bin/systemctl --no-reload disable %{name}.service >/dev/null 2>&1 || :
+    /bin/systemctl stop %{name}.service >/dev/null 2>&1 || :
+%else
+    /sbin/service %{name} stop > /dev/null 2>&1
+    chkconfig %{name} off
+    /sbin/chkconfig --del %{name}
+    if [ -f %{_localstatedir}/lock/subsys/%{name} ]; then
+        %{_initrddir}/%{name} stop
+    fi
+%endif
+    rm -f %{_localstatedir}/ossec/etc/localtime
+    rm -f %{_localstatedir}/ossec/etc/ossec.conf
+    rm -f %{_localstatedir}/ossec/bin/ossec-control
+    rm -f %{_localstatedir}/ossec/bin/ossec-logcollector 
+    rm -f %{_localstatedir}/ossec/bin/ossec-syscheckd 
 fi
+exit 0
+%endif
 
 %preun server
-if [ $1 = 0 ]; then
-  chkconfig %{name} off
-  chkconfig --del %{name}
-
-  if [ -f %{_localstatedir}/lock/subsys/%{name} ]; then
-    %{_initrddir}/%{name} stop
-  fi
-
-  rm -f %{_localstatedir}/ossec/etc/localtime
-  rm -f %{_localstatedir}/ossec/etc/ossec.conf
-  rm -f %{_localstatedir}/ossec/bin/ossec-control
+%if 0%{?systemd_preun:1}
+%systemd_preun %{name}.service
+%else
+if [ "$1" = 0 ] ; then
+# Package removal, not upgrade
+%if %{with_systemd}
+    /bin/systemctl --no-reload disable %{name}.service >/dev/null 2>&1 || :
+    /bin/systemctl stop %{name}.service >/dev/null 2>&1 || :
+%else
+    /sbin/service %{name} stop > /dev/null 2>&1
+    chkconfig %{name} off
+    /sbin/chkconfig --del %{name}
+    if [ -f %{_localstatedir}/lock/subsys/%{name} ]; then
+        %{_initrddir}/%{name} stop
+    fi
+%endif
+    rm -f %{_localstatedir}/ossec/etc/localtime
+    rm -f %{_localstatedir}/ossec/etc/ossec.conf
+    rm -f %{_localstatedir}/ossec/bin/ossec-control
 fi
+exit 0
+%endif
+
+%postun client
+%if 0%{?systemd_postun_with_restart:1}
+%systemd_postun_with_restart %{name}.service
+%else
+%if %{with_systemd}
+/bin/systemctl daemon-reload >/dev/null 2>&1 || :
+if [ $1 -ge 1 ]; then
+# Package upgrade, not uninstall
+    /bin/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
+fi
+%else
+if [ "$1" -ge 1 ]; then
+    /sbin/service %{name} restart > /dev/null 2>&1
+fi
+exit 0
+%endif
+%endif
+
+%postun server
+%if 0%{?systemd_postun_with_restart:1}
+%systemd_postun_with_restart %{name}.service
+%else
+%if %{with_systemd}
+/bin/systemctl daemon-reload >/dev/null 2>&1 || :
+if [ $1 -ge 1 ]; then
+# Package upgrade, not uninstall
+    /bin/systemctl try-restart %{name}.service >/dev/null 2>&1 || :
+fi
+%else
+if [ "$1" -ge 1 ]; then
+    /sbin/service %{name} restart > /dev/null 2>&1
+fi
+exit 0
+%endif
+%endif
 
 %triggerin -- glibc
 [ -r %{_sysconfdir}/localtime ] && cp -fpL %{_sysconfdir}/localtime %{_localstatedir}/ossec/etc
@@ -350,7 +458,11 @@ fi
 %files client
 %defattr(-,root,root)
 %attr(600,root,root) %verify(not md5 size mtime) %{_sysconfdir}/ossec-init.conf
-%{_initrddir}/*
+%if %{with_systemd}
+%{_unitdir}/%{name}.service
+%else
+%{_initrddir}/%{name}
+%endif
 %config(noreplace) %{_localstatedir}/ossec/etc/ossec-agent.conf
 %config(noreplace) %{_localstatedir}/ossec/etc/internal_options*
 %config(noreplace) %{_localstatedir}/ossec/etc/shared/*
@@ -369,7 +481,11 @@ fi
 %files server
 %defattr(-,root,root)
 %attr(600,root,root) %verify(not md5 size mtime) %{_sysconfdir}/ossec-init.conf
-%{_initrddir}/*
+%if %{with_systemd}
+%{_unitdir}/%{name}.service
+%else
+%{_initrddir}/%{name}
+%endif
 %ghost %config(missingok,noreplace) %{_localstatedir}/ossec/etc/ossec.conf
 %config(noreplace) %{_localstatedir}/ossec/etc/ossec-server.conf
 %config(noreplace) %{_localstatedir}/ossec/etc/internal_options*
