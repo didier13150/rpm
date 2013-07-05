@@ -17,7 +17,7 @@ build:
 		cd $$dir ; \
 		make 1>>../$(LOGFILE) 2>&1; cd .. ; \
 	done
-	
+
 srpm:
 	@for dir in $(PKGS) ; do cd $$dir ; make srpm ; cd .. ; done
 
@@ -31,7 +31,7 @@ repository:
 	@echo -e "\033[1;32mUpdating repository on $(REPODIR)\033[0m"
 	@for dir in $(PKGS) ; \
 		do mkdir -p $(REPODIR)/$$dir ; \
-		cp $$dir/result/*.rpm $(REPODIR)/$$dir/ ; \
+		cp $$dir/result/*.rpm $(REPODIR)/$$dir/ || true; \
 	done
 	@createrepo --update -d $(REPODIR)
 
