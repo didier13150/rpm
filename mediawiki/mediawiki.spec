@@ -1,13 +1,19 @@
-%define majorver 1.20
+%define majorver 1.21
+%global wiki_ext_path %{_datadir}/mediawiki/extensions
 Name:           mediawiki
-Version:        %{majorver}.2
+Version:        %{majorver}.1
 Release:        1%{?dist}
 License:        GPLv2+
 Group:          Development/Tools
 URL:            http://www.mediawiki.org/
 Summary:        A wiki engine
+BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+
 Source0:        http://download.wikimedia.org/mediawiki/%{majorver}/mediawiki-%{version}.tar.gz
 Source1:        mediawiki.conf
+Source2:        README.RPM
+Source3:        mw-createinstance.in
+Source4:        mw-updateallinstances.in
 Source10:       https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Cite.tgz
 Source11:       https://gerrit.wikimedia.org/r/p/mediawiki/extensions/SyntaxHighlight_GeSHi.tgz
 Source12:       https://gerrit.wikimedia.org/r/p/mediawiki/extensions/PdfExport.tgz
@@ -17,7 +23,6 @@ Source15:       https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Math.tgz
 Source16:       Linux.tag.php
 Source17:       CalcBitrate.js
 Source18:       CalcBitrate.php
-BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root
 BuildArch:      noarch
 # to make sure the "apache" group is created before mediawiki is installed
 Requires(pre):  httpd
@@ -25,13 +30,24 @@ Requires:       php-common >= 5, php-xml
 Conflicts:      php-common = 5.3.1
 Requires:       php-mysql, php-pgsql
 Requires:       diffutils, ImageMagick, php-gd
-Obsoletes:      mediawiki-nomath, mediawiki-math
+
+Provides:       mediawiki-math = %{version}-%{release}
+Provides:       mediawiki-nomath = %{version}-%{release}
+Provides:       mediawiki116 = %{version}-%{release}
+
+Obsoletes:      mediawiki-math < 1.16.5-62
+Obsoletes:      mediawiki-nomath < 1.16.5-62
+Obsoletes:      mediawiki116 < 1.16.0-9
+
 
 %description
 MediaWiki is the software used for Wikipedia and the other Wikimedia
 Foundation websites. Compared to other wikis, it has an excellent
 range of features and support for high-traffic websites using multiple
 servers
+
+This package supports wiki farms. Read the instructions for creating wiki instances under %{_defaultdocdir}/%{name}-%{version}/README.RPM.
+Remember to remove the config dir after completing the configuration.
 
 %package Cite
 Requires:       %{name}
@@ -122,98 +138,146 @@ rm -rf %{buildroot}
 
 # move away the documentation to the final folder.
 mkdir -p %{buildroot}%{_defaultdocdir}/%{name}-%{version}
-mv -f COPYING FAQ HISTORY README RELEASE-NOTES* UPGRADE CREDITS INSTALL docs \
+cp -rp COPYING FAQ HISTORY README RELEASE-NOTES* UPGRADE CREDITS INSTALL docs \
   %{buildroot}%{_defaultdocdir}/%{name}-%{version}/
 
 # now copy the rest to the buildroot.
-mkdir -p %{buildroot}%{_localstatedir}/www/wiki
-cp -a * %{buildroot}%{_localstatedir}/www/wiki
+mkdir -p %{buildroot}%{_datadir}/mediawiki
+cp -a * %{buildroot}%{_datadir}/mediawiki/
 
 # remove unneeded parts
-rm -fr %{buildroot}%{_localstatedir}/www/wiki/{t,test,tests}
-rm -fr %{buildroot}%{_localstatedir}/www/wiki/includes/zhtable
-find %{buildroot}%{_localstatedir}/www/wiki/ \
+rm -fr %{buildroot}%{_datadir}/mediawiki/{t,test,tests}
+rm -fr %{buildroot}%{_datadir}/mediawiki/includes/zhtable
+find %{buildroot}%{_datadir}/mediawiki/ \
   \( -name .htaccess -or -name \*.cmi \) \
   | xargs -r rm
 
 # fix permissions
-chmod +x %{buildroot}%{_localstatedir}/www/wiki/bin/*
-find %{buildroot}%{_localstatedir}/www/wiki -name \*.pl | xargs -r chmod +x
+find %{buildroot}%{_datadir}/mediawiki -name \*.pl | xargs -r chmod +x
 
 # remove version control/patch files
 find %{buildroot} -name .svnignore | xargs -r rm
 find %{buildroot} -name \*.commoncode | xargs -r rm
 
+# placeholder for a default instance
+mkdir -p %{buildroot}%{_localstatedir}/www/wiki
+
 mkdir -p %{buildroot}%{_sysconfdir}/httpd/conf.d/
 install -p -m 0644 %{SOURCE1} \
   %{buildroot}%{_sysconfdir}/httpd/conf.d/mediawiki.conf
 
-# Extract extensions
-tar -xzf %{SOURCE10} -C %{buildroot}%{_localstatedir}/www/wiki/extensions/
-tar -xzf %{SOURCE11} -C %{buildroot}%{_localstatedir}/www/wiki/extensions/
-tar -xzf %{SOURCE12} -C %{buildroot}%{_localstatedir}/www/wiki/extensions/
-tar -xzf %{SOURCE13} -C %{buildroot}%{_localstatedir}/www/wiki/extensions/
-tar -xzf %{SOURCE14} -C %{buildroot}%{_localstatedir}/www/wiki/extensions/
-tar -xzf %{SOURCE15} -C %{buildroot}%{_localstatedir}/www/wiki/extensions/
-%{__mkdir_p} %{buildroot}%{_localstatedir}/www/wiki/extensions/CalcBitrate
-%{__mkdir_p} %{buildroot}%{_localstatedir}/www/wiki/extensions/CustomTag
-%{__cp} %{SOURCE16} %{buildroot}%{_localstatedir}/www/wiki/extensions/CustomTag/
-%{__cp} %{SOURCE17} %{buildroot}%{_localstatedir}/www/wiki/extensions/CalcBitrate/
-%{__cp} %{SOURCE18} %{buildroot}%{_localstatedir}/www/wiki/extensions/CalcBitrate/
+# tools for keeping mediawiki instances current
+mkdir -p %{buildroot}%{_sbindir}
+sed -e's,@datadir@,%{_datadir},g' -e's,@sysconfdir@,%{_sysconfdir},g' \
+  < %{SOURCE3} > %{buildroot}%{_sbindir}/mw-createinstance
+sed -e's,@datadir@,%{_datadir},g' -e's,@sysconfdir@,%{_sysconfdir},g' \
+  < %{SOURCE4} > %{buildroot}%{_sbindir}/mw-updateallinstances
+chmod 0755 %{buildroot}%{_sbindir}/mw-*
+mkdir %{buildroot}%{_sysconfdir}/mediawiki
+echo /var/www/wiki > %{buildroot}%{_sysconfdir}/mediawiki/instances
 
+# Extract extensions
+tar -xzf %{SOURCE10} -C %{buildroot}%{wiki_ext_path}/
+tar -xzf %{SOURCE11} -C %{buildroot}%{wiki_ext_path}/
+tar -xzf %{SOURCE12} -C %{buildroot}%{wiki_ext_path}/
+tar -xzf %{SOURCE13} -C %{buildroot}%{wiki_ext_path}/
+tar -xzf %{SOURCE14} -C %{buildroot}%{wiki_ext_path}/
+tar -xzf %{SOURCE15} -C %{buildroot}%{wiki_ext_path}/
+%{__mkdir_p} %{buildroot}%{wiki_ext_path}/CalcBitrate
+%{__mkdir_p} %{buildroot}%{wiki_ext_path}/CustomTag
+%{__cp} %{SOURCE16} %{buildroot}%{wiki_ext_path}/CustomTag/
+%{__cp} %{SOURCE17} %{buildroot}%{wiki_ext_path}/CalcBitrate/
+%{__cp} %{SOURCE18} %{buildroot}%{wiki_ext_path}/CalcBitrate/
+
+%post
+%{_sbindir}/mw-updateallinstances >> /var/log/mediawiki-updates.log 2>&1 || :
 
 %clean
 rm -rf %{buildroot}
 
 %files
-%defattr(-,root,root,-)
-%{_defaultdocdir}/%{name}-%{version}
+%doc COPYING FAQ HISTORY README RELEASE-NOTES-1.21 UPGRADE CREDITS INSTALL docs
+%{_datadir}/mediawiki
+%attr(-,apache,apache) %{_datadir}/mediawiki/mw-config
 %{_localstatedir}/www/wiki
-%attr(-,apache,apache) %dir %{_localstatedir}/www/wiki/mw-config
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/mediawiki.conf
-%exclude %{_localstatedir}/www/wiki/extensions/Cite
-%exclude %{_localstatedir}/www/wiki/extensions/SyntaxHighlight_GeSHi
-%exclude %{_localstatedir}/www/wiki/extensions/PdfExport
-%exclude %{_localstatedir}/www/wiki/extensions/Mpdf
-%exclude %{_localstatedir}/www/wiki/extensions/CategoryTree
-%exclude %{_localstatedir}/www/wiki/extensions/Math
-%exclude %{_localstatedir}/www/wiki/extensions/CalcBitrate
-%exclude %{_localstatedir}/www/wiki/extensions/CustomTag
+%dir %{_sysconfdir}/mediawiki
+%config(noreplace) %{_sysconfdir}/mediawiki/instances
+%{_sbindir}/mw-createinstance
+%{_sbindir}/mw-updateallinstances
+%exclude %{wiki_ext_path}/Cite
+%exclude %{wiki_ext_path}/SyntaxHighlight_GeSHi
+%exclude %{wiki_ext_path}/PdfExport
+%exclude %{wiki_ext_path}/Mpdf
+%exclude %{wiki_ext_path}/CategoryTree
+%exclude %{wiki_ext_path}/Math
+%exclude %{wiki_ext_path}/CalcBitrate
+%exclude %{wiki_ext_path}/CustomTag
 
 #Cite SyntaxHighlight_GeSHi PdfExport Mpdf CategoryTree Math
 %files Cite
-%{_localstatedir}/www/wiki/extensions/Cite
+%{wiki_ext_path}/Cite
 
 %files SyntaxHighlight_GeSHi
-%{_localstatedir}/www/wiki/extensions/SyntaxHighlight_GeSHi
+%{wiki_ext_path}/SyntaxHighlight_GeSHi
 
 %files PdfExport
-%{_localstatedir}/www/wiki/extensions/PdfExport
+%{wiki_ext_path}/PdfExport
 
 %files Mpdf
-%{_localstatedir}/www/wiki/extensions/Mpdf
+%{wiki_ext_path}/Mpdf
 
 %files CategoryTree
-%{_localstatedir}/www/wiki/extensions/CategoryTree
+%{wiki_ext_path}/CategoryTree
 
 %files Math
-%{_localstatedir}/www/wiki/extensions/Math
+%{wiki_ext_path}/Math
 
 %files CalcBitrate
-%{_localstatedir}/www/wiki/extensions/CalcBitrate
+%{wiki_ext_path}/CalcBitrate
 
 %files CustomTag
-%{_localstatedir}/www/wiki/extensions/CustomTag
+%{wiki_ext_path}/CustomTag
+
 
 %changelog
+* Mon Jun 03 2013 Michael Cronenworth <mike@cchtml.com> - 1.21.1-1
+- New upstream release.
+
+* Tue May 28 2013 Michael Cronenworth <mike@cchtml.com> - 1.21.0-1
+- New upstream release.
+
+* Tue May 07 2013 Michael Cronenworth <mike@cchtml.com> - 1.20.5-1
+- New upstream release.
+- Obsolete mediawiki116 package.
+
+* Wed Apr 17 2013 Michael Cronenworth <mike@cchtml.com> - 1.20.4-1
+- New upstream release.
+
+* Thu Apr 11 2013 Michael Cronenworth <mike@cchtml.com> - 1.20.3-3
+- Update mw-* scripts. (#926899)
+
+* Tue Mar 12 2013 Michael Cronenworth <mike@cchtml.com> - 1.20.3-2
+- Update mw-createinstance for new access points.
+
+* Mon Mar  4 2013 Michael Cronenworth <mike@cchtml.com> - 1.20.3-1
+- New upstream release.
+
+* Thu Feb 28 2013 Michael Cronenworth <mike@cchtml.com> - 1.20.2-2
+- Fix upgrade path.
+
+* Wed Feb 27 2013 Michael Cronenworth <mike@cchtml.com> - 1.19.3-1
+- New upstream release.
+
 * Fri Feb 15 2013 Didier Fabert <didier.fabert@gmail.com> - 1.20.2-1
 - Update to 1.20.2
 - No farm release
 
+* Thu Feb 14 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.16.5-62
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_19_Mass_Rebuild
+
 * Fri Jul 20 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.16.5-61
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
-
-* Fri Jan 13 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.16.5-60
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_17_Mass_Rebuild
 
 * Sun May  8 2011 Axel Thimm <Axel.Thimm@ATrpms.net> - 1.16.5-59
@@ -294,7 +358,7 @@ rm -rf %{buildroot}
 * Tue Mar  4 2008 Axel Thimm <Axel.Thimm@ATrpms.net> - 1.10.4-38
 - Update to 1.10.4.
 
-* Tue Feb 17 2008 Axel Thimm <Axel.Thimm@ATrpms.net> - 1.10.3-37
+* Sun Feb 17 2008 Axel Thimm <Axel.Thimm@ATrpms.net> - 1.10.3-37
 - Update to 1.10.3.
 - Fixes CVE-2008-0460 (bug #430286).
 

@@ -16,14 +16,17 @@ if ! test -e "$path"; then
 fi
 
 if ! test -e "$path"/LocalSettings.php; then
-  cp -a "@datadir@"/mediawiki/config "$path"
+  cp -a "@datadir@"/mediawiki/mw-config "$path"
 fi
 
 if ! test -e "$path"/images; then
   mkdir "$path"/images
+  ln -s "@datadir@"/mediawiki/images/.htaccess "$path"/images
   chown apache:apache "$path"/images
 fi
-for f in index.php api.php opensearch_desc.php; do
+for f in index.php api.php extensions img_auth.php includes languages load.php \
+         opensearch_desc.php profileinfo.php redirect.php resources skins \
+         thumb_handler.php thumb.php; do
   rm -f "$path"/$f
   ln -s "@datadir@"/mediawiki/$f "$path"/$f
 done
