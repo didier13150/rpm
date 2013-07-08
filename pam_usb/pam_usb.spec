@@ -8,6 +8,7 @@ Version:       0.5.0
 Release:       %{gitrelease}%{?dist}
 License:       GPLv2+
 Summary:       Hardware authentication for USB Flash Drives
+BuildRoot:     %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 URL:           http://pamusb.org
 Source:        https://github.com/aluzzardi/pam_usb/tarball/master/%{author}-%{name}-%{version}-%{gitrelease}-%{gitletter}%{githash}.tar.gz
 Group:         Applications/Security

@@ -28,7 +28,7 @@ Patch6:         nagios-plugins-0006-Prevent-check_swap-from-returning-OK-if-no-s
 Patch7:         nagios-plugins-0007-undef-gets-and-glibc-2.16.patch
 Patch8:         nagios-plugins-0008-ntpdate-and-ntpq-paths.patch
 
-BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}
+BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 Requires:       perl
 Requires:       grep

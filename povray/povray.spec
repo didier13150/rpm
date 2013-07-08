@@ -4,6 +4,7 @@ Version:       %{majorver}.0.RC6
 Release:       3%{?dist}
 License:       Freeware
 Summary:       Persistence of Vision Raytracer
+BuildRoot:     %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 URL:           http://www.povray.org
 Source0:       http://www.povray.org/redirect/www.povray.org/beta/source/%{name}-%{version}.tar.gz
 Patch0:        povray-boost-1.50.patch
