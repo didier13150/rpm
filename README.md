@@ -3,9 +3,18 @@
 ========================================
 
 How to use it
--------------
+=============
 
-You need a mock RPM build environment. see http://fedoraproject.org/wiki/How_to_create_an_RPM_package for more informations.
+You need a mock RPM build environment.
+
+Short story
+-----------
+
+  # yum install mock rpmlint
+  
+  # usermod -a -G mock <USER>
+
+See http://fedoraproject.org/wiki/How_to_create_an_RPM_package for more informations.
 
 then on each directory just type
 
