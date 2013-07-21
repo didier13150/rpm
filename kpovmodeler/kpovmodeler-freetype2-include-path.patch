@@ -1,0 +1,10 @@
+--- CMakeLists.txt	2010-10-21 17:44:39.000000000 +0200
++++ CMakeLists.txt	2013-07-21 12:54:10.343952954 +0200
+@@ -12,6 +12,7 @@
+ configure_file(config-kpovmodeler.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config-kpovmodeler.h )
+ 
+ include_directories(${FREETYPE_INCLUDE_DIR})
++include_directories(${FREETYPE_INCLUDE_DIR_freetype2})
+ add_definitions (-DQT3_SUPPORT -DQT3_SUPPORT_WARNINGS)
+ 
+ ########### next target ###############
