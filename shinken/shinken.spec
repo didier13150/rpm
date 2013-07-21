@@ -23,7 +23,7 @@ Name:             shinken
 Version:          %{upstream_ver}.0
 Release:          1%{?dist}
 License:          AGPLv3+
-Group:            Applications/System
+Group:            Applications/Productivity
 URL:              http://www.shinken-monitoring.org
 Source0:          http://www.shinken-monitoring.org/pub/%{name}-%{upstream_ver}.tar.gz
 Source1:          shinken
