@@ -1,12 +1,12 @@
-PKGS := $(shell ls -l | grep ^d | grep -v common | awk '{print $$9}')
+PKGS := $(shell ls -l | grep ^d | grep -v common | grep -v doc | awk '{print $$9}')
 REPODIR := /var/www/fedora-repo
 LOGFILE := build.log
 DISTRIB := $(shell source /etc/os-release && echo $${ID}-$${VERSION_ID})
 ARCH := $(shell uname -i)
 HOSTNAME := $(shell hostname --fqdn)
 
-all: clean build repo repoview
-repo: repository repoview
+all: clean build repo
+repo: dirlist repository repoview
 
 build:
 	@rm -f $(LOGFILE)
@@ -37,3 +37,6 @@ repository:
 
 repoview:
 	repoview $(REPODIR) -o $(REPODIR)/repoview --url "http://$(HOSTNAME)/repoview" --title "RPM for $(DISTRIB) $(ARCH)"
+
+dirlist:
+	@echo "Processing directories: $(PKGS)"
