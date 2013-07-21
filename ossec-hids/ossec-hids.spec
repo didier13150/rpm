@@ -150,7 +150,7 @@ export CFLAGS LDFLAGS SH_LDFLAGS
 
 # Build the agent version first
 pushd src
-%{__make}  setagent all
+%{__make} setagent all
 mv addagent/manage_agents ../bin/manage_client
 mv logcollector/ossec-logcollector  ../bin/client-logcollector
 mv syscheckd/ossec-syscheckd  ../bin/client-syscheckd
@@ -489,7 +489,7 @@ exit 0
 %ghost %config(missingok,noreplace) %{_localstatedir}/ossec/etc/ossec.conf
 %config(noreplace) %{_localstatedir}/ossec/etc/ossec-server.conf
 %config(noreplace) %{_localstatedir}/ossec/etc/internal_options*
-%attr(640,ossec,ossec) %dir %{_localstatedir}/ossec/etc/shared/agent.conf
+%attr(640,ossec,ossec) %{_localstatedir}/ossec/etc/shared/agent.conf
 %config %{_localstatedir}/ossec/etc/*.xml
 %config(noreplace) %{_localstatedir}/ossec/etc/shared/*
 %dir %{_datadir}/ossec/contrib
