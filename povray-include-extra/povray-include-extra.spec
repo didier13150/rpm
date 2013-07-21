@@ -105,10 +105,7 @@ touch macros.list
 for i in %{SOURCE0} %{SOURCE1} %{SOURCE7} %{SOURCE8} %{SOURCE10} %{SOURCE11} \
          %{SOURCE12} %{SOURCE13} %{SOURCE14} %{SOURCE15} %{SOURCE16} \
          %{SOURCE17} %{SOURCE18} %{SOURCE19} %{SOURCE20} %{SOURCE22} \
-         %{SOURCE25} %{SOURCE32} %{SOURCE33} %{SOURCE34} %{SOURCE35} \
-         %{SOURCE36} %{SOURCE37} %{SOURCE38} %{SOURCE39} %{SOURCE40} \
-         %{SOURCE41} %{SOURCE42} %{SOURCE43} %{SOURCE44} %{SOURCE45} \
-         %{SOURCE46} %{SOURCE47} %{SOURCE48} %{SOURCE49} %{SOURCE50} \
+         %{SOURCE25} %{SOURCE32} %{SOURCE33} %{SOURCE49} %{SOURCE50} \
          %{SOURCE52} %{SOURCE53} %{SOURCE55} %{SOURCE58} %{SOURCE59} \
          %{SOURCE60} %{SOURCE67} %{SOURCE72} %{SOURCE73} %{SOURCE75} \
          %{SOURCE77} %{SOURCE78}
@@ -119,9 +116,24 @@ do
     mkdir ${dir}
     pushd ${dir}
     unzip $i
-    ../rolandmas.pl
     popd
 done
+for i in %{SOURCE34} %{SOURCE35} %{SOURCE36} %{SOURCE37} %{SOURCE38} \
+         %{SOURCE39} %{SOURCE40} %{SOURCE41} %{SOURCE42} %{SOURCE43} \
+         %{SOURCE44} %{SOURCE45} %{SOURCE46} %{SOURCE47} %{SOURCE48}
+do
+    name=$(basename $i | tr '[A-Z]' '[a-z]')
+    dir=${name%.zip}
+    echo ${dir} >> macros.list
+    mkdir ${dir}
+    pushd ${dir}
+    unzip $i
+    ../rolandmas.pl
+    sed -i -e 's/\.1\.1/1\.1/g' *
+    sed -i -e 's/tga "tcpmap.tga"/png "tcpmap.png"/g' *
+    popd
+done
+
 for i in %{SOURCE21} %{SOURCE23} %{SOURCE24} %{SOURCE28} %{SOURCE29} %{SOURCE31}
 do
     name=$(basename $i)
