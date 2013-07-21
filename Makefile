@@ -19,19 +19,21 @@ build:
 	done
 
 srpm:
-	@for dir in $(PKGS) ; do cd $$dir ; make srpm ; cd .. ; done
+	@for dir in $(PKGS) ; do pushd $$dir ; make srpm ; popd ; done
 
 clean:
-	@for dir in $(PKGS) ; do cd $$dir ; make clean ; cd .. ; done
+	@for dir in $(PKGS) ; do pushd $$dir ; make clean ; popd ; done
 
 rpmlint:
-	@for dir in $(PKGS) ; do cd $$dir ; make rpmlint ; cd .. ; done
+	@for dir in $(PKGS) ; do pushd $$dir ; make rpmlint ; popd ; done
 
 repository:
 	@echo -e "\033[1;32mUpdating repository on $(REPODIR)\033[0m"
-	@for dir in $(PKGS) ; \
-		do mkdir -p $(REPODIR)/$$dir ; \
-		cp $$dir/result/*.rpm $(REPODIR)/$$dir/ || true; \
+	@for dir in $(PKGS) ; do \
+		if [ -d $$dir/result ] ; then \
+			mkdir -p $(REPODIR)/$$dir ; \
+			cp $$dir/result/*.rpm $(REPODIR)/$$dir/ || true ; \
+		fi ; \
 	done
 	@createrepo --update -d $(REPODIR)
 
