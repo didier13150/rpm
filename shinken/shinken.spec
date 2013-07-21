@@ -16,28 +16,29 @@
 # Shinken process user and group
 %define shinken_user shinken
 %define shinken_group shinken
+%define upstream_ver 1.4
 
-Summary:      Monitoring tool compatible with Nagios configuration and plugins
-Name:         shinken
-Version:      1.2.4
-Release:      5%{?dist}
-License:      AGPLv3+
-Group:        Applications/System
-URL:          http://www.shinken-monitoring.org
-Source0:      http://www.shinken-monitoring.org/pub/%{name}-%{version}.tar.gz
-Source1:      shinken
+Summary:          Monitoring tool compatible with Nagios configuration and plugins
+Name:             shinken
+Version:          %{upstream_ver}.0
+Release:          1%{?dist}
+License:          AGPLv3+
+Group:            Applications/System
+URL:              http://www.shinken-monitoring.org
+Source0:          http://www.shinken-monitoring.org/pub/%{name}-%{upstream_ver}.tar.gz
+Source1:          shinken
 
-Patch0:       shinken-fix-conf.patch
-Patch1:       shinken-eue-test-mispelling.patch
+Patch0:           shinken-fix-conf.patch
+Patch1:           shinken-eue-test-mispelling.patch
 
 %if 0%{?rhel} >= 6 || 0%{?fedora} >= 1
-Requires:      python, python-pyro, chkconfig
-BuildRequires: python-devel, python-setuptools
+Requires:         python, python-pyro, chkconfig
+BuildRequires:    python-devel, python-setuptools
 %else
-Requires:      python26, python26-pyro < 4.0, chkconfig
-BuildRequires: python26-devel, python26-setuptools
+Requires:         python26, python26-pyro < 4.0, chkconfig
+BuildRequires:    python26-devel, python26-setuptools
 %endif
-Requires(post): httpd-tools
+Requires(post):   httpd-tools
 
 %if %{with_systemd}
 BuildRequires:    systemd
@@ -47,15 +48,15 @@ Requires(postun): systemd
 # For triggerun
 Requires(post):   systemd-sysv
 %else
-Requires: initscripts
-Requires: libevent
+Requires:         initscripts
+Requires:         libevent
 Requires(post):   /sbin/chkconfig
 Requires(preun):  /sbin/chkconfig, /sbin/service
 Requires(postun): /sbin/service
 %endif
 
-BuildRoot:    %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-BuildArch:    noarch
+BuildRoot:        %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+BuildArch:        noarch
 
 %description
 Shinken is a new monitoring tool in AGPLv3 written in Python and compatible
@@ -95,7 +96,12 @@ Shinken scheduler daemon
 Summary: Shinken Poller
 Group:   Applications/System
 Requires: %{name} = %{version}-%{release}
-Requires: shinken-plugins-all
+%if 0%{?rhel} <= 6
+Requires: nagios-plugins
+%endif
+%if 0%{?fedora}
+Requires: nagios-plugins-all
+%endif
 Requires: perl-Net-SNMP
 
 %description poller
@@ -151,7 +157,7 @@ All Shinken Modules in one meta-package
 
 
 %prep
-%setup -q
+%setup -qn %{name}-%{upstream_ver}
 %patch0 -p1
 %patch1 -p1
 
@@ -317,7 +323,7 @@ if ! /usr/bin/getent group %{shinken_group} &>/dev/null; then
 fi
 
 %post arbiter
-if [ $1 -eq 1 ] ; then
+if [ $1 -eq 1 ] ; then 
   %if %{with_systemd}
     /bin/systemctl daemon-reload >/dev/null 2>&1 || :
   %else
@@ -326,7 +332,7 @@ if [ $1 -eq 1 ] ; then
 fi
 
 %post broker
-if [ $1 -eq 1 ] ; then
+if [ $1 -eq 1 ] ; then 
   %if %{with_systemd}
     /bin/systemctl daemon-reload >/dev/null 2>&1 || :
   %else
@@ -335,7 +341,7 @@ if [ $1 -eq 1 ] ; then
 fi
 
 %post poller
-if [ $1 -eq 1 ] ; then
+if [ $1 -eq 1 ] ; then 
   %if %{with_systemd}
     /bin/systemctl daemon-reload >/dev/null 2>&1 || :
   %else
@@ -344,7 +350,7 @@ if [ $1 -eq 1 ] ; then
 fi
 
 %post reactionner
-if [ $1 -eq 1 ] ; then
+if [ $1 -eq 1 ] ; then 
   %if %{with_systemd}
     /bin/systemctl daemon-reload >/dev/null 2>&1 || :
   %else
@@ -353,7 +359,7 @@ if [ $1 -eq 1 ] ; then
 fi
 
 %post scheduler
-if [ $1 -eq 1 ] ; then
+if [ $1 -eq 1 ] ; then 
   %if %{with_systemd}
     /bin/systemctl daemon-reload >/dev/null 2>&1 || :
   %else
@@ -362,7 +368,7 @@ if [ $1 -eq 1 ] ; then
 fi
 
 %post receiver
-if [ $1 -eq 1 ] ; then
+if [ $1 -eq 1 ] ; then 
   %if %{with_systemd}
     /bin/systemctl daemon-reload >/dev/null 2>&1 || :
   %else
@@ -370,7 +376,7 @@ if [ $1 -eq 1 ] ; then
   %endif
 fi
 
-%preun arbiter
+%preun arbiter 
 if [ $1 -eq 0 ] ; then
   %if %{with_systemd}
     /bin/systemctl --no-reload disable %{name}-arbiter.service > /dev/null 2>&1 || :
@@ -381,7 +387,7 @@ if [ $1 -eq 0 ] ; then
   %endif
 fi
 
-%preun broker
+%preun broker 
 if [ $1 -eq 0 ] ; then
   %if %{with_systemd}
     /bin/systemctl --no-reload disable %{name}-broker.service > /dev/null 2>&1 || :
@@ -392,7 +398,7 @@ if [ $1 -eq 0 ] ; then
   %endif
 fi
 
-%preun poller
+%preun poller 
 if [ $1 -eq 0 ] ; then
   %if %{with_systemd}
     /bin/systemctl --no-reload disable %{name}-poller.service > /dev/null 2>&1 || :
@@ -403,7 +409,7 @@ if [ $1 -eq 0 ] ; then
   %endif
 fi
 
-%preun reactionner
+%preun reactionner 
 if [ $1 -eq 0 ] ; then
   %if %{with_systemd}
     /bin/systemctl --no-reload disable %{name}-reactionner.service > /dev/null 2>&1 || :
@@ -414,7 +420,7 @@ if [ $1 -eq 0 ] ; then
   %endif
 fi
 
-%preun scheduler
+%preun scheduler 
 if [ $1 -eq 0 ] ; then
   %if %{with_systemd}
     /bin/systemctl --no-reload disable %{name}-scheduler.service > /dev/null 2>&1 || :
@@ -425,7 +431,7 @@ if [ $1 -eq 0 ] ; then
   %endif
 fi
 
-%preun receiver
+%preun receiver 
 if [ $1 -eq 0 ] ; then
   %if %{with_systemd}
     /bin/systemctl --no-reload disable %{name}-receiver.service > /dev/null 2>&1 || :
@@ -553,7 +559,7 @@ fi
 
 %files
 %{python_sitelib}/%{name}
-%{python_sitelib}/Shinken-%{version}-py*.egg-info
+%{python_sitelib}/Shinken-*-py*.egg-info
 %doc etc/packs README.rst COPYING Changelog THANKS db doc FROM_NAGIOS_TO_SHINKEN
 %{_sbindir}/%{name}-receiver*
 %{_sbindir}/%{name}-discovery
@@ -575,6 +581,9 @@ fi
 %attr(-,%{shinken_user} ,%{shinken_group}) %dir %{_localstatedir}/run/%{name}
 
 %changelog
+* Tue May 28 2013 Didier Fabert <dfabert@b2pweb.com> - 1.4.0-1
+- Update from upstream
+
 * Sun Mar 03 2013 Didier Fabert <dfabert@b2pweb.com> - 1.2.4-5
 - Remove nagios-plugins dependency for poller
 - Add shinken-plugins-all dependency for poller
