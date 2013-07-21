@@ -3,6 +3,7 @@ Name:     nagstamon
 Version:  0.9.10
 Release:  0.1.head%{?dist}
 Summary:  Nagios status monitor for desktop
+Group:    Applications/Productivity
 
 License:  GPLv2+
 URL:      http://nagstamon.ifw-dresden.de/
