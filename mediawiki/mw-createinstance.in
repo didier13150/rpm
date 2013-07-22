@@ -25,8 +25,12 @@ if ! test -e "$path"/images; then
   chown apache:apache "$path"/images
 fi
 for f in index.php api.php extensions img_auth.php includes languages load.php \
-         opensearch_desc.php profileinfo.php redirect.php resources skins \
-         thumb_handler.php thumb.php; do
+         opensearch_desc.php profileinfo.php redirect.php resources serialized \
+         skins thumb_handler.php thumb.php; do
   rm -f "$path"/$f
   ln -s "@datadir@"/mediawiki/$f "$path"/$f
 done
+
+cat "@sysconfdir@"/mediawiki/instances | grep "$path" 1>/dev/null 2>&1
+RETVAL=$?
+[ $RETVAL -ne 0 ] && echo "$path" >> "@sysconfdir@"/mediawiki/instances

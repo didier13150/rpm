@@ -2,7 +2,7 @@
 %global wiki_ext_path %{_datadir}/mediawiki/extensions
 Name:           mediawiki
 Version:        %{majorver}.1
-Release:        1%{?dist}
+Release:        3%{?dist}
 License:        GPLv2+
 Group:          Development/Tools
 URL:            http://www.mediawiki.org/
@@ -14,15 +14,12 @@ Source1:        mediawiki.conf
 Source2:        README.RPM
 Source3:        mw-createinstance.in
 Source4:        mw-updateallinstances.in
-Source10:       https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Cite.tgz
-Source11:       https://gerrit.wikimedia.org/r/p/mediawiki/extensions/SyntaxHighlight_GeSHi.tgz
-Source12:       https://gerrit.wikimedia.org/r/p/mediawiki/extensions/PdfExport.tgz
-Source13:       https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Mpdf.tgz
-Source14:       https://gerrit.wikimedia.org/r/p/mediawiki/extensions/CategoryTree.tgz
-Source15:       https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Math.tgz
-Source16:       Linux.tag.php
-Source17:       CalcBitrate.js
-Source18:       CalcBitrate.php
+Source10:       https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Mpdf.tgz
+Source11:       https://gerrit.wikimedia.org/r/p/mediawiki/extensions/CategoryTree.tgz
+Source12:       https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Math.tgz
+Source20:       Linux.tag.php
+Source21:       CalcBitrate.js
+Source22:       CalcBitrate.php
 BuildArch:      noarch
 # to make sure the "apache" group is created before mediawiki is installed
 Requires(pre):  httpd
@@ -34,11 +31,44 @@ Requires:       diffutils, ImageMagick, php-gd
 Provides:       mediawiki-math = %{version}-%{release}
 Provides:       mediawiki-nomath = %{version}-%{release}
 Provides:       mediawiki116 = %{version}-%{release}
+Provides:       mediawiki-Cite = %{version}-%{release}
+Provides:       mediawiki-ConfirmEdit = %{version}-%{release}
+Provides:       mediawiki-Gadgets = %{version}-%{release}
+Provides:       mediawiki-ImageMap = %{version}-%{release}
+Provides:       mediawiki-InputBox = %{version}-%{release}
+Provides:       mediawiki-Interwiki = %{version}-%{release}
+Provides:       mediawiki-LocalisationUpdate = %{version}-%{release}
+Provides:       mediawiki-Nuke = %{version}-%{release}
+Provides:       mediawiki-ParserFunctions = %{version}-%{release}
+Provides:       mediawiki-PdfHandler = %{version}-%{release}
+Provides:       mediawiki-Poem = %{version}-%{release}
+Provides:       mediawiki-Renameuser = %{version}-%{release}
+Provides:       mediawiki-SpamBlacklist = %{version}-%{release}
+Provides:       mediawiki-SyntaxHighlight_GeSHi = %{version}-%{release}
+Provides:       mediawiki-TitleBlacklist = %{version}-%{release}
+Provides:       mediawiki-Vector = %{version}-%{release}
+Provides:       mediawiki-WikiEditor = %{version}-%{release}
 
 Obsoletes:      mediawiki-math < 1.16.5-62
 Obsoletes:      mediawiki-nomath < 1.16.5-62
 Obsoletes:      mediawiki116 < 1.16.0-9
-
+Obsoletes:      mediawiki-Cite < %{version}-%{release}
+Obsoletes:      mediawiki-ConfirmEdit < %{version}-%{release}
+Obsoletes:      mediawiki-Gadgets < %{version}-%{release}
+Obsoletes:      mediawiki-ImageMap < %{version}-%{release}
+Obsoletes:      mediawiki-InputBox < %{version}-%{release}
+Obsoletes:      mediawiki-Interwiki < %{version}-%{release}
+Obsoletes:      mediawiki-LocalisationUpdate < %{version}-%{release}
+Obsoletes:      mediawiki-Nuke < %{version}-%{release}
+Obsoletes:      mediawiki-ParserFunctions < %{version}-%{release}
+Obsoletes:      mediawiki-PdfHandler < %{version}-%{release}
+Obsoletes:      mediawiki-Poem < %{version}-%{release}
+Obsoletes:      mediawiki-Renameuser < %{version}-%{release}
+Obsoletes:      mediawiki-SpamBlacklist < %{version}-%{release}
+Obsoletes:      mediawiki-SyntaxHighlight_GeSHi < %{version}-%{release}
+Obsoletes:      mediawiki-TitleBlacklist < %{version}-%{release}
+Obsoletes:      mediawiki-Vector < %{version}-%{release}
+Obsoletes:      mediawiki-WikiEditor < %{version}-%{release}
 
 %description
 MediaWiki is the software used for Wikipedia and the other Wikimedia
@@ -46,41 +76,9 @@ Foundation websites. Compared to other wikis, it has an excellent
 range of features and support for high-traffic websites using multiple
 servers
 
-This package supports wiki farms. Read the instructions for creating wiki instances under %{_defaultdocdir}/%{name}-%{version}/README.RPM.
+This package supports wiki farms. Read the instructions for creating wiki 
+instances under %{_defaultdocdir}/%{name}-%{version}/README.RPM.
 Remember to remove the config dir after completing the configuration.
-
-%package Cite
-Requires:       %{name}
-Summary:        Cite mediawiki extension
-Group:          Development/Tools
-
-%description Cite
-Cite is an extension which allows a user to create footnotes. Cite includes
-several extensions which can be installed independently and operate
-independently of each other.
-
-%package SyntaxHighlight_GeSHi
-Requires:       %{name}
-Summary:        SyntaxHighlight_GeSHi mediawiki extension
-Group:          Development/Tools
-
-%description SyntaxHighlight_GeSHi
-The Extension:SyntaxHighlight GeSHi tag displays formatted source code with
-the <syntaxhighlight> tag.
-
-This extension also adds coloring according to the code language settings.
-Like the <pre> tags and the <poem> tags, the tags shows the coding exactly as
-it was typed, preserving white space.
-
-This extension also can create line numbers.
-
-%package PdfExport
-Requires:       %{name}
-Summary:        PdfExport mediawiki extension
-Group:          Development/Tools
-
-%description PdfExport
-This extension lets you view wiki pages as PDF.
 
 %package Mpdf
 Requires:       %{name}
@@ -131,7 +129,9 @@ CalcBitrate extension provides a bitrate calculator with the simple tag
 %prep
 %setup -q
 
+
 %build
+
 
 %install
 rm -rf %{buildroot}
@@ -144,7 +144,6 @@ cp -rp COPYING FAQ HISTORY README RELEASE-NOTES* UPGRADE CREDITS INSTALL docs \
 # now copy the rest to the buildroot.
 mkdir -p %{buildroot}%{_datadir}/mediawiki
 cp -a * %{buildroot}%{_datadir}/mediawiki/
-
 # remove unneeded parts
 rm -fr %{buildroot}%{_datadir}/mediawiki/{t,test,tests}
 rm -fr %{buildroot}%{_datadir}/mediawiki/includes/zhtable
@@ -180,14 +179,11 @@ echo /var/www/wiki > %{buildroot}%{_sysconfdir}/mediawiki/instances
 tar -xzf %{SOURCE10} -C %{buildroot}%{wiki_ext_path}/
 tar -xzf %{SOURCE11} -C %{buildroot}%{wiki_ext_path}/
 tar -xzf %{SOURCE12} -C %{buildroot}%{wiki_ext_path}/
-tar -xzf %{SOURCE13} -C %{buildroot}%{wiki_ext_path}/
-tar -xzf %{SOURCE14} -C %{buildroot}%{wiki_ext_path}/
-tar -xzf %{SOURCE15} -C %{buildroot}%{wiki_ext_path}/
 %{__mkdir_p} %{buildroot}%{wiki_ext_path}/CalcBitrate
 %{__mkdir_p} %{buildroot}%{wiki_ext_path}/CustomTag
-%{__cp} %{SOURCE16} %{buildroot}%{wiki_ext_path}/CustomTag/
-%{__cp} %{SOURCE17} %{buildroot}%{wiki_ext_path}/CalcBitrate/
-%{__cp} %{SOURCE18} %{buildroot}%{wiki_ext_path}/CalcBitrate/
+%{__cp} %{SOURCE20} %{buildroot}%{wiki_ext_path}/CustomTag/
+%{__cp} %{SOURCE21} %{buildroot}%{wiki_ext_path}/CalcBitrate/
+%{__cp} %{SOURCE22} %{buildroot}%{wiki_ext_path}/CalcBitrate/
 
 %post
 %{_sbindir}/mw-updateallinstances >> /var/log/mediawiki-updates.log 2>&1 || :
@@ -205,24 +201,11 @@ rm -rf %{buildroot}
 %config(noreplace) %{_sysconfdir}/mediawiki/instances
 %{_sbindir}/mw-createinstance
 %{_sbindir}/mw-updateallinstances
-%exclude %{wiki_ext_path}/Cite
-%exclude %{wiki_ext_path}/SyntaxHighlight_GeSHi
-%exclude %{wiki_ext_path}/PdfExport
 %exclude %{wiki_ext_path}/Mpdf
 %exclude %{wiki_ext_path}/CategoryTree
 %exclude %{wiki_ext_path}/Math
 %exclude %{wiki_ext_path}/CalcBitrate
 %exclude %{wiki_ext_path}/CustomTag
-
-#Cite SyntaxHighlight_GeSHi PdfExport Mpdf CategoryTree Math
-%files Cite
-%{wiki_ext_path}/Cite
-
-%files SyntaxHighlight_GeSHi
-%{wiki_ext_path}/SyntaxHighlight_GeSHi
-
-%files PdfExport
-%{wiki_ext_path}/PdfExport
 
 %files Mpdf
 %{wiki_ext_path}/Mpdf
@@ -241,6 +224,13 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Mon Jul 22 2013 Didier Fabert <didier.fabert@gmail.com> - 1.21.1-3
+- Fix Obsoletes by Michael Cronenworth <mike@cchtml.com>
+- Add several extensions
+
+* Tue Jul 09 2013 Michael Cronenworth <mike@cchtml.com> - 1.21.1-2
+- Provide/Obsolete now included extensions (#967811)
+
 * Mon Jun 03 2013 Michael Cronenworth <mike@cchtml.com> - 1.21.1-1
 - New upstream release.
 
