@@ -17,7 +17,7 @@
 Summary:     An Open Source Host-based Intrusion Detection System
 Name:        ossec-hids
 Version:     2.7
-Release:     20%{?dist}
+Release:     21%{?dist}
 License:     GPLv2
 Group:       Applications/System
 Source0:     http://www.ossec.net/files/%{name}-%{version}.tar.gz
@@ -444,7 +444,7 @@ exit 0
 %attr(770,ossec,ossec) %dir %{_localstatedir}/ossec/etc/shared
 %attr(750,ossec,ossec) %dir %{_localstatedir}/ossec/etc/templates
 %attr(640,ossec,ossec) %{_localstatedir}/ossec/etc/templates/*
-%attr(770,ossec,ossec) %dir %{_localstatedir}/ossec/logs
+%attr(700,ossec,ossec) %dir %{_localstatedir}/ossec/logs
 %attr(550,root,ossec) %dir %{_localstatedir}/ossec/queue
 %attr(770,ossec,ossec) %dir %{_localstatedir}/ossec/queue/ossec
 %attr(750,ossec,ossec) %dir %{_localstatedir}/ossec/queue/diff
@@ -542,6 +542,10 @@ exit 0
 
 
 %changelog
+* Mon Jul 22 2013 Didier Fabert <didier.fabert@gmail.com> 2.7-21
+- Fix permissions on logs
+- Improve logrotate
+
 * Mon Feb 11 2013 Didier Fabert <didier.fabert@gmail.com> 2.7-20
 - Update to 2.7 final
 

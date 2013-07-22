@@ -1,10 +1,12 @@
-/var/ossec/logs/active-responses.log {
+# Log rotation for Ossec HIDS
+/var/ossec/logs/*.log {
+    create 640 ossec ossec
+    rotate 31
+    compress
     missingok
     notifempty
+    olddir /var/ossec/logs/archives/
+    postrotate
+       systemctl restart ossec-hids
+    endscript
 }
-
-/var/ossec/logs/ossec.log {
-    missingok
-    notifempty
-}
-
