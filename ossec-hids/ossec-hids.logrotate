@@ -6,6 +6,7 @@
     missingok
     notifempty
     olddir /var/ossec/logs/archives/
+    sharedscripts
     postrotate
        systemctl restart ossec-hids
     endscript
