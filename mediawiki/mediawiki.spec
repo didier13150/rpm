@@ -17,9 +17,11 @@ Source4:        mw-updateallinstances.in
 Source10:       https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Mpdf.tgz
 Source11:       https://gerrit.wikimedia.org/r/p/mediawiki/extensions/CategoryTree.tgz
 Source12:       https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Math.tgz
+Source13:       https://git.wikimedia.org/git/mediawiki/extensions/Auth_remoteuser.tgz
 Source20:       Linux.tag.php
 Source21:       CalcBitrate.js
 Source22:       CalcBitrate.php
+Source23:       SSLAuthPlugin.php
 BuildArch:      noarch
 # to make sure the "apache" group is created before mediawiki is installed
 Requires(pre):  httpd
@@ -126,6 +128,34 @@ Group:          Development/Tools
 CalcBitrate extension provides a bitrate calculator with the simple tag
 "<calcBitrate/>"
 
+%package AuthRemoteUser
+Requires:       %{name}
+Summary:        Log user via the REMOTE_USER environment variable
+Group:          Development/Tools
+
+%description AuthRemoteUser
+This extension allows integration with the web server's built-in authentication 
+system via the REMOTE_USER environment variable, which is set through HTTP-Auth,
+LDAP, CAS, PAM, and other authentication systems. The extension automatically 
+logs-in users using the value of the REMOTE_USER environment variable as the 
+MediaWiki username. If an account of that name does not already exist, one is 
+created.
+
+%package AuthSSL
+Requires:       %{name}
+Summary:        Log user via the SSL certificate
+Group:          Development/Tools
+
+%description AuthSSL
+SSL Authentication is an extension that automatically logs users into the wiki
+using their SSL certificate. It uses mod_ssl in Apache to fetch the DN from the
+client certificate and maps that to a MediaWiki user name. All users are
+automatically logged in, and all users are required to use certificates.
+These certificates must be vouched for by one of the certification authorities
+on file, specified by SSLCACertificateFile option. Wiki user names are taken
+from the user's certificate (SSL_CLIENT_S_DN_CN), and if that user name does
+not already exist, it is created.
+
 %prep
 %setup -q
 
@@ -179,11 +209,14 @@ echo /var/www/wiki > %{buildroot}%{_sysconfdir}/mediawiki/instances
 tar -xzf %{SOURCE10} -C %{buildroot}%{wiki_ext_path}/
 tar -xzf %{SOURCE11} -C %{buildroot}%{wiki_ext_path}/
 tar -xzf %{SOURCE12} -C %{buildroot}%{wiki_ext_path}/
+tar -xzf %{SOURCE13} -C %{buildroot}%{wiki_ext_path}/
 %{__mkdir_p} %{buildroot}%{wiki_ext_path}/CalcBitrate
 %{__mkdir_p} %{buildroot}%{wiki_ext_path}/CustomTag
+%{__mkdir_p} %{buildroot}%{wiki_ext_path}/SSL_authentification
 %{__cp} %{SOURCE20} %{buildroot}%{wiki_ext_path}/CustomTag/
 %{__cp} %{SOURCE21} %{buildroot}%{wiki_ext_path}/CalcBitrate/
 %{__cp} %{SOURCE22} %{buildroot}%{wiki_ext_path}/CalcBitrate/
+%{__cp} %{SOURCE23} %{buildroot}%{wiki_ext_path}/SSL_authentification/
 
 %post
 %{_sbindir}/mw-updateallinstances >> /var/log/mediawiki-updates.log 2>&1 || :
@@ -206,6 +239,8 @@ rm -rf %{buildroot}
 %exclude %{wiki_ext_path}/Math
 %exclude %{wiki_ext_path}/CalcBitrate
 %exclude %{wiki_ext_path}/CustomTag
+%exclude %{wiki_ext_path}/Auth_remoteuser
+%exclude %{wiki_ext_path}/SSL_authentification
 
 %files Mpdf
 %{wiki_ext_path}/Mpdf
@@ -222,6 +257,11 @@ rm -rf %{buildroot}
 %files CustomTag
 %{wiki_ext_path}/CustomTag
 
+%files AuthRemoteUser
+%{wiki_ext_path}/Auth_remoteuser
+
+%files AuthSSL
+%{wiki_ext_path}/SSL_authentification
 
 %changelog
 * Mon Jul 22 2013 Didier Fabert <didier.fabert@gmail.com> - 1.21.1-3
