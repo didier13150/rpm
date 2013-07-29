@@ -18,6 +18,7 @@ Source10:       https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Mpdf.tgz
 Source11:       https://gerrit.wikimedia.org/r/p/mediawiki/extensions/CategoryTree.tgz
 Source12:       https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Math.tgz
 Source13:       https://git.wikimedia.org/git/mediawiki/extensions/Auth_remoteuser.tgz
+Source14:       https://git.wikimedia.org/git/mediawiki/extensions/Git2Pages.tgz
 Source20:       Linux.tag.php
 Source21:       CalcBitrate.js
 Source22:       CalcBitrate.php
@@ -156,6 +157,16 @@ on file, specified by SSLCACertificateFile option. Wiki user names are taken
 from the user's certificate (SSL_CLIENT_S_DN_CN), and if that user name does
 not already exist, it is created.
 
+%package Git2Pages
+Requires:       %{name}
+Summary:        Add file from git
+Group:          Development/Tools
+Requires:       bash
+
+%description Git2Pages
+The Git2Pages extension allows a user to add snippets of code to a wiki page
+from a file in a git repository.
+
 %prep
 %setup -q
 
@@ -210,6 +221,7 @@ tar -xzf %{SOURCE10} -C %{buildroot}%{wiki_ext_path}/
 tar -xzf %{SOURCE11} -C %{buildroot}%{wiki_ext_path}/
 tar -xzf %{SOURCE12} -C %{buildroot}%{wiki_ext_path}/
 tar -xzf %{SOURCE13} -C %{buildroot}%{wiki_ext_path}/
+tar -xzf %{SOURCE14} -C %{buildroot}%{wiki_ext_path}/
 %{__mkdir_p} %{buildroot}%{wiki_ext_path}/CalcBitrate
 %{__mkdir_p} %{buildroot}%{wiki_ext_path}/CustomTag
 %{__mkdir_p} %{buildroot}%{wiki_ext_path}/SSL_authentification
@@ -217,6 +229,7 @@ tar -xzf %{SOURCE13} -C %{buildroot}%{wiki_ext_path}/
 %{__cp} %{SOURCE21} %{buildroot}%{wiki_ext_path}/CalcBitrate/
 %{__cp} %{SOURCE22} %{buildroot}%{wiki_ext_path}/CalcBitrate/
 %{__cp} %{SOURCE23} %{buildroot}%{wiki_ext_path}/SSL_authentification/
+
 
 %post
 %{_sbindir}/mw-updateallinstances >> /var/log/mediawiki-updates.log 2>&1 || :
@@ -241,6 +254,7 @@ rm -rf %{buildroot}
 %exclude %{wiki_ext_path}/CustomTag
 %exclude %{wiki_ext_path}/Auth_remoteuser
 %exclude %{wiki_ext_path}/SSL_authentification
+%exclude %{wiki_ext_path}/Git2Pages
 
 %files Mpdf
 %{wiki_ext_path}/Mpdf
@@ -262,6 +276,9 @@ rm -rf %{buildroot}
 
 %files AuthSSL
 %{wiki_ext_path}/SSL_authentification
+
+%files Git2Pages
+%{wiki_ext_path}/Git2Pages
 
 %changelog
 * Mon Jul 22 2013 Didier Fabert <didier.fabert@gmail.com> - 1.21.1-3
