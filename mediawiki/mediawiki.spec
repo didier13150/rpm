@@ -2,14 +2,14 @@
 %global wiki_ext_path %{_datadir}/mediawiki/extensions
 Name:           mediawiki
 Version:        %{majorver}.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2+
 Group:          Development/Tools
 URL:            http://www.mediawiki.org/
 Summary:        A wiki engine
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
-Source0:        http://download.wikimedia.org/mediawiki/%{majorver}/mediawiki-%{version}.tar.gz
+Source0:        http://download.wikimedia.org/mediawiki/%{majorver}/%{name}-%{version}.tar.gz
 Source1:        mediawiki.conf
 Source2:        README.RPM
 Source3:        mw-createinstance.in
@@ -19,10 +19,10 @@ Source11:       https://gerrit.wikimedia.org/r/p/mediawiki/extensions/CategoryTr
 Source12:       https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Math.tgz
 Source13:       https://git.wikimedia.org/git/mediawiki/extensions/Auth_remoteuser.tgz
 Source14:       https://git.wikimedia.org/git/mediawiki/extensions/Git2Pages.tgz
-Source20:       Linux.tag.php
-Source21:       CalcBitrate.js
-Source22:       CalcBitrate.php
-Source23:       SSLAuthPlugin.php
+Source20:       http://didier.b2pweb.com/reposrc/%{name}/Linux.tag.php
+Source21:       http://didier.b2pweb.com/reposrc/%{name}/CalcBitrate.js
+Source22:       http://didier.b2pweb.com/reposrc/%{name}/CalcBitrate.php
+Source23:       http://didier.b2pweb.com/reposrc/%{name}/SSLAuthPlugin.php
 BuildArch:      noarch
 # to make sure the "apache" group is created before mediawiki is installed
 Requires(pre):  httpd
@@ -281,6 +281,10 @@ rm -rf %{buildroot}
 %{wiki_ext_path}/Git2Pages
 
 %changelog
+* Sat Jul 27 2013 Michael Cronenworth <mike@cchtml.com> - 1.21.1-4
+- Update mw-createinstance
+- Always patched to print new instance name on instances file (Didier Fabert)
+
 * Mon Jul 22 2013 Didier Fabert <didier.fabert@gmail.com> - 1.21.1-3
 - Fix Obsoletes by Michael Cronenworth <mike@cchtml.com>
 - Add several extensions
