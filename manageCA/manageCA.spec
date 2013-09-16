@@ -1,6 +1,6 @@
 Summary:        Manage Certificate Authority
 Name:           manageCA
-Version:        0.7.1
+Version:        0.7.2
 Release:        1%{?dist}
 License:        GPLv3+
 Group:          Applications/System
@@ -34,6 +34,9 @@ rm -rf .git*
 %{_sbindir}/%{name}
 
 %changelog
+* Thu Aug 01 2013 Didier Fabert <didier.fabert@gmail.com> 0.7.2-1
+- Update
+
 * Thu Aug 01 2013 Didier Fabert <didier.fabert@gmail.com> 0.7.1-1
 - Update
 
