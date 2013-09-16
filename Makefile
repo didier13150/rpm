@@ -1,4 +1,4 @@
-PKGS := $(shell ls -l | grep ^d | grep -v common | grep -v doc | awk '{print $$9}')
+PKGS := $(shell ls -l | grep ^d | grep -v '^common$$' | grep -v '^doc$$' | awk '{print $$9}')
 REPODIR := /var/www/fedora-repo
 LOGFILE := build.log
 DISTRIB := $(shell source /etc/os-release && echo $${ID}-$${VERSION_ID})
