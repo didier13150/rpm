@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=1.0
+Name=KeePass
+Exec=mono /usr/share/keepass/KeePass.exe
+Icon=/usr/share/pixmaps/KeePass_icon.png
+Categories=Other
+Type=Application
+Terminal=false
+GenericName=Cross-platform password manager
+GenericName[fr]=Gestionnaire de mot de passe multi-plateforme
+Categories=System;
+StartupNotify=true
