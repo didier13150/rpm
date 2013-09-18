@@ -1,9 +1,8 @@
 [Desktop Entry]
 Version=1.0
 Name=KeePass
-Exec=mono /usr/share/keepass/KeePass.exe
-Icon=/usr/share/pixmaps/KeePass_icon.png
-Categories=Other
+Exec=mono @datadir@/keepass/KeePass.exe
+Icon= @datadir@/pixmaps/KeePass_icon.png
 Type=Application
 Terminal=false
 GenericName=Cross-platform password manager

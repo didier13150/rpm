@@ -7,6 +7,8 @@ Group:          Applications/System
 URL:            http://keepass.info/
 Source0:        http://downloads.sourceforge.net/keepass/KeePass-%{version}.zip
 Source1:        http://upload.wikimedia.org/wikipedia/commons/1/19/KeePass_icon.png
+Source2:        keepass.desktop
+Source3:        keepass.sh
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root
 BuildArch:      noarch
 BuildRequires:  unzip
@@ -26,10 +28,16 @@ which is locked with one master key or a key file.
 
 %install
 %{__rm} -rf %{buildroot}
+%{__mkdir_p} %{buildroot}%{_bindir}
 %{__mkdir_p} %{buildroot}%{_datadir}/%{name}
 %{__mkdir_p} %{buildroot}%{_datadir}/pixmaps
+%{__mkdir_p} %{buildroot}%{_datadir}/applications
 %{__cp} -R *  %{buildroot}%{_datadir}/%{name}/
 %{__cp} %{SOURCE1} %{buildroot}%{_datadir}/pixmaps/
+%{__sed} -e 's#@datadir@#%{_datadir}#' \
+    %{SOURCE2} > %{buildroot}%{_datadir}/applications/keepass.desktop
+%{__sed} -e 's#@datadir@#%{_datadir}#' \
+    %{SOURCE3} > %{buildroot}%{_bindir}/keepass
 
 
 %clean
@@ -39,6 +47,8 @@ which is locked with one master key or a key file.
 %defattr(-, root, root, 0755)
 %{_datadir}/%{name}
 %{_datadir}/pixmaps/*
+%{_datadir}/applications/keepass.desktop
+%attr(755,root,root) %{_bindir}/keepass
 
 %changelog
 * Wed Sep 18 2013 Didier Fabert <didier.fabert@gmail.com> 2.23-1
