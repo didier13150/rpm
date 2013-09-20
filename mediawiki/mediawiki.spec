@@ -9,7 +9,7 @@ URL:            http://www.mediawiki.org/
 Summary:        A wiki engine
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
-Source0:        http://download.wikimedia.org/mediawiki/%{majorver}/%{name}-%{version}.tar.gz
+Source0:        http://download.wikimedia.org/mediawiki/%{majorver}/mediawiki-%{version}.tar.gz
 Source1:        mediawiki.conf
 Source2:        README.RPM
 Source3:        mw-createinstance.in
@@ -19,10 +19,12 @@ Source11:       https://gerrit.wikimedia.org/r/p/mediawiki/extensions/CategoryTr
 Source12:       https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Math.tgz
 Source13:       https://git.wikimedia.org/git/mediawiki/extensions/Auth_remoteuser.tgz
 Source14:       https://git.wikimedia.org/git/mediawiki/extensions/Git2Pages.tgz
-Source20:       http://didier.b2pweb.com/reposrc/%{name}/Linux.tag.php
-Source21:       http://didier.b2pweb.com/reposrc/%{name}/CalcBitrate.js
-Source22:       http://didier.b2pweb.com/reposrc/%{name}/CalcBitrate.php
-Source23:       http://didier.b2pweb.com/reposrc/%{name}/SSLAuthPlugin.php
+Source15:       https://git.wikimedia.org/git/mediawiki/extensions/RandomImage.tgz
+Source20:       Linux.tag.php
+Source21:       CalcBitrate.js
+Source22:       CalcBitrate.php
+Source23:       SSLAuthPlugin.php
+Source24:       http://www.bomber-online.de/progs/IncludeArticle/IncludeArticle.php
 BuildArch:      noarch
 # to make sure the "apache" group is created before mediawiki is installed
 Requires(pre):  httpd
@@ -79,7 +81,7 @@ Foundation websites. Compared to other wikis, it has an excellent
 range of features and support for high-traffic websites using multiple
 servers
 
-This package supports wiki farms. Read the instructions for creating wiki 
+This package supports wiki farms. Read the instructions for creating wiki
 instances under %{_defaultdocdir}/%{name}-%{version}/README.RPM.
 Remember to remove the config dir after completing the configuration.
 
@@ -135,11 +137,11 @@ Summary:        Log user via the REMOTE_USER environment variable
 Group:          Development/Tools
 
 %description AuthRemoteUser
-This extension allows integration with the web server's built-in authentication 
+This extension allows integration with the web server's built-in authentication
 system via the REMOTE_USER environment variable, which is set through HTTP-Auth,
-LDAP, CAS, PAM, and other authentication systems. The extension automatically 
-logs-in users using the value of the REMOTE_USER environment variable as the 
-MediaWiki username. If an account of that name does not already exist, one is 
+LDAP, CAS, PAM, and other authentication systems. The extension automatically
+logs-in users using the value of the REMOTE_USER environment variable as the
+MediaWiki username. If an account of that name does not already exist, one is
 created.
 
 %package AuthSSL
@@ -166,6 +168,25 @@ Requires:       bash
 %description Git2Pages
 The Git2Pages extension allows a user to add snippets of code to a wiki page
 from a file in a git repository.
+
+%package RandomImage
+Requires:       %{name}
+Summary:        Display Random Image
+Group:          Development/Tools
+
+%description RandomImage
+The Random Image extension adds a <randomimage> tag to the MediaWiki parser
+which allows for randomisation of multimedia content on a page.
+
+%package IncludeArticle
+Requires:       %{name}
+Summary:        Display the first letters of an article
+Group:          Development/Tools
+
+%description IncludeArticle
+The Include Article extension allows any page to be shown on any other wiki
+page. An editor can choose how many letters or lines of the article are shown.
+
 
 %prep
 %setup -q
@@ -222,13 +243,16 @@ tar -xzf %{SOURCE11} -C %{buildroot}%{wiki_ext_path}/
 tar -xzf %{SOURCE12} -C %{buildroot}%{wiki_ext_path}/
 tar -xzf %{SOURCE13} -C %{buildroot}%{wiki_ext_path}/
 tar -xzf %{SOURCE14} -C %{buildroot}%{wiki_ext_path}/
+tar -xzf %{SOURCE15} -C %{buildroot}%{wiki_ext_path}/
 %{__mkdir_p} %{buildroot}%{wiki_ext_path}/CalcBitrate
 %{__mkdir_p} %{buildroot}%{wiki_ext_path}/CustomTag
 %{__mkdir_p} %{buildroot}%{wiki_ext_path}/SSL_authentification
+%{__mkdir_p} %{buildroot}%{wiki_ext_path}/IncludeArticle
 %{__cp} %{SOURCE20} %{buildroot}%{wiki_ext_path}/CustomTag/
 %{__cp} %{SOURCE21} %{buildroot}%{wiki_ext_path}/CalcBitrate/
 %{__cp} %{SOURCE22} %{buildroot}%{wiki_ext_path}/CalcBitrate/
 %{__cp} %{SOURCE23} %{buildroot}%{wiki_ext_path}/SSL_authentification/
+%{__cp} %{SOURCE24} %{buildroot}%{wiki_ext_path}/IncludeArticle/
 
 
 %post
@@ -255,6 +279,8 @@ rm -rf %{buildroot}
 %exclude %{wiki_ext_path}/Auth_remoteuser
 %exclude %{wiki_ext_path}/SSL_authentification
 %exclude %{wiki_ext_path}/Git2Pages
+%exclude %{wiki_ext_path}/RandomImage
+%exclude %{wiki_ext_path}/IncludeArticle
 
 %files Mpdf
 %{wiki_ext_path}/Mpdf
@@ -280,8 +306,15 @@ rm -rf %{buildroot}
 %files Git2Pages
 %{wiki_ext_path}/Git2Pages
 
+%files RandomImage
+%{wiki_ext_path}/RandomImage
+
+%files IncludeArticle
+%{wiki_ext_path}/IncludeArticle
+
 %changelog
-* Sat Jul 27 2013 Michael Cronenworth <mike@cchtml.com> - 1.21.1-4
+* Sat Aug 31 2013 Didier Fabert <didier.fabert@gmail.com> - 1.21.1-4
+- Add RandomImage and IncludeArticle extension
 - Update mw-createinstance
 - Always patched to print new instance name on instances file (Didier Fabert)
 
