@@ -54,7 +54,13 @@ make %{?_smp_mflags}
 rm -rf $RPM_BUILD_ROOT
 %{__mkdir_p} $RPM_BUILD_ROOT%{_bindir}
 %{__mkdir_p} $RPM_BUILD_ROOT%{_datadir}/applications
-%{__mkdir_p} $RPM_BUILD_ROOT%{_datadir}/icons/hicolor
+%{__mkdir_p} $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/16x16
+%{__mkdir_p} $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/22x22
+%{__mkdir_p} $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/32x32
+%{__mkdir_p} $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/48x48
+%{__mkdir_p} $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/64x64
+%{__mkdir_p} $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/128x128
+%{__mkdir_p} $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/256x256
 %{__mkdir_p} $RPM_BUILD_ROOT%{_datadir}/%{name}-%{version}/apidoc
 %{__mkdir_p} $RPM_BUILD_ROOT%{_mandir}/man1
 %{__mkdir_p} $RPM_BUILD_ROOT%{_mandir}
@@ -86,6 +92,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/%{name}-%{version}/apidoc
 
 %changelog
+* Thu Sep 26 2013 Didier Fabert <didier.fabert@gmail.com> 0.4.0-3
+- Add icon from povray rendering
+
 * Thu Feb 14 2013 Didier Fabert <didier.fabert@gmail.com> 0.4.0-2
 - Add desktop file
 - Include doc, man
