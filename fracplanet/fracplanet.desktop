@@ -1,8 +1,9 @@
+#!/usr/bin/env xdg-open
 [Desktop Entry]
 Version=1.0
 Name=FracPlanet
 Exec=fracplanet
-Icon=system-run
+Icon=fracplanet
 Type=Application
 GenericName=Fractal planet and terrain generator
 GenericName[fr]=Générateur de planète et de terrain fractal

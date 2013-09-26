@@ -1,12 +1,19 @@
 Name:           fracplanet
 Version:        0.4.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Fractal planet and terrain generator
 License:        GPLv2
 Group:          Applications/Multimedia
 URL:            http://sourceforge.net/projects/fracplanet
 Source0:        http://sourceforge.net/projects/fracplanet/files/fracplanet/%{version}/%{name}-%{version}.tar.gz
 Source1:        %{name}.desktop
+Source2:        fracplanet-hi16.png
+Source3:        fracplanet-hi22.png
+Source4:        fracplanet-hi32.png
+Source5:        fracplanet-hi48.png
+Source6:        fracplanet-hi64.png
+Source7:        fracplanet-hi128.png
+Source8:        fracplanet-hi256.png
 Patch0:         fracplanet-libglu.patch
 Patch1:         fracplanet-doxygen-png-img.patch
 
@@ -47,6 +54,13 @@ make %{?_smp_mflags}
 rm -rf $RPM_BUILD_ROOT
 %{__mkdir_p} $RPM_BUILD_ROOT%{_bindir}
 %{__mkdir_p} $RPM_BUILD_ROOT%{_datadir}/applications
+%{__mkdir_p} $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/16x16
+%{__mkdir_p} $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/22x22
+%{__mkdir_p} $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/32x32
+%{__mkdir_p} $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/48x48
+%{__mkdir_p} $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/64x64
+%{__mkdir_p} $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/128x128
+%{__mkdir_p} $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/256x256
 %{__mkdir_p} $RPM_BUILD_ROOT%{_datadir}/%{name}-%{version}/apidoc
 %{__mkdir_p} $RPM_BUILD_ROOT%{_mandir}/man1
 %{__mkdir_p} $RPM_BUILD_ROOT%{_mandir}
@@ -54,6 +68,13 @@ rm -rf $RPM_BUILD_ROOT
 %{__install} man/man1/fracplanet.1 $RPM_BUILD_ROOT%{_mandir}/man1
 %{__install} %{SOURCE1} $RPM_BUILD_ROOT%{_datadir}/applications
 %{__cp} -r doc/* $RPM_BUILD_ROOT%{_datadir}/%{name}-%{version}/apidoc
+%{__install} %{SOURCE2} $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/16x16/fracplanet.png
+%{__install} %{SOURCE3} $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/22x22/fracplanet.png
+%{__install} %{SOURCE4} $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/32x32/fracplanet.png
+%{__install} %{SOURCE5} $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/48x48/fracplanet.png
+%{__install} %{SOURCE6} $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/64x64/fracplanet.png
+%{__install} %{SOURCE7} $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/128x128/fracplanet.png
+%{__install} %{SOURCE8} $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/256x256/fracplanet.png
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -64,12 +85,16 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/applications/fracplanet.desktop
 %doc fracplanet.htm fracplanet.css BUGS LICENSE NEWS README THANKS TODO
 %{_mandir}/man1/fracplanet.1*
+%{_datadir}/icons/hicolor/*/fracplanet.png
 
 %files apidoc
 %defattr(-,root,root,-)
 %{_datadir}/%{name}-%{version}/apidoc
 
 %changelog
+* Thu Sep 26 2013 Didier Fabert <didier.fabert@gmail.com> 0.4.0-3
+- Add icon from povray rendering
+
 * Thu Feb 14 2013 Didier Fabert <didier.fabert@gmail.com> 0.4.0-2
 - Add desktop file
 - Include doc, man
