@@ -6,11 +6,19 @@ License:        GPLv2
 Group:          Development/Libraries
 URL:            http://xen-tools.org/
 Source0:        http://xen-tools.org/software/xen-tools/xen-tools-4.3.1.tar.gz
-
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires:  perl, perl-podlators
-Requires:       xen
 BuildArch:      noarch
+AutoReqProv:    0
+
+Requires:       perl(Pod::Usage)
+Requires:       perl(Getopt::Long)
+Requires:       perl(File::Copy)
+Requires:       perl(File::Slurp)
+Requires:       perl(File::Temp)
+Requires:       perl(File::Path)
+Requires:       perl(Text::Template)
+Requires:       perl(Digest::MD5)
 
 %description
 xen-tools is a collection of simple perl scripts which allow you to easily
