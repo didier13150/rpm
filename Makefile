@@ -38,7 +38,9 @@ repository:
 	@createrepo --update -d $(REPODIR)
 
 repoview:
-	repoview $(REPODIR) -o $(REPODIR)/repoview --url "http://$(HOSTNAME)/repoview" --title "RPM for $(DISTRIB) $(ARCH)"
+	@rm -rf $(REPODIR)/repoview
+	@repoview $(REPODIR) -k ./common/repoview/templates -f -o $(REPODIR)/repoview --url "http://$(HOSTNAME)/repository/repoview" --title "RPM for $(DISTRIB) $(ARCH)"
+	@rsync -avzr ./common/repoview/images $(REPODIR)/repoview/
 
 dirlist:
 	@echo "Processing directories: $(PKGS)"
