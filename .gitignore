@@ -35,3 +35,4 @@ povray-include-extra/*.include
 */result/*
 Nagstamon
 fracplanet/fracplanet-hi*.png
+*.pyc

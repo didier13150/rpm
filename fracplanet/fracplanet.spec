@@ -68,6 +68,7 @@ rm -rf $RPM_BUILD_ROOT
 %{__install} man/man1/fracplanet.1 $RPM_BUILD_ROOT%{_mandir}/man1
 %{__install} %{SOURCE1} $RPM_BUILD_ROOT%{_datadir}/applications
 %{__cp} -r doc/* $RPM_BUILD_ROOT%{_datadir}/%{name}-%{version}/apidoc
+%{__install} %{SOURCE4} $RPM_BUILD_ROOT%{_datadir}/icons/fracplanet.png
 %{__install} %{SOURCE2} $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/16x16/fracplanet.png
 %{__install} %{SOURCE3} $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/22x22/fracplanet.png
 %{__install} %{SOURCE4} $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/32x32/fracplanet.png
@@ -86,6 +87,7 @@ rm -rf $RPM_BUILD_ROOT
 %doc fracplanet.htm fracplanet.css BUGS LICENSE NEWS README THANKS TODO
 %{_mandir}/man1/fracplanet.1*
 %{_datadir}/icons/hicolor/*/fracplanet.png
+%{_datadir}/icons/fracplanet.png
 
 %files apidoc
 %defattr(-,root,root,-)

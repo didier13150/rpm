@@ -1,0 +1,127 @@
+body {
+	background-color: gainsboro;
+	color: navy;
+}
+a, a:visited {
+	color:blue;
+}
+a:hover {
+    background-color: mistyrose;
+	color: red;
+}
+.nav {
+    text-align: right;
+    color: gray;
+    font-size: small;
+    }
+.nactive {
+    border-bottom: 1px dotted blue;
+    background-color: mistyrose;
+    color: blue;
+    font-size: small;
+    text-decoration: none;
+    }
+.ninactive {
+    color: gray;
+    font-size: small;
+    }
+.nlink {
+    text-decoration: none;
+    color: blue;
+    font-size: small;
+    }
+.nlink:hover {
+    background-color: mistyrose;
+	color: red;
+    border-bottom: 1px dotted #242424;
+    font-size: small;
+    }
+.inpage {
+    text-decoration: none;
+    color: blue;
+    }
+.inpage:hover {
+    background-color: mistyrose;
+    color: red;
+    border-bottom: 1px dotted #242424;
+    }
+.levbar {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 13em;
+    }
+.main {
+    position: absolute;
+    left: 14em;
+    width: 75%;
+    }
+.logo {
+	text-align: center;
+}
+h1,h2,h3,h4,h5 {
+    border: 1px dotted gray;
+    font-weight: bold;
+	padding: 0.1em 0.5em;
+    }
+.pagetitle {
+    border: 1px dotted gray;
+    padding-top: 0.1em;
+    padding-bottom: 0.1em;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+    text-align: center;
+    width: 100%;
+	font-weight: bold;
+	font-size: 1.5em;
+    }
+
+dt  {
+    font-weight: bold;
+    margin-top: 1%;
+    }
+th  {
+    text-align: left;
+    }
+
+.field, .pagetitle, h1,h2,h3,h4,h5  {
+	background-image:url("../images/bg-item.png");
+	background-repeat:repeat-x;
+	background-position:0 50%;
+    background-color: #3176CA;
+	text-shadow:0.1em 0.1em 0.2em white;
+    border-radius: 4px;
+}
+.field  {
+    text-align: right;
+    }
+.levbarlist {
+    list-style-type: none;
+    padding: 5%;
+    }
+.pkglist {
+    padding-top: 2%;
+    padding-bottom: 2%;
+    list-style-type: square;
+    }
+.letterlist a {
+    padding-left: 0.2em;
+    padding-right: 0.2em;
+    color: blue;
+    }
+.footernote {
+    text-align: right;
+    font-size: small;
+    }
+.repoview {
+    text-decoration: none;
+    color: mistyrose;
+    border-bottom: 1px dotted gray;
+    font-size: small;
+    }
+.repoview:hover {
+    background-color: mistyrose;
+    border-bottom: 1px dotted blue;
+    color: red;
+    font-size: small;
+    }

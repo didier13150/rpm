@@ -9,8 +9,13 @@ function linuxParserInit( Parser $parser ) {
         $parser->setHook( 'path', 'pathRender' );
         $parser->setHook( 'package', 'packageRender' );
         $parser->setHook( 'app', 'appRender' );
+<<<<<<< HEAD
         $parser->setHook( 'class', 'classRender' );
         $parser->setHook( 'previous', 'previousPage' );
+=======
+        $parser->setHook( 'class', 'myClassRender' );
+        $parser->setHook( 'previous', 'myPreviousPage' );
+>>>>>>> c4cd11103c460b4c8fb42d864202b0dd5fbf9682
         // Always return true from this function. The return value does not denote
         // success or otherwise have meaning - it just must always be true.
         return true;
@@ -32,6 +37,7 @@ function appRender( $input, array $args, Parser $parser, PPFrame $frame ) {
         return '<span style="color:#008080;font-weight:bold;">' . htmlspecialchars( $input ) . '</span>';
 }
 
+<<<<<<< HEAD
 function classRender( $input, array $args, Parser $parser, PPFrame $frame ) {
         return '<span style="color:#0000aa;font-weight:bold;">' . htmlspecialchars( $input ) . '</span>';
 }
@@ -39,4 +45,14 @@ function classRender( $input, array $args, Parser $parser, PPFrame $frame ) {
 function previousPage( $input, array $args, Parser $parser, PPFrame $frame ) {
         return '<a href="javascript:history.go(-1)">' . htmlspecialchars( $input ) . '</a>';
 }
+=======
+function myClassRender( $input, array $args, Parser $parser, PPFrame $frame ) {
+        return '<span style="color:#0000aa;font-weight:bold;">' . htmlspecialchars( $input ) . '</span>';
+}
+
+function myPreviousPage( $input, array $args, Parser $parser, PPFrame $frame ) {
+        return '<a href="javascript:history.go(-1)">' . htmlspecialchars( $input ) . '</a>';
+}
+
+>>>>>>> c4cd11103c460b4c8fb42d864202b0dd5fbf9682
 
