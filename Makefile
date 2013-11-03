@@ -44,3 +44,11 @@ repoview:
 
 dirlist:
 	@echo "Processing directories: $(PKGS)"
+
+help:
+	@echo -e "\033[1;32mAvailable targets:\033[0m"
+	@echo " - all:       Building all SRPM and RPMs and create repository (default target: ie when make is called without arg)"
+	@echo " - repo:      Create or update local repository, and run repoview"
+	@echo " - srpm:      Make SRPM"
+	@echo " - build:     Make RPMs from SRPM"
+	@echo " - clean:     Delete mock log files and all (S)RPMs"

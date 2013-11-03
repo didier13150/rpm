@@ -38,10 +38,9 @@ build: srpm
 help:
 	@echo -e "\033[1;32mAvailable targets:\033[0m"
 	@echo " - all:       Building SRPM and RPMs (default target: ie when make is called without arg)"
-	@echo " - rpmlint:   Test spec file"
+	@echo " - rpmlint:   Test spec and SRPM files"
 	@echo " - srpm:      Make SRPM"
 	@echo " - build:     Make RPMs from SRPM"
-	@echo " - log:       Copy mock log file to current dir"
 	@echo " - clean:     Delete mock log files and all (S)RPMs"
 
 sources: prepare
