@@ -1,8 +1,8 @@
 %define majorver 1.21
 %global wiki_ext_path %{_datadir}/mediawiki/extensions
 Name:           mediawiki
-Version:        %{majorver}.1
-Release:        4%{?dist}
+Version:        %{majorver}.2
+Release:        2%{?dist}
 License:        GPLv2+
 Group:          Development/Tools
 URL:            http://www.mediawiki.org/
@@ -17,7 +17,7 @@ Source4:        mw-updateallinstances.in
 Source10:       https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Mpdf.tgz
 Source11:       https://gerrit.wikimedia.org/r/p/mediawiki/extensions/CategoryTree.tgz
 Source12:       https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Math.tgz
-Source13:       https://git.wikimedia.org/git/mediawiki/extensions/Auth_remoteuser.tgz
+Source13:       https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Auth_remoteuser.tgz
 Source14:       https://git.wikimedia.org/git/mediawiki/extensions/Git2Pages.tgz
 Source15:       https://git.wikimedia.org/git/mediawiki/extensions/RandomImage.tgz
 Source20:       Linux.tag.php
@@ -200,12 +200,12 @@ rm -rf %{buildroot}
 
 # move away the documentation to the final folder.
 mkdir -p %{buildroot}%{_defaultdocdir}/%{name}-%{version}
-cp -rp COPYING FAQ HISTORY README RELEASE-NOTES* UPGRADE CREDITS INSTALL docs \
-  %{buildroot}%{_defaultdocdir}/%{name}-%{version}/
+cp -p %{SOURCE2} %{buildroot}%{_defaultdocdir}/%{name}-%{version}/
 
 # now copy the rest to the buildroot.
 mkdir -p %{buildroot}%{_datadir}/mediawiki
 cp -a * %{buildroot}%{_datadir}/mediawiki/
+
 # remove unneeded parts
 rm -fr %{buildroot}%{_datadir}/mediawiki/{t,test,tests}
 rm -fr %{buildroot}%{_datadir}/mediawiki/includes/zhtable
@@ -215,10 +215,24 @@ find %{buildroot}%{_datadir}/mediawiki/ \
 
 # fix permissions
 find %{buildroot}%{_datadir}/mediawiki -name \*.pl | xargs -r chmod +x
+chmod +x %{buildroot}%{_datadir}/mediawiki/maintenance/cssjanus/cssjanus.py
+chmod +x %{buildroot}%{_datadir}/mediawiki/maintenance/cssjanus/csslex.py
+chmod +x %{buildroot}%{_datadir}/mediawiki/maintenance/hiphop/make
+chmod +x %{buildroot}%{_datadir}/mediawiki/maintenance/hiphop/run-server
+chmod +x %{buildroot}%{_datadir}/mediawiki/maintenance/storage/make-blobs
+chmod +x %{buildroot}%{_datadir}/mediawiki/includes/limit.sh
+chmod +x %{buildroot}%{_datadir}/mediawiki/includes/normal/UtfNormalTest2.php
+chmod +x %{buildroot}%{_datadir}/mediawiki/extensions/ConfirmEdit/captcha.py
 
 # remove version control/patch files
 find %{buildroot} -name .svnignore | xargs -r rm
 find %{buildroot} -name \*.commoncode | xargs -r rm
+find %{buildroot} -name .gitreview | xargs -r rm
+find %{buildroot} -name .jshintignore | xargs -r rm
+find %{buildroot} -name .jshintrc | xargs -r rm
+
+# https://bugzilla.wikimedia.org/show_bug.cgi?id=49436
+rm -f %{buildroot}%{_datadir}/mediawiki/maintenance/language/zhtable/trad2simp_supp_unset.manual
 
 # placeholder for a default instance
 mkdir -p %{buildroot}%{_localstatedir}/www/wiki
@@ -262,7 +276,7 @@ tar -xzf %{SOURCE15} -C %{buildroot}%{wiki_ext_path}/
 rm -rf %{buildroot}
 
 %files
-%doc COPYING FAQ HISTORY README RELEASE-NOTES-1.21 UPGRADE CREDITS INSTALL docs
+%doc COPYING FAQ HISTORY README RELEASE-NOTES-1.21 UPGRADE CREDITS docs
 %{_datadir}/mediawiki
 %attr(-,apache,apache) %{_datadir}/mediawiki/mw-config
 %{_localstatedir}/www/wiki
@@ -313,6 +327,9 @@ rm -rf %{buildroot}
 %{wiki_ext_path}/IncludeArticle
 
 %changelog
+* Sun Nov 03 2013 Didier Fabert <didier.fabert@gmail.com> - 1.21.2-2
+- New upstream release.
+
 * Sat Aug 31 2013 Didier Fabert <didier.fabert@gmail.com> - 1.21.1-4
 - Add RandomImage and IncludeArticle extension
 
