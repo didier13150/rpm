@@ -36,3 +36,4 @@ povray-include-extra/*.include
 Nagstamon
 fracplanet/fracplanet-hi*.png
 *.pyc
+channel.xml
