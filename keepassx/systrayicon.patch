@@ -1,0 +1,251 @@
+diff -rup a/src/core/Config.cpp b/src/core/Config.cpp
+--- a/src/core/Config.cpp	2013-03-29 16:31:26.000000000 +0100
++++ b/src/core/Config.cpp	2013-11-09 11:27:47.980659139 +0100
+@@ -94,6 +94,7 @@ void Config::init(const QString& fileNam
+     m_defaults.insert("ShowToolbar", true);
+     m_defaults.insert("security/clearclipboard", true);
+     m_defaults.insert("security/clearclipboardtimeout", 10);
++    m_defaults.insert("SystemTrayIcon", false);
+ }
+ 
+ Config* Config::instance()
+diff -rup a/src/gui/MainWindow.cpp b/src/gui/MainWindow.cpp
+--- a/src/gui/MainWindow.cpp	2013-03-29 16:31:26.000000000 +0100
++++ b/src/gui/MainWindow.cpp	2013-11-09 15:10:37.157268064 +0100
+@@ -38,6 +38,12 @@ MainWindow::MainWindow()
+     : m_ui(new Ui::MainWindow())
+ {
+     m_ui->setupUi(this);
++    
++    m_systrayicon = 0;
++    m_systrayShow = 0;
++    m_systrayHide = 0;
++    m_forceExit = false;
++    setupSystemTrayIcon();
+ 
+     setWindowIcon(filePath()->applicationIcon());
+     QAction* toggleViewAction = m_ui->toolBar->toggleViewAction();
+@@ -72,6 +78,7 @@ MainWindow::MainWindow()
+     setShortcut(m_ui->actionDatabaseClose, QKeySequence::Close, Qt::CTRL + Qt::Key_W);
+     m_ui->actionLockDatabases->setShortcut(Qt::CTRL + Qt::Key_L);
+     setShortcut(m_ui->actionQuit, QKeySequence::Quit, Qt::CTRL + Qt::Key_Q);
++    setShortcut(m_ui->actionClose, QKeySequence::Close, Qt::CTRL + Qt::Key_H);
+     setShortcut(m_ui->actionSearch, QKeySequence::Find, Qt::CTRL + Qt::Key_F);
+     m_ui->actionEntryNew->setShortcut(Qt::CTRL + Qt::Key_N);
+     m_ui->actionEntryEdit->setShortcut(Qt::CTRL + Qt::Key_E);
+@@ -94,6 +101,7 @@ MainWindow::MainWindow()
+     m_ui->actionChangeDatabaseSettings->setIcon(filePath()->icon("actions", "document-edit"));
+     m_ui->actionChangeMasterKey->setIcon(filePath()->icon("actions", "database-change-key", false));
+     m_ui->actionLockDatabases->setIcon(filePath()->icon("actions", "document-encrypt", false));
++    m_ui->actionClose->setIcon(filePath()->icon("actions", "application-exit"));
+     m_ui->actionQuit->setIcon(filePath()->icon("actions", "application-exit"));
+ 
+     m_ui->actionEntryNew->setIcon(filePath()->icon("actions", "entry-new", false));
+@@ -153,7 +161,7 @@ MainWindow::MainWindow()
+             SLOT(importKeePass1Database()));
+     connect(m_ui->actionLockDatabases, SIGNAL(triggered()), m_ui->tabWidget,
+             SLOT(lockDatabases()));
+-    connect(m_ui->actionQuit, SIGNAL(triggered()), SLOT(close()));
++    connect(m_ui->actionQuit, SIGNAL(triggered()), SLOT(forceExit()));
+ 
+     m_actionMultiplexer.connect(m_ui->actionEntryNew, SIGNAL(triggered()),
+             SLOT(createEntry()));
+@@ -397,11 +405,18 @@ void MainWindow::databaseTabChanged(int
+ 
+ void MainWindow::closeEvent(QCloseEvent* event)
+ {
+-    if (!m_ui->tabWidget->closeAllDatabases()) {
++    if ( m_systrayicon && ! m_forceExit ) {
+         event->ignore();
++        hide();
+     }
+     else {
+-        event->accept();
++        if (!m_ui->tabWidget->closeAllDatabases()) {
++            m_forceExit = false;
++            event->ignore();
++        }
++        else {
++            event->accept();
++        }
+     }
+ }
+ 
+@@ -429,3 +444,70 @@ void MainWindow::setShortcut(QAction* ac
+         action->setShortcut(QKeySequence(fallback));
+     }
+ }
++
++void MainWindow::forceExit()
++{
++    m_forceExit = true;
++    close();
++}
++
++void MainWindow::toggleDisplay()
++{
++    if(isVisible()) {
++        if (m_systrayHide) m_systrayHide->setEnabled(false);
++        if (m_systrayShow) m_systrayShow->setEnabled(true);
++        hide();
++    }
++    else {
++        if (m_systrayHide) m_systrayHide->setEnabled(true);
++        if (m_systrayShow) m_systrayShow->setEnabled(false);
++        show();
++    }
++}
++
++void MainWindow::toggleDisplay(QSystemTrayIcon::ActivationReason r)
++{
++    if ( r == QSystemTrayIcon::Context ) {
++        m_systrayicon->contextMenu()->show();
++        return;
++    }
++    toggleDisplay();
++}
++
++void MainWindow::setupSystemTrayIcon()
++{
++    if ( ! config()->get("SystemTrayIcon").toBool()) return;
++    m_systrayicon = new QSystemTrayIcon(this);
++
++    // Creation Systray context menu
++    QMenu* stmenu = new QMenu(this);
++    stmenu->setTitle("KeePassX");
++    stmenu->setIcon(filePath()->applicationIcon());
++
++    // Restore action (show main window)
++    m_systrayShow = new QAction("Restore",this);
++    m_systrayShow->setEnabled(false);
++    // Hide action (hide main window)
++    m_systrayHide = new QAction("Hide",this);
++    // Quit application with icon
++    QAction* quitAction = new QAction("Quit",this);
++    quitAction->setIcon(filePath()->icon("actions", "application-exit"));
++
++    stmenu->addAction(m_systrayShow);
++    stmenu->addAction(m_systrayHide);
++    stmenu->addAction(quitAction);
++
++    // Set context menu to systray icon
++    m_systrayicon->setContextMenu(stmenu);
++
++    // Set application icon to systray icon
++    m_systrayicon->setIcon(filePath()->applicationIcon());
++    connect(m_systrayicon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), 
++            SLOT(toggleDisplay(QSystemTrayIcon::ActivationReason)));
++    connect(m_systrayShow, SIGNAL(triggered()), SLOT(toggleDisplay()));
++    connect(m_systrayHide, SIGNAL(triggered()), SLOT(toggleDisplay()));
++    connect(quitAction, SIGNAL(triggered()), SLOT(forceExit()));
++
++    // Show systray icon
++    m_systrayicon->show();
++}
+diff -rup a/src/gui/MainWindow.h b/src/gui/MainWindow.h
+--- a/src/gui/MainWindow.h	2013-03-29 16:31:26.000000000 +0100
++++ b/src/gui/MainWindow.h	2013-11-09 15:07:37.810012093 +0100
+@@ -20,10 +20,13 @@
+ 
+ #include <QtGui/QActionGroup>
+ #include <QtGui/QMainWindow>
++#include <QtGui/QSystemTrayIcon>
+ 
+ #include "core/SignalMultiplexer.h"
+ #include "gui/DatabaseWidget.h"
+ 
++class QSystemTrayIcon;
++
+ namespace Ui {
+     class MainWindow;
+ }
+@@ -57,6 +60,10 @@ private Q_SLOTS:
+     void showEntryContextMenu(const QPoint& globalPos);
+     void showGroupContextMenu(const QPoint& globalPos);
+     void saveToolbarState(bool value);
++    void setupSystemTrayIcon();
++    void forceExit();
++    void toggleDisplay();
++    void toggleDisplay(QSystemTrayIcon::ActivationReason);
+ 
+ private:
+     static void setShortcut(QAction* action, QKeySequence::StandardKey standard, int fallback = 0);
+@@ -68,6 +75,10 @@ private:
+     QAction* m_clearHistoryAction;
+     QActionGroup* m_lastDatabasesActions;
+     QActionGroup* m_copyAdditionalAttributeActions;
++    QSystemTrayIcon* m_systrayicon;
++    bool m_forceExit;
++    QAction* m_systrayShow;
++    QAction* m_systrayHide;
+ 
+     Q_DISABLE_COPY(MainWindow)
+ };
+diff -rup a/src/gui/MainWindow.ui b/src/gui/MainWindow.ui
+--- a/src/gui/MainWindow.ui	2013-03-29 16:31:26.000000000 +0100
++++ b/src/gui/MainWindow.ui	2013-11-09 13:27:38.479270163 +0100
+@@ -70,7 +70,7 @@
+      <x>0</x>
+      <y>0</y>
+      <width>800</width>
+-     <height>20</height>
++     <height>21</height>
+     </rect>
+    </property>
+    <widget class="QMenu" name="menuFile">
+@@ -95,6 +95,7 @@
+     <addaction name="actionImportKeePass1"/>
+     <addaction name="separator"/>
+     <addaction name="actionLockDatabases"/>
++    <addaction name="actionClose"/>
+     <addaction name="actionQuit"/>
+    </widget>
+    <widget class="QMenu" name="menuHelp">
+@@ -346,6 +347,11 @@
+     <string>Lock databases</string>
+    </property>
+   </action>
++  <action name="actionClose">
++   <property name="text">
++    <string>Close</string>
++   </property>
++  </action>
+  </widget>
+  <customwidgets>
+   <customwidget>
+diff -rup a/src/gui/SettingsWidget.cpp b/src/gui/SettingsWidget.cpp
+--- a/src/gui/SettingsWidget.cpp	2013-03-29 16:31:26.000000000 +0100
++++ b/src/gui/SettingsWidget.cpp	2013-11-09 11:25:51.698624647 +0100
+@@ -56,6 +56,7 @@ void SettingsWidget::loadSettings()
+     m_generalUi->modifiedExpandedChangedCheckBox->setChecked(config()->get("ModifiedOnExpandedStateChanges").toBool());
+     m_generalUi->autoSaveAfterEveryChangeCheckBox->setChecked(config()->get("AutoSaveAfterEveryChange").toBool());
+     m_generalUi->autoSaveOnExitCheckBox->setChecked(config()->get("AutoSaveOnExit").toBool());
++    m_generalUi->systemTrayIconCheckBox->setChecked(config()->get("SystemTrayIcon").toBool());
+ 
+     m_globalAutoTypeKey = static_cast<Qt::Key>(config()->get("GlobalAutoTypeKey").toInt());
+     m_globalAutoTypeModifiers = static_cast<Qt::KeyboardModifiers>(config()->get("GlobalAutoTypeModifiers").toInt());
+@@ -79,6 +80,7 @@ void SettingsWidget::saveSettings()
+     config()->set("GlobalAutoTypeModifiers", static_cast<int>(m_generalUi->autoTypeShortcutWidget->modifiers()));
+     config()->set("security/clearclipboard", m_secUi->clearClipboardCheckBox->isChecked());
+     config()->set("security/clearclipboardtimeout", m_secUi->clearClipboardSpinBox->value());
++    config()->set("SystemTrayIcon", m_generalUi->systemTrayIconCheckBox->isChecked());
+ 
+     Q_EMIT editFinished(true);
+ }
+diff -rup a/src/gui/SettingsWidgetGeneral.ui b/src/gui/SettingsWidgetGeneral.ui
+--- a/src/gui/SettingsWidgetGeneral.ui	2013-03-29 16:31:26.000000000 +0100
++++ b/src/gui/SettingsWidgetGeneral.ui	2013-11-09 13:31:36.461579577 +0100
+@@ -55,6 +55,13 @@
+    <item row="4" column="1">
+     <widget class="ShortcutWidget" name="autoTypeShortcutWidget"/>
+    </item>
++   <item row="5" column="0" colspan="2">
++    <widget class="QCheckBox" name="systemTrayIconCheckBox">
++     <property name="text">
++      <string>System Tray Icon</string>
++     </property>
++    </widget>
++   </item>
+   </layout>
+  </widget>
+  <customwidgets>

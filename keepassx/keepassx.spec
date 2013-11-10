@@ -2,13 +2,14 @@
 
 Name:           keepassx
 Version:        2.0
-Release:        0.%{alpha}%{?dist}
+Release:        0.1.%{alpha}%{?dist}
 Summary:        Cross-platform password manager
 Group:          User Interface/Desktops
 License:        GPLv2+
 URL:            http://keepassx.sourceforge.net
 Source0:        http://www.keepassx.org/dev/attachments/download/36/%{name}-%{version}-%{alpha}.tar.gz
 Source1:        %{name}.desktop
+Patch0:         systrayicon.patch
 BuildRequires:  qt4-devel > 4.1
 BuildRequires:  libXtst-devel
 BuildRequires:  ImageMagick
@@ -19,10 +20,10 @@ Requires:       hicolor-icon-theme
 Requires:       libgcrypt
 
 %description
-KeePassX is an application for people with extremly high demands on secure
+KeePassX is an application for people with extremely high demands on secure
 personal data management.
 KeePassX saves many different information e.g. user names, passwords, urls,
-attachemts and comments in one single database. For a better management
+attachments and comments in one single database. For a better management
 user-defined titles and icons can be specified for each single entry.
 Furthermore the entries are sorted in groups, which are customizable as well.
 The integrated search function allows to search in a single group or the
@@ -33,10 +34,11 @@ generates passwords frequently will appreciate this feature.
 The complete database is always encrypted either with AES (alias Rijndael) or
 Twofish encryption algorithm using a 256 bit key. Therefore the saved
 information can be considered as quite safe. KeePassX uses a database format
-that is compatible with KeePass Password Safe for MS Windows.
+that is compatible with KeePass Password Safe for MS Windows version 2.
 
 %prep
 %setup -qn keepassx-%{version}-%{alpha}
+%patch0 -p1
 
 %build
 mkdir build
@@ -52,12 +54,6 @@ make %{?_smp_mflags}
 %install
 cd build
 make install DESTDIR=%{buildroot}
-
-# Use png in _datadir/icons/hicolor instead of xpm in pixmaps
-#mkdir -p %{buildroot}%{_datadir}/icons/hicolor/32x32/apps/
-#convert %{buildroot}%{_datadir}/pixmaps/keepassx.xpm \
-#        %{buildroot}%{_datadir}/icons/hicolor/32x32/apps/keepassx.png
-#rm -f %{buildroot}%{_datadir}/pixmaps/keepassx.xpm
 
 # Menu
 %{__mkdir_p} %{buildroot}%{_datadir}/applications
@@ -110,6 +106,9 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 %{_datadir}/icons/hicolor/*/apps/keepassx.*
 
 %changelog
+* Sat Nov 09 2013 Didier Fabert <didier.fabert@gmail.com> - 2.0-0.1.alpha4
+- Patch to add systray icon capability
+
 * Fri Sep 20 2013 Didier Fabert <didier.fabert@gmail.com> - 2.0-0.alpha4
 - Update
 
