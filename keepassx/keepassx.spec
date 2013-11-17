@@ -1,4 +1,4 @@
-%define alpha alpha4
+%define alpha alpha4.1
 
 Name:           keepassx
 Version:        2.0
@@ -9,7 +9,7 @@ License:        GPLv2+
 URL:            http://keepassx.sourceforge.net
 Source0:        http://www.keepassx.org/dev/attachments/download/36/%{name}-%{version}-%{alpha}.tar.gz
 Source1:        %{name}.desktop
-Patch0:         systrayicon.patch
+Patch0:         test-failure-crypto-selftest.patch
 BuildRequires:  qt4-devel > 4.1
 BuildRequires:  libXtst-devel
 BuildRequires:  ImageMagick
@@ -22,7 +22,7 @@ Requires:       libgcrypt
 %description
 KeePassX is an application for people with extremely high demands on secure
 personal data management.
-KeePassX saves many different information e.g. user names, passwords, urls,
+KeePassX saves many different information e.g. user names, passwords, URLs,
 attachments and comments in one single database. For a better management
 user-defined titles and icons can be specified for each single entry.
 Furthermore the entries are sorted in groups, which are customizable as well.
@@ -37,7 +37,7 @@ information can be considered as quite safe. KeePassX uses a database format
 that is compatible with KeePass Password Safe for MS Windows version 2.
 
 %prep
-%setup -qn keepassx-%{version}-%{alpha}
+%setup -qn keepassx
 %patch0 -p1
 
 %build
@@ -47,7 +47,7 @@ cmake .. \
     -DCMAKE_INSTALL_PREFIX=/usr \
     -DCMAKE_VERBOSE_MAKEFILE=ON \
     -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-    -DWITH_GUI_TESTS=ON
+    -DWITH_GUI_TESTS=OFF
 
 make %{?_smp_mflags}
 
@@ -78,7 +78,6 @@ EOF
 install -D -m 644 -p x-keepass.desktop \
   %{buildroot}%{_datadir}/mimelnk/application/x-keepass.desktop
 
-
 %post
 touch --no-create %{_datadir}/icons/hicolor &>/dev/null || :
 update-desktop-database &> /dev/null ||:
@@ -99,13 +98,16 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 %doc CHANGELOG INSTALL COPYING LICENSE*
 
 %{_bindir}/keepassx
-%{_prefix}/lib/keepassx/*.so
+%{_libdir}/keepassx/*.so
 %{_datadir}/keepassx
 %{_datadir}/applications/*.desktop
 %{_datadir}/mimelnk/application/*.desktop
 %{_datadir}/icons/hicolor/*/apps/keepassx.*
 
 %changelog
+* Sun Nov 10 2013 Didier Fabert <didier.fabert@gmail.com> - 2.0-0.2.alpha4
+- Patch to change welcome page
+
 * Sat Nov 09 2013 Didier Fabert <didier.fabert@gmail.com> - 2.0-0.1.alpha4
 - Patch to add systray icon capability
 
