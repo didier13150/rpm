@@ -2,7 +2,7 @@
 
 Name:           keepassx
 Version:        2.0
-Release:        0.1.%{alpha}%{?dist}
+Release:        0.2.%{alpha}%{?dist}
 Summary:        Cross-platform password manager
 Group:          User Interface/Desktops
 License:        GPLv2+
@@ -105,6 +105,9 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 %{_datadir}/icons/hicolor/*/apps/keepassx.*
 
 %changelog
+* Tue Nov 26 2013 Didier Fabert <didier.fabert@gmail.com> - 2.0-0.3.alpha4
+- BUGFIX: multiple icons on systray when settings was edited
+
 * Sun Nov 10 2013 Didier Fabert <didier.fabert@gmail.com> - 2.0-0.2.alpha4
 - Patch to change welcome page
 
