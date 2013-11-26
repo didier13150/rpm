@@ -6,7 +6,7 @@ include ../common/Makefile
 prepare:
 	@echo -e "\033[1;32mDownloading from Git\033[0m"
 	@if [ ! -d keepassx ] ; then \
-		git clone git@gitorious.org:keepassx/keepassx-tartare.git $(NAME) ; \
+		git clone https://github.com/didier13150/keepassx.git $(NAME) ; \
 	else \
 		pushd $(NAME) ; \
 		git pull ; \
