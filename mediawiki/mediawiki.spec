@@ -1,8 +1,8 @@
 %define majorver 1.21
 %global wiki_ext_path %{_datadir}/mediawiki/extensions
 Name:           mediawiki
-Version:        %{majorver}.2
-Release:        2%{?dist}
+Version:        %{majorver}.3
+Release:        1%{?dist}
 License:        GPLv2+
 Group:          Development/Tools
 URL:            http://www.mediawiki.org/
@@ -327,6 +327,9 @@ rm -rf %{buildroot}
 %{wiki_ext_path}/IncludeArticle
 
 %changelog
+* Tue Dec 03 2013 Didier Fabert <didier.fabert@gmail.com> - 1.21.3-1
+- New upstream release.
+
 * Sun Nov 03 2013 Didier Fabert <didier.fabert@gmail.com> - 1.21.2-2
 - New upstream release.
 
