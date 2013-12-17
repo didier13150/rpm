@@ -1,12 +1,13 @@
 %define majorver 3.7
 Name:          povray
-Version:       %{majorver}.0.RC6
-Release:       3%{?dist}
-License:       Freeware
+Version:       %{majorver}.1
+Release:       1%{?dist}
+License:       AGPLv3+
 Summary:       Persistence of Vision Raytracer
 BuildRoot:     %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 URL:           http://www.povray.org
-Source0:       http://www.povray.org/redirect/www.povray.org/beta/source/%{name}-%{version}.tar.gz
+# http://www.povray.org/redirect/www.povray.org/beta/source/%{name}-%{version}.tar.gz
+Source0:       https://github.com/POV-Ray/%{name}/archive/%{majorver}-stable.tar.gz
 Patch0:        povray-boost-1.50.patch
 Patch1:        povray-print-cmdline.patch
 Patch2:        povray-noprint-authors.patch
@@ -26,7 +27,7 @@ and i86 Linux. The source code is available for those wanting
 to do their own ports. 
 
 %prep
-%setup -q
+%setup -qn %{name}-%{majorver}-stable
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
@@ -36,7 +37,10 @@ find . -name '*.sh' -exec dos2unix {} \;
 CXXFLAGS="-Wno-multichar -Wdeprecated"
 %configure \
            COMPILED_BY="rpmbuild" \
-           --with-boost-thread=boost_thread-mt
+           --with-boost=/usr/lib64 \
+           --disable-io-restrictions \
+           --with-boost-thread=boost_thread LIBS=-Lboost_system
+
 make %{?_smp_mflags}
 
 %install
@@ -61,6 +65,9 @@ rm -rf %{buildroot}
 %doc AUTHORS COPYING ChangeLog NEWS README VERSION changes.txt revision.txt
 
 %changelog
+* Tue Dec 17 2013 Didier Fabert <didier.fabert@gmail.com> 3.7.1-1
+- Update to stable 3.7
+
 * Sun Feb 17 2013 Didier Fabert <didier.fabert@gmail.com> 3.7.0.RC6-3
 - No Print about authors, contributors ans libs
 
