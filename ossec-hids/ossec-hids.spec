@@ -47,7 +47,10 @@ BuildRequires: mysql-devel
 %if 0%{?rhel} >= 6
 BuildRequires: inotify-tools-devel
 %endif
+%if 0%{?fedora} >= 20
+%else
 BuildRequires: libprelude-devel
+%endif
 BuildRequires: zlib-devel
 
 Provides: ossec = %{version}-%{release}
@@ -157,7 +160,11 @@ mv syscheckd/ossec-syscheckd  ../bin/client-syscheckd
 mv client-agent/ossec-agentd  ../bin/client-agentd
 
 # Rebuild for server
+%if 0%{?fedora} >= 20
+%{__make} clean setdb all build
+%else
 %{__make} clean setdb setprelude all build
+%endif
 popd
 
 # Bugfix, Cleanup for agentd
