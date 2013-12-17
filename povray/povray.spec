@@ -6,17 +6,15 @@ License:       AGPLv3+
 Summary:       Persistence of Vision Raytracer
 BuildRoot:     %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 URL:           http://www.povray.org
-# http://www.povray.org/redirect/www.povray.org/beta/source/%{name}-%{version}.tar.gz
 Source0:       https://github.com/POV-Ray/%{name}/archive/%{majorver}-stable.tar.gz
-Patch0:        povray-boost-1.50.patch
-Patch1:        povray-print-cmdline.patch
-Patch2:        povray-noprint-authors.patch
+Patch0:        povray-print-cmdline.patch
+Patch1:        povray-noprint-authors.patch
 Group:         Applications/Multimedia
 BuildRoot:     %{_tmppath}/%{name}-%{version}-root
 BuildRequires: autoconf, automake, binutils, sed, grep, gcc-c++, libXpm
 BuildRequires: libjpeg-devel, libtiff-devel, libpng-devel, zlib-devel
 BuildRequires: svgalib-devel, libX11-devel, libXt-devel, xorg-x11-proto-devel
-BuildRequires: boost-devel, SDL-devel, dos2unix
+BuildRequires: boost-devel, SDL-devel, dos2unix, OpenEXR-devel
 Requires:      boost, SDL
 
 %description
@@ -30,10 +28,12 @@ to do their own ports.
 %setup -qn %{name}-%{majorver}-stable
 %patch0 -p1
 %patch1 -p1
-%patch2 -p1
 find . -name '*.sh' -exec dos2unix {} \;
 
 %build
+pushd unix
+./prebuild.sh
+popd
 CXXFLAGS="-Wno-multichar -Wdeprecated"
 %configure \
            COMPILED_BY="rpmbuild" \
@@ -45,7 +45,6 @@ make %{?_smp_mflags}
 
 %install
 rm -rf %{buildroot}
-
 make DESTDIR=%{buildroot} install
 # Add executable flag to script
 chmod 0755 %{buildroot}%{_datadir}/%{name}-%{majorver}/scenes/camera/mesh_camera/bake.sh

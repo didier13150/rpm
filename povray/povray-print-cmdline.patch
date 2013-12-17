@@ -1,28 +1,29 @@
-diff -U 3 -H -b -w -B -E -d -r -N -- a/source/backend/povray.cpp b/source/backend/povray.cpp
---- a/source/backend/povray.cpp	2012-03-16 00:19:34.000000000 +0100
-+++ b/source/backend/povray.cpp	2013-02-17 14:48:36.028704438 +0100
-@@ -738,6 +738,10 @@ int main(int argc, char **argv)
+diff -rup a/source/backend/povray.cpp b/source/backend/povray.cpp
+--- a/source/backend/povray.cpp	2013-11-16 09:52:20.000000000 +0100
++++ b/source/backend/povray.cpp	2013-12-17 16:48:46.520573975 +0100
+@@ -688,6 +688,11 @@ int main(int argc, char **argv)
  	int i = 0;
  
  	printf("Welcome to POV-Ray 3.7 SMP!\n");
 +	printf("Command line: ");
-+	for(int i = 0 ; i < argc ; i++)
++	for(int i = 0 ; i < argc ; i++) {
 +		printf("%s ", argv[i]);
++	}
 +	printf("\n");
  	fflush(stdout);
  
  //	char *nargv[2];
-Binary files a/vfe/unix/.unixconsole.cpp.kate-swp and b/vfe/unix/.unixconsole.cpp.kate-swp differ
-diff -U 3 -H -b -w -B -E -d -r -N -- a/vfe/unix/unixconsole.cpp b/vfe/unix/unixconsole.cpp
---- a/vfe/unix/unixconsole.cpp	2012-06-19 18:29:38.000000000 +0200
-+++ b/vfe/unix/unixconsole.cpp	2013-02-17 14:48:03.855597817 +0100
-@@ -426,6 +426,10 @@ int main (int argc, char **argv)
+diff -rup a/vfe/unix/unixconsole.cpp b/vfe/unix/unixconsole.cpp
+--- a/vfe/unix/unixconsole.cpp	2013-11-16 09:52:20.000000000 +0100
++++ b/vfe/unix/unixconsole.cpp	2013-12-17 16:50:32.772500176 +0100
+@@ -368,6 +368,11 @@ int main (int argc, char **argv)
  	int               argc_copy=argc; /* because it might also be updated */
  
- 	fprintf(stderr, "%s: This is a RELEASE CANDIDATE version of POV-Ray. General distribution is discouraged.\n", PACKAGE);
+ 	/*fprintf(stderr, "%s: This is a RELEASE CANDIDATE version of POV-Ray. General distribution is discouraged.\n", PACKAGE);*/
 +	fprintf(stderr, "%s", "Command line: ");
-+	for(int i = 0 ; i < argc_copy ; i++)
++	for(int i = 0 ; i < argc_copy ; i++) {
 +		fprintf(stderr, "%s ", argv_copy[i]);
++	}
 +	fprintf(stderr, "\n");
  
  	// block some signals for this thread as well as those created afterwards

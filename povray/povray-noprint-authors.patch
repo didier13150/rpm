@@ -1,7 +1,7 @@
-diff -U 3 -H -b -w -B -E -d -r -N -- a/source/frontend/renderfrontend.cpp b/source/frontend/renderfrontend.cpp
---- a/source/frontend/renderfrontend.cpp	2012-02-05 21:54:17.000000000 +0100
-+++ b/source/frontend/renderfrontend.cpp	2013-02-24 12:31:46.799751429 +0100
-@@ -219,8 +219,8 @@
+diff -rup a/source/frontend/renderfrontend.cpp b/source/frontend/renderfrontend.cpp
+--- a/source/frontend/renderfrontend.cpp	2013-11-16 09:52:20.000000000 +0100
++++ b/source/frontend/renderfrontend.cpp	2013-12-17 16:52:09.279624145 +0100
+@@ -160,8 +160,8 @@ void RenderFrontendBase::ConnectToBacken
  	if(resultobj != NULL)
  		*resultobj = result;
  
