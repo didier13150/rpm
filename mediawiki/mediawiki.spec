@@ -25,6 +25,7 @@ Source21:       CalcBitrate.js
 Source22:       CalcBitrate.php
 Source23:       SSLAuthPlugin.php
 Source24:       http://www.bomber-online.de/progs/IncludeArticle/IncludeArticle.php
+Source25:       NoTitle.php
 BuildArch:      noarch
 # to make sure the "apache" group is created before mediawiki is installed
 Requires(pre):  httpd
@@ -187,6 +188,15 @@ Group:          Development/Tools
 The Include Article extension allows any page to be shown on any other wiki
 page. An editor can choose how many letters or lines of the article are shown.
 
+%package NoTitle
+Requires:       %{name}
+Summary:        Hide Page name
+Group:          Development/Tools
+
+%description NoTitle
+Just put __NOTITLE__ on any pages where you want to hide the title.
+This extension will work for any skin that puts the title heading in an h1 
+with class="firstHeading", including the default Vector skin.
 
 %prep
 %setup -q
@@ -262,11 +272,13 @@ tar -xzf %{SOURCE15} -C %{buildroot}%{wiki_ext_path}/
 %{__mkdir_p} %{buildroot}%{wiki_ext_path}/CustomTag
 %{__mkdir_p} %{buildroot}%{wiki_ext_path}/SSL_authentification
 %{__mkdir_p} %{buildroot}%{wiki_ext_path}/IncludeArticle
+%{__mkdir_p} %{buildroot}%{wiki_ext_path}/NoTitle
 %{__cp} %{SOURCE20} %{buildroot}%{wiki_ext_path}/CustomTag/
 %{__cp} %{SOURCE21} %{buildroot}%{wiki_ext_path}/CalcBitrate/
 %{__cp} %{SOURCE22} %{buildroot}%{wiki_ext_path}/CalcBitrate/
 %{__cp} %{SOURCE23} %{buildroot}%{wiki_ext_path}/SSL_authentification/
 %{__cp} %{SOURCE24} %{buildroot}%{wiki_ext_path}/IncludeArticle/
+%{__cp} %{SOURCE25} %{buildroot}%{wiki_ext_path}/NoTitle/
 
 
 %post
@@ -295,6 +307,7 @@ rm -rf %{buildroot}
 %exclude %{wiki_ext_path}/Git2Pages
 %exclude %{wiki_ext_path}/RandomImage
 %exclude %{wiki_ext_path}/IncludeArticle
+%exclude %{wiki_ext_path}/NoTitle
 
 %files Mpdf
 %{wiki_ext_path}/Mpdf
@@ -326,7 +339,13 @@ rm -rf %{buildroot}
 %files IncludeArticle
 %{wiki_ext_path}/IncludeArticle
 
+%files NoTitle
+%{wiki_ext_path}/NoTitle
+
 %changelog
+* Mon Dec 09 2013 Didier Fabert <didier.fabert@gmail.com> - 1.21.3-2
+- Add NoTitle extension
+
 * Tue Dec 03 2013 Didier Fabert <didier.fabert@gmail.com> - 1.21.3-1
 - New upstream release.
 
