@@ -1,7 +1,7 @@
 %define githash d4c190aa68a6ae6db35c6862c57cb40f3b263c0e
 Name:     nagstamon
 Version:  0.9.11
-Release:  0.1.head%{?dist}
+Release:  0.2.head%{?dist}
 Summary:  Nagios status monitor for desktop
 Group:    Applications/Productivity
 
@@ -67,6 +67,9 @@ desktop-file-install --dir %{buildroot}/%{_datadir}/applications\
 %{python_sitelib}/%{name}*.egg-info
 
 %changelog
+* Wed Dec 18 2013 Didier Fabert <didier.fabert@gmail.com> 0.9.11-0.2.head
+- Update from git upstream
+
 * Tue Apr 30 2013 Nikita Klimov <nk@jaur.su> 0.9.9-8
 - Added gnome-python2-libegg to 'Requires' for fix incorrect display in tray
 

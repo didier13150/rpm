@@ -15,7 +15,8 @@ build:
 	do \
 		echo -e "\033[1;32mBuilding $$dir\033[0m" ; \
 		cd $$dir ; \
-		make 1>>../$(LOGFILE) 2>&1; cd .. ; \
+		make 1>>../$(LOGFILE) 2>&1; \
+		cd .. ; \
 	done
 
 srpm:

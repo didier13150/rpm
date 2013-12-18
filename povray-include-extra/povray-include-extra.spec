@@ -186,5 +186,5 @@ echo "Add the following line into your povray.conf"
 echo "read* = %{_datadir}/%{name}"
 
 %changelog
-* Mon Mar 24 2013 Didier Fabert <didier.fabert@gmail.com> 1.0.0-1
+* Sun Mar 24 2013 Didier Fabert <didier.fabert@gmail.com> 1.0.0-1
 - First Release
