@@ -11,7 +11,7 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 Source0:        http://download.wikimedia.org/mediawiki/%{majorver}/mediawiki-%{version}.tar.gz
 Source1:        mediawiki.conf
-Source2:        README.RPM
+#Source2:        README.RPM
 Source3:        mw-createinstance.in
 Source4:        mw-updateallinstances.in
 Source10:       https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Mpdf.tgz
@@ -209,8 +209,8 @@ with class="firstHeading", including the default Vector skin.
 rm -rf %{buildroot}
 
 # move away the documentation to the final folder.
-mkdir -p %{buildroot}%{_defaultdocdir}/%{name}-%{version}
-cp -p %{SOURCE2} %{buildroot}%{_defaultdocdir}/%{name}-%{version}/
+#mkdir -p %{buildroot}%{_defaultdocdir}/%{name}-%{version}
+#cp -p %{SOURCE2} %{buildroot}%{_defaultdocdir}/%{name}-%{version}/
 
 # now copy the rest to the buildroot.
 mkdir -p %{buildroot}%{_datadir}/mediawiki
