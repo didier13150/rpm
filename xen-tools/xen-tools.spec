@@ -43,7 +43,9 @@ mkdir -p man
 pushd bin
 for i in *-*[!y]
 do
-  pod2man --release=${VERSION} --official --section=8 $i ../man/$i.8
+  # Replace non-ascii character on author's firstname (quick and dirty)
+  sed -i -e 's/[S|s]téphane/Stephane/g' $i
+  pod2man --release=${version} --official --section=8 $i ../man/$i.8
 done
 popd
 for i in man/*.8
