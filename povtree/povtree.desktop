@@ -2,7 +2,7 @@
 Version=1.0
 Name=PovTree
 Exec=povtree
-Icon=system-run
+Icon=povtree
 Type=Application
 GenericName=Tree generator
 GenericName[fr]=Générateur d'arbre

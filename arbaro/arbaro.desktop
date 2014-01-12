@@ -2,7 +2,7 @@
 Version=1.0
 Name=Arbaro
 Exec=arbaro-gui
-Icon=system-run
+Icon=arbaro
 Type=Application
 GenericName=Tree generator
 GenericName[fr]=Générateur d'arbre
