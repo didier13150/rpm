@@ -14,47 +14,48 @@
 %define prg  ossec
 %define cvs  rc1
 
-Summary:     An Open Source Host-based Intrusion Detection System
-Name:        ossec-hids
-Version:     2.7
-Release:     21%{?dist}
-License:     GPLv2
-Group:       Applications/System
-Source0:     http://www.ossec.net/files/%{name}-%{version}.tar.gz
-Source1:     %{name}.service
-Source2:     %{name}.init
-Source5:     asl-shun.pl
-Source6:     ossec-hids.logrotate
-Source7:     zabbix-alert.sh
-Source8:     ossec-configure
-Source9:     ossec-hids-agent.conf
-Patch1:      syscheck-increase-sleep.patch
-Patch4:      ossec-client-conf.patch
-Patch5:      firewall-drop-update.patch
-Patch6:      disable-psql.patch
-Patch20:     ossec-hids-mysql-schema-fix1.patch
-Patch21:     ossec-hids-server-init.patch
-Patch22:     ossec-hids-2.7-duplicate-suppression-revert.patch
-Patch23:     Make.patch
-Patch24:     pam-decoder-update.patch
+Summary:          An Open Source Host-based Intrusion Detection System
+Name:             ossec-hids
+Version:          2.7.1
+Release:          1%{?dist}
+License:          GPLv2
+Group:            Applications/System
+Source0:          http://www.ossec.net/files/%{name}-%{version}.tar.gz
+Source1:          %{name}.service
+Source2:          %{name}.init
+Source5:          asl-shun.pl
+Source6:          ossec-hids.logrotate
+Source7:          zabbix-alert.sh
+Source8:          ossec-configure
+Source9:          ossec-hids-agent.conf
+Patch1:           syscheck-increase-sleep.patch
+Patch4:           ossec-client-conf.patch
+Patch5:           firewall-drop-update-2.7.1.patch
+Patch6:           disable-psql.patch
+Patch20:          ossec-hids-mysql-schema-fix1.patch
+Patch21:          ossec-hids-server-init.patch
+Patch22:          ossec-hids-2.7-duplicate-suppression-revert.patch
+Patch23:          Make.patch
+Patch24:          pam-decoder-update.patch
 
-URL:         http://www.ossec.net/
-BuildRoot:   %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+URL:              http://www.ossec.net/
+BuildRoot:        %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Requires(pre):    /usr/sbin/groupadd /usr/sbin/useradd
 
-BuildRequires: coreutils glibc-devel httpd-devel openssl-devel
-BuildRequires: mysql-devel 
+BuildRequires:    coreutils glibc-devel httpd-devel openssl-devel
+BuildRequires:    mysql-devel 
 %if 0%{?rhel} >= 6
-BuildRequires: inotify-tools-devel
+BuildRequires:    inotify-tools-devel
 %endif
+# libprelude is not available on fedora 20
 %if 0%{?fedora} >= 20
 %else
-BuildRequires: libprelude-devel
+BuildRequires:    libprelude-devel
 %endif
-BuildRequires: zlib-devel
+BuildRequires:    zlib-devel
 
-Provides: ossec = %{version}-%{release}
-Requires: inotify-tools
+Provides:         ossec = %{version}-%{release}
+Requires:         inotify-tools
 
 %description
 OSSEC is a scalable, multi-platform, open source Host-based Intrusion Detection
@@ -66,10 +67,10 @@ Solaris and Windows.
 
 This package contains common files required for all packages.
 %package client
-Summary:     The OSSEC HIDS Client
-Group:       System Environment/Daemons
-Provides:    ossec-client = %{version}-%{release}
-Requires:    %{name} = %{version}-%{release}
+Summary:          The OSSEC HIDS Client
+Group:            System Environment/Daemons
+Provides:         ossec-client = %{version}-%{release}
+Requires:         %{name} = %{version}-%{release}
 %if %{with_systemd}
 BuildRequires:    systemd
 Requires(post):   systemd
@@ -84,9 +85,9 @@ Requires(post):   /sbin/chkconfig
 Requires(preun):  /sbin/chkconfig, /sbin/service
 Requires(postun): /sbin/service
 %endif
-Conflicts:   %{name}-server
+Conflicts:        %{name}-server
 %if %{asl}
-Requires:    perl-DBD-SQLite
+Requires:         perl-DBD-SQLite
 %endif
 
 %description client
@@ -95,11 +96,11 @@ OSSEC HIDS. Install this package on every client to be
 monitored.
 
 %package server
-Summary:     The OSSEC HIDS Server
-Group:       System Environment/Daemons
-Provides:    ossec-server = %{version}-%{release}
-Requires:    %{name} = %{version}-%{release} 
-Conflicts:   %{name}-client
+Summary:          The OSSEC HIDS Server
+Group:            System Environment/Daemons
+Provides:         ossec-server = %{version}-%{release}
+Requires:         %{name} = %{version}-%{release} 
+Conflicts:        %{name}-client
 Requires(pre):    /usr/sbin/groupadd /usr/sbin/useradd
 %if %{with_systemd}
 Requires(post):   systemd
@@ -115,7 +116,7 @@ Requires(preun):  /sbin/chkconfig, /sbin/service
 Requires(postun): /sbin/service
 %endif
 %if %{asl}
-Requires:    perl-DBD-SQLite
+Requires:         perl-DBD-SQLite
 %endif
 
 %description server
@@ -128,7 +129,7 @@ log collection and alerting.
 %if %{asl}
 %patch1 -p1
 %patch4 -p0
-%patch5 -p0
+%patch5 -p1
 %patch6 -p0
 %patch20 -p1
 %patch21 -p1
@@ -549,6 +550,9 @@ exit 0
 
 
 %changelog
+* Sun Feb 02 2014 Didier Fabert <didier.fabert@gmail.com> 2.7.1-1
+- Update from upstream to 2.7.1
+
 * Mon Jul 22 2013 Didier Fabert <didier.fabert@gmail.com> 2.7-21
 - Fix permissions on logs
 - Improve logrotate

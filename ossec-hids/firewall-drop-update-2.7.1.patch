@@ -1,17 +1,17 @@
---- active-response/firewall-drop.sh		2007-11-26 06:46:04.000000000 -0500
-+++ active-response/firewall-drop.sh		2007-11-26 06:48:50.000000000 -0500
-@@ -23,6 +23,10 @@ RULEID=""
- ACTION=$1
- USER=$2
- IP=$3
+diff -rup a/active-response/firewall-drop.sh b/active-response/firewall-drop.sh
+--- a/active-response/firewall-drop.sh	2013-10-29 19:13:44.000000000 +0100
++++ b/active-response/firewall-drop.sh	2014-02-02 11:52:33.721638365 +0100
+@@ -32,7 +32,8 @@ IP=$3
+ PWD=`pwd`
+ LOCK="${PWD}/fw-drop"
+ LOCK_PID="${PWD}/fw-drop/pid"
+-
 +TIMESTAMP=`date +%s`
 +OHOME="/var/ossec/"
-+
-+
  
  LOCAL=`dirname $0`;
  cd $LOCAL
-@@ -52,9 +56,15 @@ if [ "X${UNAME}" = "XLinux" ]; then
+@@ -143,9 +144,15 @@ if [ "X${UNAME}" = "XLinux" ]; then
     if [ "x${ACTION}" = "xadd" ]; then
        ARG1="-I INPUT -s ${IP} -j DROP"
        ARG2="-I FORWARD -s ${IP} -j DROP"
