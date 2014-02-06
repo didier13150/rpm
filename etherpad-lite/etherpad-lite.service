@@ -1,0 +1,13 @@
+[Unit]
+Description=Online editor providing collaborative editing in really real-time
+After=network.target
+After=syslog.target
+
+[Service]
+Type=simple
+User=etherpad
+WorkingDirectory=/var/lib/etherpad-lite
+ExecStart=/usr/bin/node node_modules/ep_etherpad-lite/node/server.js
+
+[Install]
+WantedBy=multi-user.target
