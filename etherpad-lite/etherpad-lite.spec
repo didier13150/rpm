@@ -81,18 +81,16 @@ bin/installDeps.sh
 rm -rf %{buildroot}
 %{__mkdir_p} %{buildroot}%{_sysconfdir}/%{name}
 %{__mkdir_p} %{buildroot}%{_sysconfdir}/sysconfig
-%{__mkdir_p} %{buildroot}%{_datadir}/%{name}
 %{__mkdir_p} %{buildroot}%{_docdir}/%{name}/apidoc
 %{__mkdir_p} %{buildroot}%{_localstatedir}/lib/%{name}
-for dir in bin doc src tests tools node_modules
+%{__mkdir_p} %{buildroot}%{_localstatedir}/log/%{name}
+for dir in bin doc src tests tools node_modules out var
 do
-    %{__cp} -r ${dir} %{buildroot}%{_datadir}/%{name}/
+    %{__cp} -r ${dir} %{buildroot}%{_localstatedir}/lib/%{name}/
 done
 %{__cp} %{SOURCE3} %{buildroot}%{_sysconfdir}/sysconfig/%{name}
 %{__cp} %{SOURCE4} %{buildroot}%{_sysconfdir}/%{name}/settings.json
-pushd %{buildroot}%{_datadir}/%{name}
-ln -s %{_localstatedir}/lib/%{name} var
-ln -s %{_docdir}/%{name} out
+pushd %{buildroot}%{_localstatedir}/lib/%{name}
 ln -s %{_sysconfdir}/%{name}/settings.json
 popd
 %{__cp} -r out/doc/* %{buildroot}%{_docdir}/%{name}/
@@ -105,7 +103,7 @@ install -Dp -m0644 %{SOURCE2} %{buildroot}%{_unitdir}/%{name}.service
 %{__mkdir_p} %{buildroot}%{_initrddir}
 install -Dp -m0755 %{SOURCE1} %{buildroot}%{_initrddir}/%{name}
 %endif
-touch %{_localstatedir}/log/%{name}.log
+touch %{_localstatedir}/log/%{name}/%{name}.log
 
 %clean
 rm -rf %{buildroot}
@@ -142,7 +140,7 @@ if [ $1 -eq 0 ]; then
         /usr/sbin/userdel %{paduser} || echo "User \"%{paduser}\" could not be deleted."
     fi
     if ! /usr/bin/getent group %{padgroup} &>/dev/null; then
-        /usr/sbin/groupdel %{padgroup} || echo "Group \"%{padgroup}\" could not be     deleted."
+        /usr/sbin/groupdel %{padgroup} || echo "Group \"%{padgroup}\" could not be deleted."
     fi
 fi
 
@@ -196,11 +194,11 @@ fi
 %doc CHANGELOG.md CONTRIBUTING.md README.md
 %config(noreplace) %{_sysconfdir}/%{name}/settings.json
 %config(noreplace) %{_sysconfdir}/sysconfig/%{name}
-%{_datadir}/%{name}
 %{_docdir}/%{name}
 %exclude %{_docdir}/%{name}/api
-%attr(0755,%{paduser},%{padgroup}) %dir %{_localstatedir}/lib/%{name}
-%attr(0644,%{paduser},%{padgroup}) %{_localstatedir}/log/%{name}.log
+%defattr(-,%{paduser},%{padgroup})
+%{_localstatedir}/lib/%{name}
+%{_localstatedir}/log/%{name}
 
 %if %{with_systemd}
 %{_unitdir}/%{name}.service

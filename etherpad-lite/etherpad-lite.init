@@ -23,7 +23,7 @@
 [ "$NETWORKING" = "no" ] && exit 0
 
 progname="Etherpad Lite"
-path="/usr/share/etherpad-lite"
+path="/var/lib/etherpad-lite"
 prog="/usr/bin/node"
 parameter="node_modules/ep_etherpad-lite/node/server.js"
 log="/var/log/error.log"
