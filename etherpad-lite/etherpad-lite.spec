@@ -17,6 +17,8 @@ URL:              http://etherpad.org/
 Source0:          https://github.com/%{author}/%{name}/archive/%{version}.tar.gz
 Source1:          %{name}.init
 Source2:          %{name}.service
+Source3:          etherpad-lite.sysconfig
+Source4:          settings.json
 Group:            Applications/Internet
 BuildRoot:        %{_tmppath}/%{name}-%{version}-root
 BuildRequires:    openssl-devel
@@ -51,6 +53,7 @@ Requires(preun):  /sbin/chkconfig, /sbin/service
 Requires(postun): /sbin/service
 %endif
 
+BuildRequires:    tree
 %description
 Etherpad allows you to edit documents collaboratively in real-time, much like a
 live multi player editor that runs in your browser. Write articles, press 
@@ -72,26 +75,32 @@ API documentation for etherpad-lite
 make %{?_smp_mflags}
 bin/installDeps.sh
 %{__rm} -f start.bat
+tree
 
 %install
 rm -rf %{buildroot}
 %{__mkdir_p} %{buildroot}%{_sysconfdir}/%{name}
+%{__mkdir_p} %{buildroot}%{_sysconfdir}/sysconfig
 %{__mkdir_p} %{buildroot}%{_datadir}/%{name}
-%{__mkdir_p} %{buildroot}%{_docdir}/%{name}
+%{__mkdir_p} %{buildroot}%{_docdir}/%{name}/apidoc
 %{__mkdir_p} %{buildroot}%{_localstatedir}/lib/%{name}
-%{__cp} -r bin doc src tests tools %{buildroot}%{_datadir}/%{name}/
-%{__cp} settings.json.template %{buildroot}%{_localstatedir}/lib/%{name}/
-pushd %{buildroot}%{_localstatedir}/lib/%{name}
-for dir in bin doc out src tests tools
+for dir in bin doc src tests tools node_modules
 do
-    ln -s %{_datadir}/%{name}/${dir} .
+    %{__cp} -r ${dir} %{buildroot}%{_datadir}/%{name}/
 done
-ln -s . var
+%{__cp} %{SOURCE3} %{buildroot}%{_sysconfdir}/sysconfig/%{name}
+%{__cp} %{SOURCE4} %{buildroot}%{_datadir}/%{name}/settings.json
+pushd %{buildroot}%{_datadir}/%{name}
+ln -s %{_localstatedir}/lib/%{name} var
+ln -s %{_docdir}/%{name} out
 popd
 pushd %{buildroot}%{_sysconfdir}/%{name}
-ln -s %{_datadir}/%{name}/settings.json .
+ln -s %{_localstatedir}/lib/%{name}/settings.json .
 popd
-%{__cp} -r out/doc/* %{buildroot}%{_docdir}/%{name}/
+%{__cp} -r out/doc/apidoc/* %{buildroot}%{_docdir}/%{name}/apidoc/
+%{__cp} -r out/doc/assets %{buildroot}%{_docdir}/%{name}/
+%{__cp} -r out/doc/easysync %{buildroot}%{_docdir}/%{name}/
+%{__cp} -r out/doc/*.html %{buildroot}%{_docdir}/%{name}/
 %if %{with_systemd}
 # Unit file
 %{__mkdir_p} %{buildroot}%{_unitdir}
@@ -192,13 +201,19 @@ fi
 %attr(0755,%{paduser},%{padgroup}) %dir %{_localstatedir}/lib/%{name}
 %{_localstatedir}/lib/%{name}/*
 %config(noreplace) %{_sysconfdir}/%{name}/settings.json
+%{_docdir}/%{name}
+%exclude %{_docdir}/%{name}/apidoc
 %doc CHANGELOG.md CONTRIBUTING.md README.md
+%{_sysconfdir}/sysconfig/%{name}
 %if %{with_systemd}
 %{_unitdir}/%{name}.service
 %else
 %attr(0755,root,root) %{_initrddir}/%{name}
 %endif
 
+%files apidoc
+%defattr(-,root,root)
+%{_docdir}/%{name}/apidoc
 
 %changelog
 * Thu Feb 06 2014 Didier Fabert <didier.fabert@gmail.com> 1.3.0-1

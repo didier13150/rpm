@@ -6,8 +6,9 @@ After=syslog.target
 [Service]
 Type=simple
 User=etherpad
+EnvironmentFile=/etc/sysconfig/etherpad-lite
 WorkingDirectory=/var/lib/etherpad-lite
-ExecStart=/usr/bin/node node_modules/ep_etherpad-lite/node/server.js
+ExecStart=/usr/bin/node src/node/server.js
 
 [Install]
 WantedBy=multi-user.target

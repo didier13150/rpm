@@ -1,0 +1,7 @@
+NODE_PATH=/var/lib/etherpad-lite/node_modules
+
+# Set to 1 to load modules in their own global contexts.
+#NODE_MODULE_CONTEXTS=1
+
+# Set to 1 to disable colors in the REPL
+#NODE_DISABLE_COLORS=1

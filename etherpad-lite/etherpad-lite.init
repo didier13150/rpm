@@ -4,7 +4,7 @@
 #
 # chkconfig: - 99 36
 # Default-Start: 2 3 4 5
-# Default-Stop: 0 1 2 3 4 6
+# Default-Stop: 0 1 6
 # Required-Start:
 # description: etherpad lite is a collaboration editor
 # processname: node
@@ -18,19 +18,23 @@
 # Source networking configuration.
 . /etc/sysconfig/network
 
+
 # Check that networking is up.
 [ "$NETWORKING" = "no" ] && exit 0
 
 progname="Etherpad Lite"
-path="/var/lib/etherpad-lite"
+path="/usr/share/etherpad-lite"
 prog="/usr/bin/node"
-parameter="node_modules/ep_etherpad-lite/node/server.js"
+parameter="src/node/server.js"
 log="/var/log/error.log"
 conf="/etc/settings.json"
 user="etherpad"
-lockfile="/var/lock/subsys/etherpad-light"
+lockfile="/var/lock/subsys/etherpad-lite"
 
 logpath=$(dirname $log)
+
+# Source our configuration
+. /etc/sysconfig/etherpad-lite
 
 start() {
         [ -x $prog ] || exit 5
@@ -40,7 +44,7 @@ start() {
         chown $user $log
 
         echo -n $"Starting $progname: "
-        daemon --user=$user "cd $path; $prog $parameter >>$log &"
+        daemon --user=$user "cd $path ; $prog $parameter 1>>$log 2>&1 &"
         retval=$?
         echo
         [ $retval -eq 0 ] && touch $lockfile
