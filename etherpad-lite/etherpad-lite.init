@@ -25,7 +25,7 @@
 progname="Etherpad Lite"
 path="/usr/share/etherpad-lite"
 prog="/usr/bin/node"
-parameter="src/node/server.js"
+parameter="node_modules/ep_etherpad-lite/node/server.js"
 log="/var/log/error.log"
 conf="/etc/settings.json"
 user="etherpad"

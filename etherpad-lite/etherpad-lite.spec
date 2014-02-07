@@ -22,6 +22,8 @@ Source4:          settings.json
 Group:            Applications/Internet
 BuildRoot:        %{_tmppath}/%{name}-%{version}-root
 BuildRequires:    openssl-devel
+BuildRequires:    mysql-devel
+BuildRequires:    postgresql-devel
 BuildRequires:    make
 BuildRequires:    gcc-c++
 BuildRequires:    python
@@ -53,7 +55,6 @@ Requires(preun):  /sbin/chkconfig, /sbin/service
 Requires(postun): /sbin/service
 %endif
 
-BuildRequires:    tree
 %description
 Etherpad allows you to edit documents collaboratively in real-time, much like a
 live multi player editor that runs in your browser. Write articles, press 
@@ -75,7 +76,6 @@ API documentation for etherpad-lite
 make %{?_smp_mflags}
 bin/installDeps.sh
 %{__rm} -f start.bat
-tree
 
 %install
 rm -rf %{buildroot}
@@ -89,18 +89,13 @@ do
     %{__cp} -r ${dir} %{buildroot}%{_datadir}/%{name}/
 done
 %{__cp} %{SOURCE3} %{buildroot}%{_sysconfdir}/sysconfig/%{name}
-%{__cp} %{SOURCE4} %{buildroot}%{_datadir}/%{name}/settings.json
+%{__cp} %{SOURCE4} %{buildroot}%{_sysconfdir}/%{name}/settings.json
 pushd %{buildroot}%{_datadir}/%{name}
 ln -s %{_localstatedir}/lib/%{name} var
 ln -s %{_docdir}/%{name} out
+ln -s %{_sysconfdir}/%{name}/settings.json
 popd
-pushd %{buildroot}%{_sysconfdir}/%{name}
-ln -s %{_localstatedir}/lib/%{name}/settings.json .
-popd
-%{__cp} -r out/doc/apidoc/* %{buildroot}%{_docdir}/%{name}/apidoc/
-%{__cp} -r out/doc/assets %{buildroot}%{_docdir}/%{name}/
-%{__cp} -r out/doc/easysync %{buildroot}%{_docdir}/%{name}/
-%{__cp} -r out/doc/*.html %{buildroot}%{_docdir}/%{name}/
+%{__cp} -r out/doc/* %{buildroot}%{_docdir}/%{name}/
 %if %{with_systemd}
 # Unit file
 %{__mkdir_p} %{buildroot}%{_unitdir}
@@ -110,6 +105,7 @@ install -Dp -m0644 %{SOURCE2} %{buildroot}%{_unitdir}/%{name}.service
 %{__mkdir_p} %{buildroot}%{_initrddir}
 install -Dp -m0755 %{SOURCE1} %{buildroot}%{_initrddir}/%{name}
 %endif
+touch %{_localstatedir}/log/%{name}.log
 
 %clean
 rm -rf %{buildroot}
@@ -197,14 +193,15 @@ fi
 
 %files
 %defattr(-,root,root)
-%{_datadir}/%{name}
-%attr(0755,%{paduser},%{padgroup}) %dir %{_localstatedir}/lib/%{name}
-%{_localstatedir}/lib/%{name}/*
-%config(noreplace) %{_sysconfdir}/%{name}/settings.json
-%{_docdir}/%{name}
-%exclude %{_docdir}/%{name}/apidoc
 %doc CHANGELOG.md CONTRIBUTING.md README.md
-%{_sysconfdir}/sysconfig/%{name}
+%config(noreplace) %{_sysconfdir}/%{name}/settings.json
+%config(noreplace) %{_sysconfdir}/sysconfig/%{name}
+%{_datadir}/%{name}
+%{_docdir}/%{name}
+%exclude %{_docdir}/%{name}/api
+%attr(0755,%{paduser},%{padgroup}) %dir %{_localstatedir}/lib/%{name}
+%attr(0644,%{paduser},%{padgroup}) %{_localstatedir}/log/%{name}.log
+
 %if %{with_systemd}
 %{_unitdir}/%{name}.service
 %else
@@ -213,7 +210,7 @@ fi
 
 %files apidoc
 %defattr(-,root,root)
-%{_docdir}/%{name}/apidoc
+%{_docdir}/%{name}/api
 
 %changelog
 * Thu Feb 06 2014 Didier Fabert <didier.fabert@gmail.com> 1.3.0-1
