@@ -19,11 +19,13 @@ Declare our repository to the current mock file by adding following lines
 
     [didier]
     name=didier
-    baseurl=http://localhost/repository/
+    baseurl=http://localhost/repository/fc$releasever
     cost=500
 
 *  Fedora 19 x86_64 -> /etc/mock/fedora-19-x86_64.cfg
 *  Fedora 19 i386 -> /etc/mock/fedora-19-i386.cfg
+*  Fedora 20 x86_64 -> /etc/mock/fedora-20-x86_64.cfg
+*  Fedora 20 i386 -> /etc/mock/fedora-20-i386.cfg
 
 then on each directory just type
 
