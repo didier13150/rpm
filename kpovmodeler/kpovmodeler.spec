@@ -1,24 +1,19 @@
 %define svnrevision 1305095
 Name:           kpovmodeler
 Version:        1.1.3
-Release:        0.2.svn%{svnrevision}%{?dist}
+Release:        0.3.qt5%{?dist}
 Summary:        KDE Graphical 3D modeler for POV-Ray
 License:        GPLv2
 URL:            http://www.kpovmodeler.org
-Group:         Applications/Multimedia
-# The source for this package was pulled from upstream's vcs.  Use the
-# following commands to generate the tarball:
-#  svn export -r 1305095 svn://anonsvn.kde.org/home/kde/trunk/extragear/graphics/kpovmodeler kpovmodeler-1.1.3
-#  tar -czvf kpovmodeler-1.1.3.tar.gz kpovmodeler-1.1.3
-Source0:        %{name}-%{version}.tar.gz
-# Remove radiosity option from command line ( removed option with povray > 3.6 )
-Patch0:         kpovmodeler-povray37-no-radiosity-opt.patch
-# Add include path for freetype2 (ftheader.h moved from freetype to freetype-devel)
-Patch1:         kpovmodeler-freetype2-include-path.patch
+Group:          Applications/Multimedia
+# The source for this package was given from non-official upstream.
+# Downloaded from https://app.box.com/s/8rn3tl8lglmvoef3tqwl
+Source0:        %{name}-qt5.tar.gz
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires:  cmake, kdelibs-devel, freetype-devel
 Requires:       povray, freetype
+Obsoletes:      %{name} <= %{version}-0.2.svn1305095
 
 %description
 KPovModeler is a modeling and composition program for creating POV-Ray scenes
@@ -30,9 +25,7 @@ the case for KPovModeler, which allows you to use all the features of POV-Ray
 through the translation of POV-Ray language into a graphical tree. 
 
 %prep
-%setup -q
-%patch0 -p0
-%patch1 -p0
+%setup -qn %{name}-qt5
 
 %build
 cmake . \
@@ -66,8 +59,11 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
-* Sat Jul 21 2013 Didier Fabert <didier.fabert@gmail.com> 1.1.3-0.2.svn1305095
-- Add freetype-devel for build requires
+* Sat Feb 08 2014 Didier Fabert <didier.fabert@gmail.com> 1.1.3-0.qt5
+- reworked for qt5, qt3 support removed from qt code, kpart use almost them by eticre
+
+* Sun Jul 21 2013 Didier Fabert <didier.fabert@gmail.com> 1.1.3-0.2.svn1305095
+- Add freetype-devel to build requires
 
 * Sat Jun 15 2013 Didier Fabert <didier.fabert@gmail.com> 1.1.3-0.1.svn1305095
 - First Release
