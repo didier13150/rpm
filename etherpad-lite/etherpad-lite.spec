@@ -19,6 +19,7 @@ Source1:          %{name}.init
 Source2:          %{name}.service
 Source3:          etherpad-lite.sysconfig
 Source4:          settings.json
+Patch0:           conf-sysVinit.patch
 Group:            Applications/Internet
 BuildRoot:        %{_tmppath}/%{name}-%{version}-root
 BuildRequires:    openssl-devel
@@ -61,16 +62,21 @@ live multi player editor that runs in your browser. Write articles, press
 releases, to-do lists, etc. together with your friends, fellow students or 
 colleagues, all working on the same document at the same time.
 
-%package apidoc
+%package doc
 Group:            Documentation
-Summary:          %{name} API docs
+Summary:          documentation for etherpad-lite %{version}-%{release}
 Requires:         %{name} = %{version}-%{release}
 
-%description apidoc
-API documentation for etherpad-lite
+%description doc
+HTML documentation for etherpad-lite
 
 %prep
 %setup -qn %{name}-%{version}
+%{__cp} %{SOURCE4} .
+%if %{with_systemd}
+%else
+%patch0 -p0
+%endif
 
 %build 
 make %{?_smp_mflags}
@@ -81,29 +87,29 @@ bin/installDeps.sh
 rm -rf %{buildroot}
 %{__mkdir_p} %{buildroot}%{_sysconfdir}/%{name}
 %{__mkdir_p} %{buildroot}%{_sysconfdir}/sysconfig
-%{__mkdir_p} %{buildroot}%{_docdir}/%{name}/apidoc
+%{__mkdir_p} %{buildroot}%{_docdir}/%{name}
 %{__mkdir_p} %{buildroot}%{_localstatedir}/lib/%{name}
-%{__mkdir_p} %{buildroot}%{_localstatedir}/log/%{name}
-for dir in bin doc src tests tools node_modules out var
+for dir in bin src tests tools node_modules var
 do
     %{__cp} -r ${dir} %{buildroot}%{_localstatedir}/lib/%{name}/
 done
 %{__cp} %{SOURCE3} %{buildroot}%{_sysconfdir}/sysconfig/%{name}
-%{__cp} %{SOURCE4} %{buildroot}%{_sysconfdir}/%{name}/settings.json
 pushd %{buildroot}%{_localstatedir}/lib/%{name}
 ln -s %{_sysconfdir}/%{name}/settings.json
 popd
 %{__cp} -r out/doc/* %{buildroot}%{_docdir}/%{name}/
+install -Dp -m0644 settings.json %{buildroot}%{_sysconfdir}/%{name}/settings.json
 %if %{with_systemd}
-# Unit file
+# Unit file. Logs are managed by journalctl
 %{__mkdir_p} %{buildroot}%{_unitdir}
 install -Dp -m0644 %{SOURCE2} %{buildroot}%{_unitdir}/%{name}.service
 %else
-# Init script
+# Init script and log file
 %{__mkdir_p} %{buildroot}%{_initrddir}
+%{__mkdir_p} %{buildroot}%{_localstatedir}/log/%{name}
 install -Dp -m0755 %{SOURCE1} %{buildroot}%{_initrddir}/%{name}
+touch %{buildroot}%{_localstatedir}/log/%{name}/%{name}.log
 %endif
-touch %{_localstatedir}/log/%{name}/%{name}.log
 
 %clean
 rm -rf %{buildroot}
@@ -157,6 +163,27 @@ if [ $1 = 1 ]; then
 %endif
 fi
 %endif
+# Generate certicates
+FQDN=`hostname --fqdn`
+if [ "x${FQDN}" = "x" ]; then
+    FQDN=localhost.localdomain
+fi
+if [ ! -f %{_localstatedir}/lib/%{name}/%{name}.key ] ; then
+%{_bindir}/openssl genrsa -rand /proc/apm:/proc/cpuinfo:/proc/dma:/proc/filesystems:/proc/interrupts:/proc/ioports:/proc/pci:/proc/rtc:/proc/uptime 1024 > %{_localstatedir}/lib/%{name}/%{name}.key 2> /dev/null
+fi
+if [ ! -f %{_localstatedir}/lib/%{name}/%{name}.crt ] ; then
+cat << EOF | %{_bindir}/openssl req -new -key %{_localstatedir}/lib/%{name}/%{name}.key -x509 -days 365 -out %{_localstatedir}/lib/%{name}/%{name}.crt 2>/dev/null
+FR
+Languedoc Roussilon
+Beaucaire
+%{name}
+Home
+${FQDN}
+root@${FQDN}
+EOF
+fi
+chown %{paduser}:%{padgroup} %{_localstatedir}/lib/%{name}/%{name}.key
+chown %{paduser}:%{padgroup} %{_localstatedir}/lib/%{name}/%{name}.crt
 
 %preun
 %if 0%{?systemd_preun:1}
@@ -171,6 +198,9 @@ if [ "$1" = 0 ] ; then
     /sbin/service %{name} stop > /dev/null 2>&1
     /sbin/chkconfig --del %{name}
 %endif
+else
+    rm -f %{_localstatedir}/lib/%{name}/%{name}.key
+    rm -f %{_localstatedir}/lib/%{name}/%{name}.crt
 fi
 exit 0
 %endif
@@ -192,23 +222,23 @@ fi
 %files
 %defattr(-,root,root)
 %doc CHANGELOG.md CONTRIBUTING.md README.md
-%config(noreplace) %{_sysconfdir}/%{name}/settings.json
 %config(noreplace) %{_sysconfdir}/sysconfig/%{name}
-%{_docdir}/%{name}
-%exclude %{_docdir}/%{name}/api
 %defattr(-,%{paduser},%{padgroup})
+# Settings can be edited online
+%config(noreplace) %{_sysconfdir}/%{name}/settings.json
 %{_localstatedir}/lib/%{name}
-%{_localstatedir}/log/%{name}
 
 %if %{with_systemd}
 %{_unitdir}/%{name}.service
 %else
 %attr(0755,root,root) %{_initrddir}/%{name}
+%defattr(-,%{paduser},%{padgroup})
+%{_localstatedir}/log/%{name}
 %endif
 
-%files apidoc
+%files doc
 %defattr(-,root,root)
-%{_docdir}/%{name}/api
+%{_docdir}/%{name}
 
 %changelog
 * Thu Feb 06 2014 Didier Fabert <didier.fabert@gmail.com> 1.3.0-1

@@ -17,7 +17,7 @@
 
   // Session Key, used for reconnecting user sessions
   // Set this to a secure string at least 10 characters long.  Do not share this value.
-  "sessionKey" : "",
+  "sessionKey" : "a56bfbc9-2050-4568-869b-ded7f30b7b50",
 
   /*  
   // Node native SSL support
@@ -27,8 +27,8 @@
   // so that the Etherpad server can access them
 
   "ssl" : {
-            "key"  : "/path-to-your/epl-server.key",
-            "cert" : "/path-to-your/epl-server.crt"
+            "key"  : "/var/lib/etherpad-lite/etherpad-lite.key",
+            "cert" : "/var/lib/etherpad-lite/etherpad-lite.crt"
           },
 
   */
@@ -87,18 +87,18 @@
   
   /* Users for basic authentication. is_admin = true gives access to /admin.
      If you do not uncomment this, /admin will not be available! */
-  /*
+  
   "users": {
     "admin": {
-      "password": "changeme1",
+      "password": "admin",
       "is_admin": true
     },
     "user": {
-      "password": "changeme1",
+      "password": "user",
       "is_admin": false
     }
   },
-  */
+  
 
   // restrict socket.io transport methods
   "socketTransportProtocols" : ["xhr-polling", "jsonp-polling", "htmlfile"],
@@ -116,7 +116,7 @@
 	    }
     /*
 	  , { "type": "file"
-      , "filename": "your-log-file-here.log"
+      , "filename": "/var/log/etherpad-lite/etherpad-lite.log"
       , "maxLogSize": 1024
       , "backups": 3 // how many log files there're gonna be at max
       //, "category": "test" // only log a specific category
