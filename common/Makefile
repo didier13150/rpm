@@ -7,12 +7,22 @@ SRCDEFINES := --define "_source_filedigest_algorithm 1" \
               --define "_binary_filedigest_algorithm 1"
 
 ARCH := $(shell uname -i)
-DISTRIB := $(shell source /etc/os-release && echo $${ID}-$${VERSION_ID})
+DISTNAME := $(shell source /etc/os-release && echo $${ID})
+DISTRELEASE := $(shell source /etc/os-release && echo $${VERSION_ID})
+DISTRIB := $(DISTNAME)-$(DISTRELEASE)
 TARGET := $(DISTRIB)-$(ARCH)
 SRCURIS := $(shell rpmspec -P $(NAME).spec | grep -i '^source' | awk -F ':' '{print $$2":"$$3}' | tr -d ' ')
 
 all: fedora
 fedora: clean sources srpm rpmlint build
+centos: clean sources srpm rpmlint el6-build
+
+showvars:
+	@echo "ARCH:        $(ARCH)"
+	@echo "DISTNAME:    $(DISTNAME)"
+	@echo "DISTRELEASE: $(DISTRELEASE)"
+	@echo "DISTRIB:     $(DISTRIB)"
+	@echo "TARGET:      $(TARGET)"
 
 clean:
 	@echo -e "\033[1;32mCleaning" $(shell basename $(SRCDIR) ) "directory \033[0m"
@@ -20,7 +30,7 @@ clean:
 		*~ \
 		$(SRCDIR)/{build,root,state,available_pkgs,installed_pkgs}.log \
 		$(SRCDIR)/*.rpm \
-	@rm -rf $(SRCDIR)/result
+		$(SRCDIR)/result/$(NAME)*.src.rpm
 
 rpmlint:
 	@echo -e "\033[1;32mChecking "$(NAME)".spec file\033[0m"
@@ -32,12 +42,20 @@ srpm:
 
 build: srpm
 	@echo -e "\033[1;32mBuilding RPMs files\033[0m"
+	@rm -rf $(SRCDIR)/result
 	@mkdir -p $(SRCDIR)/result
 	@mock -r '$(TARGET)' --resultdir=$(SRCDIR)/result rebuild $(SRCDIR)/result/$(NAME)*.src.rpm
 
+el6-build: srpm
+	@echo -e "\033[1;32mBuild RPMs files for CentOS 6\033[0m"
+	@rm -rf $(SRCDIR)/result-el6
+	@mkdir -p $(SRCDIR)/result-el6
+	@mock -r 'centos-6-$(ARCH)' --resultdir=$(SRCDIR)/result-el6 rebuild $(SRCDIR)/result/$(NAME)*.src.rpm
+
 help:
 	@echo -e "\033[1;32mAvailable targets:\033[0m"
-	@echo " - all:       Building SRPM and RPMs (default target: ie when make is called without arg)"
+	@echo " - fedora:    Building SRPM and RPMs for current Fedora release"
+	@echo " - centos:    Building SRPM and RPMs for CentOS 6"
 	@echo " - rpmlint:   Test spec and SRPM files"
 	@echo " - srpm:      Make SRPM"
 	@echo " - build:     Make RPMs from SRPM"
