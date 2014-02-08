@@ -30,7 +30,8 @@ clean:
 		*~ \
 		$(SRCDIR)/{build,root,state,available_pkgs,installed_pkgs}.log \
 		$(SRCDIR)/*.rpm \
-		$(SRCDIR)/result/$(NAME)*.src.rpm
+		$(SRCDIR)/result/$(NAME)*.src.rpm \
+		$(SRCDIR)/result/*log
 
 rpmlint:
 	@echo -e "\033[1;32mChecking "$(NAME)".spec file\033[0m"
@@ -42,8 +43,6 @@ srpm:
 
 build: srpm
 	@echo -e "\033[1;32mBuilding RPMs files\033[0m"
-	@rm -rf $(SRCDIR)/result
-	@mkdir -p $(SRCDIR)/result
 	@mock -r '$(TARGET)' --resultdir=$(SRCDIR)/result rebuild $(SRCDIR)/result/$(NAME)*.src.rpm
 
 el6-build: srpm
