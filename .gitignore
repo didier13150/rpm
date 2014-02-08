@@ -37,3 +37,4 @@ Nagstamon
 fracplanet/fracplanet-hi*.png
 *.pyc
 channel.xml
+*-swp
