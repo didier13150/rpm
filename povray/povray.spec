@@ -74,15 +74,4 @@ rm -rf %{buildroot}
 - Print command line on stdout
 
 * Sun Jul 15 2012 Didier Fabert <didier.fabert@gmail.com> 3.7.0.RC6-1
-- Update to 3.7.0.RC6
-
-* Fri Jun 08 2007 <roma@lcg.ufrj.br> 3.6.1-2
-- Included missing BRs.
-
-* Wed Aug 02 2006 <roma@lcg.ufrj.br> 3.6.1-1
-- Rebuilt for Fedora 5.
-
-* Thu Nov  4 2004 <fenn@stanford.edu> 3.6.1-0
-- RPM based off subpop.net FC1 3.50c package
-- inc. Wolfgang Wieser's patchset 
-  (http://www.cip.physik.uni-muenchen.de/~wwieser/render/povray/patches/)
+- First import 3.7.0.RC6
