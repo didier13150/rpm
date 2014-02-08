@@ -12,7 +12,8 @@
   "favicon": "favicon.ico",
   
   //IP and port which etherpad should bind at
-  "ip": "0.0.0.0",
+  //"ip": "0.0.0.0",
+  "ip": "127.0.0.1",
   "port" : 9001,
 
   // Session Key, used for reconnecting user sessions
@@ -25,13 +26,14 @@
   //
   // make sure to have the minimum and correct file access permissions set
   // so that the Etherpad server can access them
+  */
 
   "ssl" : {
             "key"  : "/var/lib/etherpad-lite/etherpad-lite.key",
             "cert" : "/var/lib/etherpad-lite/etherpad-lite.crt"
           },
 
-  */
+  
 
   //The Type of the database. You can choose between dirty, postgres, sqlite and mysql
   //You shouldn't use "dirty" for for anything else than testing or development

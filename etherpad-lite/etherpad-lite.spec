@@ -9,7 +9,7 @@
 
 Name:             etherpad-lite
 Version:          1.3.0
-Release:          1%{?dist}
+Release:          2%{?dist}
 License:          ASL 2.0
 Summary:          Online editor providing collaborative editing in really real-time
 BuildRoot:        %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
@@ -241,5 +241,8 @@ fi
 %{_docdir}/%{name}
 
 %changelog
+* Sat Feb 08 2014 Didier Fabert <didier.fabert@gmail.com> 1.3.0-2
+- Restrict to localhost and active ssl on config
+
 * Thu Feb 06 2014 Didier Fabert <didier.fabert@gmail.com> 1.3.0-1
 - First release
