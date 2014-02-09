@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Version=0.60
+Name=NGPlant
+GenericName=Plant generation for POV-Ray
+GenericName[fr]=Générateur de plantes pour POV-Ray
+Exec=ngplant
+Icon=/usr/share/icons/ngplant.xpm
+Terminal=false
+MimeType=image/png
+Categories=Graphics;3DGraphics;
+StartupNotify=true
