@@ -172,9 +172,12 @@ if [ $1 = 1 ]; then
 fi
 %endif
 # Generate certicates
-FQDN=`hostname --fqdn`
+FQDN=`hostname --fqdn` 2>/dev/null
 if [ "x${FQDN}" = "x" ]; then
-    FQDN=localhost.localdomain
+    FQDN=`hostname` 2>/dev/null
+fi
+if [ "x${FQDN}" = "x" ]; then
+    FQDN="localhost.localdomain"
 fi
 if [ ! -f %{_localstatedir}/lib/%{name}/%{name}.key ] ; then
 %{_bindir}/openssl genrsa -rand /proc/apm:/proc/cpuinfo:/proc/dma:/proc/filesystems:/proc/interrupts:/proc/ioports:/proc/pci:/proc/rtc:/proc/uptime 1024 > %{_localstatedir}/lib/%{name}/%{name}.key 2> /dev/null
