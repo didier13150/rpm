@@ -77,11 +77,19 @@ HTML documentation for etherpad-lite
 %else
 %patch0 -p0
 %endif
+# Remove win parts
+%{__rm} -f start.bat
+%{__rm} -f bin/buildForWindows.sh
+%{__rm} -f bin/installOnWindows.bat
 
 %build 
 make %{?_smp_mflags}
 bin/installDeps.sh
-%{__rm} -f start.bat
+# Workaround: Some files have /usr/bin/bash for interpreter
+for file in `grep -R '/usr/bin/bash' * | awk -F ':' '{print $1}'`
+do
+    sed -i -e 's#/usr/bin/bash#/bin/bash#g' ${file}
+done
 
 %install
 rm -rf %{buildroot}
