@@ -21,6 +21,7 @@ Source3:          etherpad-lite.sysconfig
 Source4:          settings.json
 Patch0:           conf-sysVinit.patch
 Group:            Applications/Internet
+BuildArch:        noarch
 BuildRoot:        %{_tmppath}/%{name}-%{version}-root
 BuildRequires:    openssl-devel
 BuildRequires:    mysql-devel
@@ -84,12 +85,6 @@ HTML documentation for etherpad-lite
 
 %build 
 make %{?_smp_mflags}
-bin/installDeps.sh
-# Workaround: Some files have /usr/bin/bash for interpreter
-for file in `grep -R '/usr/bin/bash' * | awk -F ':' '{print $1}'`
-do
-    sed -i -e 's#/usr/bin/bash#/bin/bash#g' ${file}
-done
 
 %install
 rm -rf %{buildroot}
@@ -97,7 +92,7 @@ rm -rf %{buildroot}
 %{__mkdir_p} %{buildroot}%{_sysconfdir}/sysconfig
 %{__mkdir_p} %{buildroot}%{_docdir}/%{name}
 %{__mkdir_p} %{buildroot}%{_localstatedir}/lib/%{name}
-for dir in bin src tests tools node_modules var
+for dir in bin src tests tools var
 do
     %{__cp} -r ${dir} %{buildroot}%{_localstatedir}/lib/%{name}/
 done
@@ -252,6 +247,9 @@ fi
 %{_docdir}/%{name}
 
 %changelog
+* Mon Feb 10 2014 Didier Fabert <didier.fabert@gmail.com> 1.3.0-3
+- No arch package (remove installDeps.sh running)
+
 * Sat Feb 08 2014 Didier Fabert <didier.fabert@gmail.com> 1.3.0-2
 - Restrict to localhost and active ssl on config
 
