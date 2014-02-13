@@ -21,6 +21,7 @@ Source3:          etherpad-lite.sysconfig
 Source4:          settings.json
 Patch0:           conf-sysVinit.patch
 Group:            Applications/Internet
+BuildArch:        noarch
 BuildRoot:        %{_tmppath}/%{name}-%{version}-root
 BuildRequires:    openssl-devel
 BuildRequires:    mysql-devel
@@ -77,11 +78,13 @@ HTML documentation for etherpad-lite
 %else
 %patch0 -p0
 %endif
+# Remove win parts
+%{__rm} -f start.bat
+%{__rm} -f bin/buildForWindows.sh
+%{__rm} -f bin/installOnWindows.bat
 
 %build 
 make %{?_smp_mflags}
-bin/installDeps.sh
-%{__rm} -f start.bat
 
 %install
 rm -rf %{buildroot}
@@ -89,7 +92,7 @@ rm -rf %{buildroot}
 %{__mkdir_p} %{buildroot}%{_sysconfdir}/sysconfig
 %{__mkdir_p} %{buildroot}%{_docdir}/%{name}
 %{__mkdir_p} %{buildroot}%{_localstatedir}/lib/%{name}
-for dir in bin src tests tools node_modules var
+for dir in bin src tests tools var
 do
     %{__cp} -r ${dir} %{buildroot}%{_localstatedir}/lib/%{name}/
 done
@@ -164,9 +167,12 @@ if [ $1 = 1 ]; then
 fi
 %endif
 # Generate certicates
-FQDN=`hostname --fqdn`
+FQDN=`hostname --fqdn` 2>/dev/null
 if [ "x${FQDN}" = "x" ]; then
-    FQDN=localhost.localdomain
+    FQDN=`hostname` 2>/dev/null
+fi
+if [ "x${FQDN}" = "x" ]; then
+    FQDN="localhost.localdomain"
 fi
 if [ ! -f %{_localstatedir}/lib/%{name}/%{name}.key ] ; then
 %{_bindir}/openssl genrsa -rand /proc/apm:/proc/cpuinfo:/proc/dma:/proc/filesystems:/proc/interrupts:/proc/ioports:/proc/pci:/proc/rtc:/proc/uptime 1024 > %{_localstatedir}/lib/%{name}/%{name}.key 2> /dev/null
@@ -241,6 +247,9 @@ fi
 %{_docdir}/%{name}
 
 %changelog
+* Mon Feb 10 2014 Didier Fabert <didier.fabert@gmail.com> 1.3.0-3
+- No arch package (remove installDeps.sh running)
+
 * Sat Feb 08 2014 Didier Fabert <didier.fabert@gmail.com> 1.3.0-2
 - Restrict to localhost and active ssl on config
 

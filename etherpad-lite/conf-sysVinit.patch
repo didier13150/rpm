@@ -1,23 +1,24 @@
-diff -u settings.json settings.json
---- settings.json	2014-02-07 20:42:19.000000000 +0100
-+++ settings.json	2014-02-07 20:43:43.477203646 +0100
-@@ -111,16 +111,17 @@
+--- settings.json	2014-02-10 12:15:58.682099663 +0100
++++ settings.json.1	2014-02-10 12:16:41.486572732 +0100
+@@ -113,17 +113,17 @@
    // You can add as many appenders as you want here:
    "logconfig" :
- 	{ "appenders": [
-+	    /*
- 	    { "type": "console" 
- 	    //, "category": "access"// only logs pad access
- 	    }
+   { "appenders": [
+-    
++    /*
+     { "type": "console" 
+     //, "category": "access"// only logs pad access
+     }
 -    /*
+-    , { "type": "file"
 +    */
- 	  , { "type": "file"
++    { "type": "file"
        , "filename": "/var/log/etherpad-lite/etherpad-lite.log"
-       , "maxLogSize": 1024
-       , "backups": 3 // how many log files there're gonna be at max
+       //, "maxLogSize": 1024
+       //, "backups": 3 // how many log files there're gonna be at max
        //, "category": "test" // only log a specific category
--      }*/
-+      }
+-    }*/
++    }
      /*
- 	  , { "type": "logLevelFilter"
- 	    , "level": "warn" // filters out all log messages that have a lower level than "error"
+     , { "type": "logLevelFilter"
+       , "level": "warn" // filters out all log messages that have a lower level than "error"
