@@ -1,0 +1,36 @@
+diff -U 3 -H -b -w -B -E -d -r -N -- a/planet.inc b/planet.inc
+--- a/planet.inc	1998-04-13 13:30:50.000000000 +0200
++++ b/planet.inc	2014-02-22 21:58:59.118172483 +0100
+@@ -141,32 +141,9 @@
+   rotate x*-10
+ }
+ 
+-//----------------------------------------------------------------------
+-// A thin blue halo, becoming lighter as it approaches the planet's
+-// surface.
+-//
+-#declare PlanetAtmosphere = sphere { <0,0,0>, 1
+-  pigment { colour rgbt <1,1,1,1> }
+-  halo {
+-    glowing
+-    spherical_mapping
+-    linear
+-    colour_map {
+-      [0.00 colour rgbt <0,0,2,1>]
+-      [0.05 colour rgbt <2,2,2,0>]
+-      [1.00 colour rgbt <2,2,2,0>]
+-    }
+-    samples 10
+-  }
+-  hollow
+-  scale 1.05
+-}  
+-
+-
+ #declare Planet = union {
+   object { PlanetSphere }
+   #ifndef (Quick)
+     object { PlanetCloudSphere0 }
+-    object { PlanetAtmosphere }
+   #end
+ }
