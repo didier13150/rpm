@@ -1,0 +1,8 @@
+[didier]
+name=Didier Personnal repository for Fedora $releasever - $basearch
+baseurl=http://localhost/repository/fc$releasever/
+enabled=1
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-didier
+priority=10
+skip_if_unavailable=True

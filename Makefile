@@ -8,9 +8,10 @@ TARGET := $(DISTRIB)-$(ARCH)
 HOSTNAME := $(shell hostname --fqdn)
 REPOPATH := /var/www/fedora-repo
 REPODIR := $(REPOPATH)/fc$(DISTRELEASE)
+rpm2sign := $(shell find $(REPOPATH) -name '*.rpm' -exec rpm --checksig {} \; | grep -v pgp | awk -F ':' '{print $$1}')
 
 all: clean build repo
-repo: dirlist repository repoview sign
+repo: dirlist copy sign refresh repoview
 
 build:
 	@rm -f $(LOGFILE)
@@ -32,8 +33,8 @@ clean:
 rpmlint:
 	@for dir in $(PKGS) ; do pushd $$dir 1>/dev/null 2>&1 ; make rpmlint ; popd 1>/dev/null 2>&1 ; done
 
-repository:
-	@echo -e "\033[1;32mUpdating repository on $(REPODIR)\033[0m"
+copy:
+	@echo -e "\033[1;32mCopy RPM to $(REPODIR)\033[0m"
 	@mkdir -p $(REPODIR)
 	@for dir in $(PKGS) ; do \
 		if [ -d $$dir/result ] ; then \
@@ -41,21 +42,27 @@ repository:
 			cp $$dir/result/*.rpm $(REPODIR)/$$dir/ || true ; \
 		fi ; \
 	done
+
+refresh:
+	@echo -e "\033[1;32mUpdating repository on $(REPODIR)\033[0m"
 	@createrepo --update -d $(REPODIR)
 
 repoview:
+	@echo -e "\033[1;32mRun repoview on $(REPODIR)\033[0m"
 	@rm -rf $(REPODIR)/repoview
 	@repoview $(REPODIR) -k ./common/repoview/templates -f -o $(REPODIR)/repoview --url "http://$(HOSTNAME)/repository/repoview" --title "RPM for $(DISTRIB) $(ARCH)"
 	@rsync -avzr ./common/repoview/images $(REPODIR)/repoview/
 
-sign:
-	@echo "Signing RPM on $(REPOPATH)"
-	@for rpm in $(shell find $(REPOPATH) -name '*.rpm') ; do \
-		echo $${rpm} ; \
-	done
+testsign:
+	@echo $(rpm2sign)
+
+sign:   
+	@echo -e "\033[1;32mSigning RPM on $(REPODIR)\033[0m"
+	@rpm --addsign $(rpm2sign)
 
 dirlist:
-	@echo "Processing directories: $(PKGS)"
+	@echo -e "\033[1;32mProcessing directories\033[0m"
+	@echo $(PKGS)
 
 showvars:
 	@echo "ARCH:        $(ARCH)"
