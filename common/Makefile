@@ -12,6 +12,7 @@ DISTRELEASE := $(shell source /etc/os-release && echo $${VERSION_ID})
 DISTRIB := $(DISTNAME)-$(DISTRELEASE)
 TARGET := $(DISTRIB)-$(ARCH)
 SRCURIS := $(shell rpmspec -P $(NAME).spec | grep -i '^source' | awk -F ':' '{print $$2":"$$3}' | tr -d ' ')
+MOCKOPTS := "--disable-plugin=package_state"
 
 all: fedora
 fedora: clean sources srpm rpmlint build
@@ -43,13 +44,13 @@ srpm:
 
 build: srpm
 	@echo -e "\033[1;32mBuilding RPMs files\033[0m"
-	@mock -r '$(TARGET)' --resultdir=$(SRCDIR)/result rebuild $(SRCDIR)/result/$(NAME)*.src.rpm
+	@mock $(MOCKOPTS) -r '$(TARGET)' --resultdir=$(SRCDIR)/result rebuild $(SRCDIR)/result/$(NAME)*.src.rpm
 
 el6-build: srpm
 	@echo -e "\033[1;32mBuild RPMs files for CentOS 6\033[0m"
 	@rm -rf $(SRCDIR)/result-el6
 	@mkdir -p $(SRCDIR)/result-el6
-	@mock -r 'centos-6-$(ARCH)' --resultdir=$(SRCDIR)/result-el6 rebuild $(SRCDIR)/result/$(NAME)*.src.rpm
+	@mock $(MOCKOPTS) -r 'centos-6-$(ARCH)' --resultdir=$(SRCDIR)/result-el6 rebuild $(SRCDIR)/result/$(NAME)*.src.rpm
 
 help:
 	@echo -e "\033[1;32mAvailable targets:\033[0m"
