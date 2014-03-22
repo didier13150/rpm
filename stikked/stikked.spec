@@ -27,6 +27,7 @@ original Stikked with lots of bugfixes and improvements.
 %{__sed} -i -e 's#@datadir@#%{_datadir}#g' stikked.conf
 %{__sed} -i \
     -e '/db_hostname/ s#127.0.0.1#localhost#g' \
+    -e '/site_name/ s#Stikked#stikked#' \
     -e '/theme/ s#default#bootstrap#' \
     stikked.php
 
