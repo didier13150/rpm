@@ -10,6 +10,7 @@ Source0:        https://github.com/claudehohl/%{githubname}/archive/%{version}.t
 Source1:        stikked.conf
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Requires:       webserver
+BuildArch:      noarch
 
 %description
 Stikked is an Open-Source PHP Pastebin, with the aim of keeping a simple and
