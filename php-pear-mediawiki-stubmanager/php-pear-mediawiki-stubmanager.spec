@@ -69,5 +69,5 @@ rm -rf %{buildroot}
 %{pear_phpdir}/*
 
 %changelog
-* Tue Sep 27 2011 Didier Fabert <dfabert@b2pweb.com> - 1.4.0-1
+* Tue Sep 27 2011 Didier Fabert <didier.fabert@gmail.com> - 1.4.0-1
 - Centos 5.6 - php 5.2
