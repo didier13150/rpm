@@ -45,7 +45,7 @@ rm -rf %{buildroot}
 %files
 %defattr(-,root,root,-)
 %doc AUTHORS.md README.md doc
-%{_sysconfdir}/httpd/conf.d/%{name}.conf
+%config(noreplace) %{_sysconfdir}/httpd/conf.d/%{name}.conf
 %{_datadir}/%{name}
 %config(noreplace) %{_sysconfdir}/%{name}/stikked.php
 
