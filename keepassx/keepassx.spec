@@ -1,15 +1,14 @@
-%define alpha alpha4.1
+%define alpha alpha5.1
 
 Name:           keepassx
 Version:        2.0
-Release:        0.2.%{alpha}%{?dist}
+Release:        0.3.%{alpha}%{?dist}
 Summary:        Cross-platform password manager
 Group:          User Interface/Desktops
 License:        GPLv2+
 URL:            http://keepassx.sourceforge.net
-Source0:        http://www.keepassx.org/dev/attachments/download/36/%{name}-%{version}-%{alpha}.tar.gz
+Source0:        https://github.com/didier13150/%{name}/archive/%{version}-%{alpha}.tar.gz
 Source1:        %{name}.desktop
-Patch0:         test-failure-crypto-selftest.patch
 BuildRequires:  qt4-devel > 4.1
 BuildRequires:  libXtst-devel
 BuildRequires:  ImageMagick
@@ -38,7 +37,6 @@ that is compatible with KeePass Password Safe for MS Windows version 2.
 
 %prep
 %setup -qn keepassx
-%patch0 -p1
 
 %build
 mkdir build
@@ -78,6 +76,10 @@ EOF
 install -D -m 644 -p x-keepass.desktop \
   %{buildroot}%{_datadir}/mimelnk/application/x-keepass.desktop
 
+%check
+cd build
+make test
+
 %post
 touch --no-create %{_datadir}/icons/hicolor &>/dev/null || :
 update-desktop-database &> /dev/null ||:
@@ -102,9 +104,13 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 %{_datadir}/keepassx
 %{_datadir}/applications/*.desktop
 %{_datadir}/mimelnk/application/*.desktop
-%{_datadir}/icons/hicolor/*/apps/keepassx.*
+%{_datadir}/icons/hicolor/*/*/*keepassx.*
+%{_datadir}/mime/packages/keepassx.xml
 
 %changelog
+* Sun Mar 23 2014 Didier Fabert <didier.fabert@gmail.com> - 2.0-0.3.alpha5.1
+- Sync to upstream
+
 * Tue Nov 26 2013 Didier Fabert <didier.fabert@gmail.com> - 2.0-0.3.alpha4
 - BUGFIX: multiple icons on systray when settings was edited
 
