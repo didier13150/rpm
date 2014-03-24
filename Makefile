@@ -24,13 +24,25 @@ build:
 	done
 
 srpm:
-	@for dir in $(PKGS) ; do pushd $$dir 1>/dev/null 2>&1; make srpm ; popd 1>/dev/null 2>&1 ; done
+	@for dir in $(PKGS) ; do \
+		pushd $$dir 1>/dev/null 2>&1 ; \
+		make srpm ; \
+		popd 1>/dev/null 2>&1 ; \
+	done
 
 clean:
-	@for dir in $(PKGS) ; do pushd $$dir 1>/dev/null 2>&1 ; make clean ; popd 1>/dev/null 2>&1 ; done
+	@for dir in $(PKGS) ; do \
+		pushd $$dir 1>/dev/null 2>&1 ; \
+		make clean ; \
+		popd 1>/dev/null 2>&1 ; \
+	done
 
 rpmlint:
-	@for dir in $(PKGS) ; do pushd $$dir 1>/dev/null 2>&1 ; make rpmlint ; popd 1>/dev/null 2>&1 ; done
+	@for dir in $(PKGS) ; do \
+		pushd $$dir 1>/dev/null 2>&1 ; \
+		make rpmlint ; \
+		popd 1>/dev/null 2>&1 ; \
+	done
 
 copy:
 	@echo -e "\033[1;32mCopy RPM to $(REPODIR)\033[0m"
@@ -49,7 +61,10 @@ refresh:
 repoview:
 	@echo -e "\033[1;32mRun repoview on $(REPODIR)\033[0m"
 	@rm -rf $(REPODIR)/repoview
-	@repoview $(REPODIR) -k ./common/repoview/templates -f -o $(REPODIR)/repoview --url "http://$(HOSTNAME)/repository/repoview" --title "RPM for $(DISTRIB) $(ARCH)"
+	@repoview $(REPODIR) -k ./common/repoview/templates -f \
+		-o $(REPODIR)/repoview \
+		--url "http://$(HOSTNAME)/repository/repoview" \
+		--title "RPM for $(DISTRIB) $(ARCH)"
 	@rsync -avzr ./common/repoview/images $(REPODIR)/repoview/
 
 sign:   
