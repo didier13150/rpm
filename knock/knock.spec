@@ -177,14 +177,14 @@ fi
 %doc %{_mandir}/man?/%{name}d.*
 
 %changelog
-* Sun Jan 20 2013 Didier Fabert <dfabert@b2pweb.com> 0.5-4
+* Sun Jan 20 2013 Didier Fabert <didier.fabert@gmail.com> 0.5-4
 - Add patch for fedora (systemd)
 
-* Mon Nov 14 2011 Didier Fabert <dfabert@b2pweb.com> 0.5-3
+* Mon Nov 14 2011 Didier Fabert <didier.fabert@gmail.com> 0.5-3
 - Add patch for CentOS-6
 
-* Thu Sep 22 2011 Didier Fabert <dfabert@b2pweb.com> 0.5-2
+* Thu Sep 22 2011 Didier Fabert <didier.fabert@gmail.com> 0.5-2
 - rebuild against libpcap 0.9.4 instead of 1.0.0 for CentOS-5
 
-* Fri May 20 2011 Didier Fabert <dfabert@b2pweb.com> 0.5-1
+* Fri May 20 2011 Didier Fabert <didier.fabert@gmail.com> 0.5-1
 - First B2PWeb package

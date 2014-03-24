@@ -581,30 +581,30 @@ fi
 %attr(-,%{shinken_user} ,%{shinken_group}) %dir %{_localstatedir}/run/%{name}
 
 %changelog
-* Tue May 28 2013 Didier Fabert <dfabert@b2pweb.com> - 1.4.0-1
+* Tue May 28 2013 Didier Fabert <didier.fabert@gmail.com> - 1.4.0-1
 - Update from upstream
 
-* Sun Mar 03 2013 Didier Fabert <dfabert@b2pweb.com> - 1.2.4-5
+* Sun Mar 03 2013 Didier Fabert <didier.fabert@gmail.com> - 1.2.4-5
 - Remove nagios-plugins dependency for poller
 - Add shinken-plugins-all dependency for poller
 
-* Thu Feb 28 2013 Didier Fabert <dfabert@b2pweb.com> - 1.2.4-4
+* Thu Feb 28 2013 Didier Fabert <didier.fabert@gmail.com> - 1.2.4-4
 - Fix summary for broker and receiver
 
-* Thu Feb 28 2013 Didier Fabert <dfabert@b2pweb.com> - 1.2.4-3
+* Thu Feb 28 2013 Didier Fabert <didier.fabert@gmail.com> - 1.2.4-3
 - Fix path for element log file to /var/log/shinken
 
-* Thu Feb 21 2013 Didier Fabert <dfabert@b2pweb.com> - 1.2.4-2
+* Thu Feb 21 2013 Didier Fabert <didier.fabert@gmail.com> - 1.2.4-2
 - Fix skonf pid and log file path
 
-* Tue Feb 19 2013 Didier Fabert <dfabert@b2pweb.com> - 1.2.4-1
+* Tue Feb 19 2013 Didier Fabert <didier.fabert@gmail.com> - 1.2.4-1
 - Update from upstream
 
-* Wed Jun 20 2012 Didier Fabert <dfabert@b2pweb.com> - 1.0.1-1
+* Wed Jun 20 2012 Didier Fabert <didier.fabert@gmail.com> - 1.0.1-1
 - Update from upstream
 
-* Fri Mar 09 2012 Didier Fabert <dfabert@b2pweb.com> - 1.0-1
+* Fri Mar 09 2012 Didier Fabert <didier.fabert@gmail.com> - 1.0-1
 - Update from upstream
 
-* Wed Feb 09 2011 Didier Fabert <dfabert@b2pweb.com> - 0.5.1-1
+* Wed Feb 09 2011 Didier Fabert <didier.fabert@gmail.com> - 0.5.1-1
 - Initial build.

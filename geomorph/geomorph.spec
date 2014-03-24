@@ -39,7 +39,7 @@ cd -
 %{__rm} -rf %{buildroot}
 %{__make} install DESTDIR="%{buildroot}"
 
-# Remove debug sources
+# Remove sources
 %{__rm} -rf %{buildroot}%{_prefix}/src
 # Create directories
 %{__mkdir_p} $RPM_BUILD_ROOT%{_datadir}/icons

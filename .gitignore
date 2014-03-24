@@ -40,3 +40,5 @@ channel.xml
 *-swp
 result-el6
 povray-include-extra/*.png
+RPM-GPG-KEY-didier
+povray-include-extra/*.ttf
