@@ -8,6 +8,7 @@ TARGET := $(DISTRIB)-$(ARCH)
 HOSTNAME := $(shell hostname --fqdn)
 REPOPATH := /var/www/fedora-repo
 REPODIR := $(REPOPATH)/fc$(DISTRELEASE)
+SRCDIR := $(shell pwd)
 
 all: clean build repo
 repo: dirlist copy sign refresh repoview
@@ -70,7 +71,9 @@ repoview:
 sign:   
 	@echo -e "\033[1;32mSigning RPM on $(REPODIR)\033[0m"
 	@for rpm in `find $(REPOPATH) -name '*.rpm' -exec rpm --checksig {} \; | grep -v pgp | awk -F ':' '{print $$1}'` ; do \
-		rpm --addsign $$rpm ; \
+		rpm --checksig $$rpm ; \
+		$(SRCDIR)/rpmwrap.sh --addsign $$rpm ; \
+		rpm --checksig $$rpm ; \
 	done
 
 dirlist:
