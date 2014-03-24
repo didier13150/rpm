@@ -8,7 +8,6 @@ TARGET := $(DISTRIB)-$(ARCH)
 HOSTNAME := $(shell hostname --fqdn)
 REPOPATH := /var/www/fedora-repo
 REPODIR := $(REPOPATH)/fc$(DISTRELEASE)
-rpm2sign := $(shell find $(REPOPATH) -name '*.rpm' -exec rpm --checksig {} \; | grep -v pgp | awk -F ':' '{print $$1}')
 
 all: clean build repo
 repo: dirlist copy sign refresh repoview
@@ -39,7 +38,7 @@ copy:
 	@for dir in $(PKGS) ; do \
 		if [ -d $$dir/result ] ; then \
 			mkdir -p $(REPODIR)/$$dir ; \
-			cp $$dir/result/*.rpm $(REPODIR)/$$dir/ || true ; \
+			cp -u $$dir/result/*.rpm $(REPODIR)/$$dir/ || true ; \
 		fi ; \
 	done
 
@@ -53,12 +52,11 @@ repoview:
 	@repoview $(REPODIR) -k ./common/repoview/templates -f -o $(REPODIR)/repoview --url "http://$(HOSTNAME)/repository/repoview" --title "RPM for $(DISTRIB) $(ARCH)"
 	@rsync -avzr ./common/repoview/images $(REPODIR)/repoview/
 
-testsign:
-	@echo $(rpm2sign)
-
 sign:   
 	@echo -e "\033[1;32mSigning RPM on $(REPODIR)\033[0m"
-	@rpm --addsign $(rpm2sign)
+	@for rpm in `find $(REPOPATH) -name '*.rpm' -exec rpm --checksig {} \; | grep -v pgp | awk -F ':' '{print $$1}'` ; do \
+		rpm --addsign $$rpm ; \
+	done
 
 dirlist:
 	@echo -e "\033[1;32mProcessing directories\033[0m"
