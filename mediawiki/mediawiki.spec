@@ -1,7 +1,7 @@
-%define majorver 1.21
+%define majorver 1.22
 %global wiki_ext_path %{_datadir}/mediawiki/extensions
 Name:           mediawiki
-Version:        %{majorver}.3
+Version:        %{majorver}.5
 Release:        1%{?dist}
 License:        GPLv2+
 Group:          Development/Tools
@@ -9,7 +9,7 @@ URL:            http://www.mediawiki.org/
 Summary:        A wiki engine
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
-Source0:        http://download.wikimedia.org/mediawiki/%{majorver}/mediawiki-%{version}.tar.gz
+Source0:        http://download.wikimedia.org/mediawiki/%{majorver}/%{name}-%{version}.tar.gz
 Source1:        mediawiki.conf
 #Source2:        README.RPM
 Source3:        mw-createinstance.in
@@ -32,7 +32,11 @@ Requires(pre):  httpd
 Requires:       php-common >= 5, php-xml
 Conflicts:      php-common = 5.3.1
 Requires:       php-mysql, php-pgsql
-Requires:       diffutils, ImageMagick, php-gd
+Requires:       diffutils
+Requires:       ImageMagick
+Requires:       php-gd
+# for mw-createinstance and mw-updateallinstances
+Requires:       php-cli
 
 Provides:       mediawiki-math = %{version}-%{release}
 Provides:       mediawiki-nomath = %{version}-%{release}
@@ -82,7 +86,7 @@ Foundation websites. Compared to other wikis, it has an excellent
 range of features and support for high-traffic websites using multiple
 servers
 
-This package supports wiki farms. Read the instructions for creating wiki
+This package supports wiki farms. Read the instructions for creating wiki 
 instances under %{_defaultdocdir}/%{name}-%{version}/README.RPM.
 Remember to remove the config dir after completing the configuration.
 
@@ -138,11 +142,11 @@ Summary:        Log user via the REMOTE_USER environment variable
 Group:          Development/Tools
 
 %description AuthRemoteUser
-This extension allows integration with the web server's built-in authentication
+This extension allows integration with the web server's built-in authentication 
 system via the REMOTE_USER environment variable, which is set through HTTP-Auth,
-LDAP, CAS, PAM, and other authentication systems. The extension automatically
-logs-in users using the value of the REMOTE_USER environment variable as the
-MediaWiki username. If an account of that name does not already exist, one is
+LDAP, CAS, PAM, and other authentication systems. The extension automatically 
+logs-in users using the value of the REMOTE_USER environment variable as the 
+MediaWiki username. If an account of that name does not already exist, one is 
 created.
 
 %package AuthSSL
@@ -217,6 +221,8 @@ mkdir -p %{buildroot}%{_datadir}/mediawiki
 cp -a * %{buildroot}%{_datadir}/mediawiki/
 
 # remove unneeded parts
+rm -fr %{buildroot}%{_datadir}/mediawiki/maintenance/hiphop
+rm -fr %{buildroot}%{_datadir}/mediawiki/{t,test,tests}
 rm -fr %{buildroot}%{_datadir}/mediawiki/{t,test,tests}
 rm -fr %{buildroot}%{_datadir}/mediawiki/includes/zhtable
 find %{buildroot}%{_datadir}/mediawiki/ \
@@ -227,8 +233,8 @@ find %{buildroot}%{_datadir}/mediawiki/ \
 find %{buildroot}%{_datadir}/mediawiki -name \*.pl | xargs -r chmod +x
 chmod +x %{buildroot}%{_datadir}/mediawiki/maintenance/cssjanus/cssjanus.py
 chmod +x %{buildroot}%{_datadir}/mediawiki/maintenance/cssjanus/csslex.py
-chmod +x %{buildroot}%{_datadir}/mediawiki/maintenance/hiphop/make
-chmod +x %{buildroot}%{_datadir}/mediawiki/maintenance/hiphop/run-server
+#chmod +x %{buildroot}%{_datadir}/mediawiki/maintenance/hiphop/make
+#chmod +x %{buildroot}%{_datadir}/mediawiki/maintenance/hiphop/run-server
 chmod +x %{buildroot}%{_datadir}/mediawiki/maintenance/storage/make-blobs
 chmod +x %{buildroot}%{_datadir}/mediawiki/includes/limit.sh
 chmod +x %{buildroot}%{_datadir}/mediawiki/includes/normal/UtfNormalTest2.php
@@ -246,7 +252,6 @@ rm -f %{buildroot}%{_datadir}/mediawiki/maintenance/language/zhtable/trad2simp_s
 
 # placeholder for a default instance
 mkdir -p %{buildroot}%{_localstatedir}/www/wiki
-
 mkdir -p %{buildroot}%{_sysconfdir}/httpd/conf.d/
 install -p -m 0644 %{SOURCE1} \
   %{buildroot}%{_sysconfdir}/httpd/conf.d/mediawiki.conf
@@ -288,7 +293,8 @@ tar -xzf %{SOURCE15} -C %{buildroot}%{wiki_ext_path}/
 rm -rf %{buildroot}
 
 %files
-%doc COPYING FAQ HISTORY README RELEASE-NOTES-1.21 UPGRADE CREDITS docs
+%defattr(-,root,root,-)
+%doc COPYING FAQ HISTORY README RELEASE-NOTES* UPGRADE CREDITS docs
 %{_datadir}/mediawiki
 %attr(-,apache,apache) %{_datadir}/mediawiki/mw-config
 %{_localstatedir}/www/wiki
@@ -310,40 +316,68 @@ rm -rf %{buildroot}
 %exclude %{wiki_ext_path}/NoTitle
 
 %files Mpdf
+%defattr(-,root,root,-)
 %{wiki_ext_path}/Mpdf
 
 %files CategoryTree
+%defattr(-,root,root,-)
 %{wiki_ext_path}/CategoryTree
 
 %files Math
+%defattr(-,root,root,-)
 %{wiki_ext_path}/Math
 
 %files CalcBitrate
+%defattr(-,root,root,-)
 %{wiki_ext_path}/CalcBitrate
 
 %files CustomTag
+%defattr(-,root,root,-)
 %{wiki_ext_path}/CustomTag
 
 %files AuthRemoteUser
+%defattr(-,root,root,-)
 %{wiki_ext_path}/Auth_remoteuser
 
 %files AuthSSL
+%defattr(-,root,root,-)
 %{wiki_ext_path}/SSL_authentification
 
 %files Git2Pages
+%defattr(-,root,root,-)
 %{wiki_ext_path}/Git2Pages
 
 %files RandomImage
+%defattr(-,root,root,-)
 %{wiki_ext_path}/RandomImage
 
 %files IncludeArticle
+%defattr(-,root,root,-)
 %{wiki_ext_path}/IncludeArticle
 
 %files NoTitle
+%defattr(-,root,root,-)
 %{wiki_ext_path}/NoTitle
 
 %changelog
-* Mon Dec 09 2013 Didier Fabert <didier.fabert@gmail.com> - 1.21.3-2
+* Thu Apr 03 2014 Didier Fabert <didier.fabert@gmail.com> - 1.22.5-1
+- New upstream release.
+
+* Fri Feb 28 2014 Didier Fabert <didier.fabert@gmail.com> - 1.22.3-1
+- New upstream release.
+
+* Fri Feb 28 2014 Didier Fabert <didier.fabert@gmail.com> - 1.22.2-2
+- Minor changes on mw-createinstance script
+- Add php-cli for dependency
+
+* Thu Feb 27 2014 Didier Fabert <didier.fabert@gmail.com> - 1.22.2-1
+- New upstream release.
+- Remove maintenance hiphop directory (needs hiphop virtual machine)
+
+* Tue Jan 21 2014 Didier Fabert <didier.fabert@gmail.com> - 1.22.1-1
+- New upstream release.
+
+* Mon Dec 09 2013 Didier Fabert <didier.fabert@gmail.com> - 1.21.3-3
 - Add NoTitle extension
 
 * Tue Dec 03 2013 Didier Fabert <didier.fabert@gmail.com> - 1.21.3-1
