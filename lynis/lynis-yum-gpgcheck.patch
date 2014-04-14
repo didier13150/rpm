@@ -1,0 +1,21 @@
+diff -rup a/include/tests_ports_packages b/include/tests_ports_packages
+--- a/include/tests_ports_packages	2014-03-13 16:40:02.000000000 +0100
++++ b/include/tests_ports_packages	2014-03-20 12:17:09.334598226 +0100
+@@ -504,8 +504,15 @@
+                logtext "Result: GPG check is enabled"
+                Display --indent 2 --text "- Checking GPG checks (yum.conf)" --result OK --color GREEN
+              else
+-               Display --indent 2 --text "- Checking GPG checks (yum.conf)" --result DISABLED --color RED
+-               ReportWarning ${TEST_NO} "M" "No GPG signing option found in yum.conf"
++               SearchItem "^gpgcheck=1$" "/etc/yum.conf"
++               if [ ${ITEM_FOUND} -eq 1 ]; then
++                   FOUND=1
++                   logtext "Result: GPG check is enabled"
++                   Display --indent 2 --text "- Checking GPG checks (yum.conf)" --result OK --color GREEN
++               else
++                   Display --indent 2 --text "- Checking GPG checks (yum.conf)" --result DISABLED --color RED
++                   ReportWarning ${TEST_NO} "M" "No GPG signing option found in yum.conf"
++               fi
+            fi
+         fi
+      fi

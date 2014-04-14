@@ -1,0 +1,12 @@
+diff -rup a/include/tests_banners b/include/tests_banners
+--- a/include/tests_banners     2013-12-26 09:53:44.000000000 +0100
++++ b/include/tests_banners     2014-03-20 11:38:50.956542853 +0100
+@@ -24,7 +24,7 @@
+ #################################################################################
+ #
+     BANNER_FILES="/etc/issue /etc/issue.net /etc/motd"
+-    LEGAL_BANNER_STRINGS="access authorized legal monitor owner policy policies private prohibited restricted this unauthorized"
++    LEGAL_BANNER_STRINGS="access authorized legal monitor owner policy policies private prohibited restricted this unauthorized criminal evidence expressly authority warning"
+ #
+ #################################################################################
+ #
