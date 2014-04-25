@@ -1,7 +1,6 @@
-%define githash d4c190aa68a6ae6db35c6862c57cb40f3b263c0e
 Name:     nagstamon
 Version:  0.9.11
-Release:  0.2.head%{?dist}
+Release:  0.3.head%{?dist}
 Summary:  Nagios status monitor for desktop
 Group:    Applications/Productivity
 
