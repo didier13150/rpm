@@ -1,4 +1,4 @@
-%define alpha alpha5.1
+%define alpha alpha6.1
 
 Name:           keepassx
 Version:        2.0
@@ -7,7 +7,7 @@ Summary:        Cross-platform password manager
 Group:          User Interface/Desktops
 License:        GPLv2+
 URL:            http://keepassx.sourceforge.net
-Source0:        https://github.com/didier13150/%{name}/archive/%{version}-%{alpha}.tar.gz
+Source0:        https://github.com/didier13150/%{name}/archive/%{name}-%{version}-%{alpha}.tar.gz
 Source1:        %{name}.desktop
 BuildRequires:  qt4-devel > 4.1
 BuildRequires:  libXtst-devel
@@ -36,7 +36,7 @@ information can be considered as quite safe. KeePassX uses a database format
 that is compatible with KeePass Password Safe for MS Windows version 2.
 
 %prep
-%setup -qn keepassx
+%setup -qn %{name}
 
 %build
 mkdir build
@@ -64,17 +64,17 @@ desktop-file-install \
         %{buildroot}%{_datadir}/applications/%{name}.desktop
 
 # Associate KDB* files
-cat > x-keepass.desktop << EOF
+cat > x-keepassx.desktop << EOF
 [Desktop Entry]
 Comment=
 Hidden=false
 Icon=keepassx.png
-MimeType=application/x-keepass
+MimeType=application/x-keepassx
 Patterns=*.kdb;*.KDB;*.kdbx;*.KDBX*
 Type=MimeType
 EOF
-install -D -m 644 -p x-keepass.desktop \
-  %{buildroot}%{_datadir}/mimelnk/application/x-keepass.desktop
+install -D -m 644 -p x-keepassx.desktop \
+  %{buildroot}%{_datadir}/mimelnk/application/x-keepassx.desktop
 
 %check
 cd build
@@ -108,6 +108,12 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 %{_datadir}/mime/packages/keepassx.xml
 
 %changelog
+* Sat Apr 19 2014 Didier Fabert <didier.fabert@gmail.com> - 2.0-0.3.alpha6.1
+- Sync to upstream
+
+* Fri Mar 28 2014 Didier Fabert <didier.fabert@gmail.com> - 2.0-0.3.alpha5.2
+- Sync to upstream
+
 * Sun Mar 23 2014 Didier Fabert <didier.fabert@gmail.com> - 2.0-0.3.alpha5.1
 - Sync to upstream
 
@@ -121,7 +127,7 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 - Patch to add systray icon capability
 
 * Fri Sep 20 2013 Didier Fabert <didier.fabert@gmail.com> - 2.0-0.alpha4
-- Update
+- Update to 2.0 version (alpha)
 
 * Tue Feb 12 2013 Jon Ciesla <limburgher@gmail.com> - 0.4.3-7
 - Drop desktop vendor tag.
