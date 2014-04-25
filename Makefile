@@ -75,6 +75,7 @@ sign:
 		rpm --addsign $$rpm ; \
 		rpm --checksig $$rpm ; \
 	done
+	# $(SRCDIR)/rpmwrap.sh --addsign $$rpm;
 
 dirlist:
 	@echo -e "\033[1;32mProcessing directories\033[0m"
