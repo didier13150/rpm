@@ -72,7 +72,7 @@ sign:
 	@echo -e "\033[1;32mSigning RPM on $(REPODIR)\033[0m"
 	@for rpm in `find $(REPOPATH) -name '*.rpm' -exec rpm --checksig {} \; | grep -v pgp | awk -F ':' '{print $$1}'` ; do \
 		rpm --checksig $$rpm ; \
-		$(SRCDIR)/rpmwrap.sh --addsign $$rpm ; \
+		rpm --addsign $$rpm ; \
 		rpm --checksig $$rpm ; \
 	done
 
