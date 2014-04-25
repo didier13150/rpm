@@ -10,7 +10,7 @@ You need a mock RPM build environment.
 Short story
 -----------
 
-    # yum install mock rpmlint
+    # yum install mock rpmlint expect
     # usermod -a -G mock <USER>
 
 See http://fedoraproject.org/wiki/How_to_create_an_RPM_package and http://fedoraproject.org/wiki/Projects/Mock for more informations.
@@ -41,3 +41,7 @@ Common Makefile contains help target. So just type the following command to get 
 
     make help
     
+References
+----------
+
+* Signing tips: http://linux.dell.com/wiki/index.php/Repository/tips
