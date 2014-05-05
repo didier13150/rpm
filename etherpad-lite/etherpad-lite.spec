@@ -8,8 +8,8 @@
 %define padgroup etherpad
 
 Name:             etherpad-lite
-Version:          1.3.0
-Release:          2%{?dist}
+Version:          1.4.0
+Release:          1%{?dist}
 License:          ASL 2.0
 Summary:          Online editor providing collaborative editing in really real-time
 BuildRoot:        %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
@@ -32,7 +32,6 @@ BuildRequires:    python
 BuildRequires:    gzip
 BuildRequires:    git-core
 BuildRequires:    curl
-BuildRequires:    gcc-c++
 BuildRequires:    nodejs
 BuildRequires:    npm
 %if %{with_systemd}
@@ -43,6 +42,10 @@ Requires:         curl
 Requires:         python
 Requires:         nodejs
 Requires:         npm
+Requires:         openssl-devel
+Requires:         mysql-devel
+Requires:         postgresql-devel
+Requires:         make
 %if %{with_systemd}
 Requires(post):   systemd
 Requires(preun):  systemd
@@ -113,6 +116,7 @@ install -Dp -m0644 %{SOURCE2} %{buildroot}%{_unitdir}/%{name}.service
 install -Dp -m0755 %{SOURCE1} %{buildroot}%{_initrddir}/%{name}
 touch %{buildroot}%{_localstatedir}/log/%{name}/%{name}.log
 %endif
+
 
 %clean
 rm -rf %{buildroot}
@@ -229,24 +233,25 @@ fi
 %defattr(-,root,root)
 %doc CHANGELOG.md CONTRIBUTING.md README.md
 %config(noreplace) %{_sysconfdir}/sysconfig/%{name}
-%defattr(-,%{paduser},%{padgroup})
-# Settings can be edited online
-%config(noreplace) %{_sysconfdir}/%{name}/settings.json
-%{_localstatedir}/lib/%{name}
-
 %if %{with_systemd}
 %{_unitdir}/%{name}.service
 %else
 %attr(0755,root,root) %{_initrddir}/%{name}
-%defattr(-,%{paduser},%{padgroup})
-%{_localstatedir}/log/%{name}
+%attr(-,%{paduser},%{padgroup}) %dir %{_localstatedir}/log/%{name}
 %endif
+# Settings can be edited online
+%config(noreplace) %attr(0644,%{paduser},%{padgroup}) %{_sysconfdir}/%{name}/settings.json
+%attr(0755,%{paduser},%{padgroup}) %{_localstatedir}/lib/%{name}/*
+%ghost %attr(0644,%{paduser},%{padgroup}) %{_localstatedir}/log/%{name}/%{name}.log
 
 %files doc
 %defattr(-,root,root)
 %{_docdir}/%{name}
 
 %changelog
+* Mon May 05 2014 Didier Fabert <didier.fabert@gmail.com> 1.4.0-1
+- Update from upstream
+
 * Mon Feb 10 2014 Didier Fabert <didier.fabert@gmail.com> 1.3.0-3
 - No arch package (remove installDeps.sh running)
 
