@@ -1,7 +1,7 @@
 %define majorver 1.22
 %global wiki_ext_path %{_datadir}/mediawiki/extensions
 Name:           mediawiki
-Version:        %{majorver}.5
+Version:        %{majorver}.6
 Release:        1%{?dist}
 License:        GPLv2+
 Group:          Development/Tools
@@ -360,6 +360,9 @@ rm -rf %{buildroot}
 %{wiki_ext_path}/NoTitle
 
 %changelog
+* Thu May 15 2014 Didier Fabert <didier.fabert@gmail.com> - 1.22.6-1
+- New upstream release.
+
 * Thu Apr 03 2014 Didier Fabert <didier.fabert@gmail.com> - 1.22.5-1
 - New upstream release.
 
