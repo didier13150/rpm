@@ -2,7 +2,7 @@
 %global wiki_ext_path %{_datadir}/mediawiki/extensions
 Name:           mediawiki
 Version:        %{majorver}.6
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+
 Group:          Development/Tools
 URL:            http://www.mediawiki.org/
