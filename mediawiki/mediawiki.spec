@@ -20,6 +20,7 @@ Source12:       https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Math.tgz
 Source13:       https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Auth_remoteuser.tgz
 Source14:       https://git.wikimedia.org/git/mediawiki/extensions/Git2Pages.tgz
 Source15:       https://git.wikimedia.org/git/mediawiki/extensions/RandomImage.tgz
+Source16:       https://git.wikimedia.org/git/mediawiki/extensions/MultimediaViewer.tgz
 Source20:       Linux.tag.php
 Source21:       CalcBitrate.js
 Source22:       CalcBitrate.php
@@ -202,6 +203,16 @@ Just put __NOTITLE__ on any pages where you want to hide the title.
 This extension will work for any skin that puts the title heading in an h1 
 with class="firstHeading", including the default Vector skin.
 
+%package MultimediaViewer
+Requires:       %{name}
+Summary:        Slightly nicer interface for viewing images
+Group:          Development/Tools
+
+%description MultimediaViewer
+The MultimediaViewer extension gives the user of a wiki a slightly nicer
+interface for viewing full-size, or nearly full-size, images in their browser
+without extraneous page loads or confusing interstitial pages.
+
 %prep
 %setup -q
 
@@ -222,7 +233,6 @@ cp -a * %{buildroot}%{_datadir}/mediawiki/
 
 # remove unneeded parts
 rm -fr %{buildroot}%{_datadir}/mediawiki/maintenance/hiphop
-rm -fr %{buildroot}%{_datadir}/mediawiki/{t,test,tests}
 rm -fr %{buildroot}%{_datadir}/mediawiki/{t,test,tests}
 rm -fr %{buildroot}%{_datadir}/mediawiki/includes/zhtable
 find %{buildroot}%{_datadir}/mediawiki/ \
@@ -273,6 +283,7 @@ tar -xzf %{SOURCE12} -C %{buildroot}%{wiki_ext_path}/
 tar -xzf %{SOURCE13} -C %{buildroot}%{wiki_ext_path}/
 tar -xzf %{SOURCE14} -C %{buildroot}%{wiki_ext_path}/
 tar -xzf %{SOURCE15} -C %{buildroot}%{wiki_ext_path}/
+tar -xzf %{SOURCE16} -C %{buildroot}%{wiki_ext_path}/
 %{__mkdir_p} %{buildroot}%{wiki_ext_path}/CalcBitrate
 %{__mkdir_p} %{buildroot}%{wiki_ext_path}/CustomTag
 %{__mkdir_p} %{buildroot}%{wiki_ext_path}/SSL_authentification
@@ -314,6 +325,7 @@ rm -rf %{buildroot}
 %exclude %{wiki_ext_path}/RandomImage
 %exclude %{wiki_ext_path}/IncludeArticle
 %exclude %{wiki_ext_path}/NoTitle
+%exclude %{wiki_ext_path}/MultimediaViewer
 
 %files Mpdf
 %defattr(-,root,root,-)
@@ -359,7 +371,14 @@ rm -rf %{buildroot}
 %defattr(-,root,root,-)
 %{wiki_ext_path}/NoTitle
 
+%files MultimediaViewer
+%defattr(-,root,root,-)
+%{wiki_ext_path}/MultimediaViewer
+
 %changelog
+* Thu May 15 2014 Didier Fabert <didier.fabert@gmail.com> - 1.22.6-2
+- Add MultimediaViewer extension
+
 * Thu May 15 2014 Didier Fabert <didier.fabert@gmail.com> - 1.22.6-1
 - New upstream release.
 
