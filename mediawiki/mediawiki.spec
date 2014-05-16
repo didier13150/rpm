@@ -1,8 +1,8 @@
-%define majorver 1.22
+%define majorver 1.23
 %global wiki_ext_path %{_datadir}/mediawiki/extensions
 Name:           mediawiki
-Version:        %{majorver}.6
-Release:        2%{?dist}
+Version:        %{majorver}.0rc0
+Release:        0.1%{?dist}
 License:        GPLv2+
 Group:          Development/Tools
 URL:            http://www.mediawiki.org/
@@ -22,6 +22,7 @@ Source14:       https://git.wikimedia.org/git/mediawiki/extensions/Git2Pages.tgz
 Source15:       https://git.wikimedia.org/git/mediawiki/extensions/RandomImage.tgz
 Source16:       https://git.wikimedia.org/git/mediawiki/extensions/MultimediaViewer.tgz
 Source17:       https://git.wikimedia.org/git/mediawiki/extensions/CommonsMetadata.tgz
+Source18:       https://git.wikimedia.org/git/mediawiki/extensions/BetaFeatures.tgz
 Source20:       Linux.tag.php
 Source21:       CalcBitrate.js
 Source22:       CalcBitrate.php
@@ -224,6 +225,17 @@ Group:          Development/Tools
 CommonsMetadata is an attempt at extracting metadata from Wikimedia Commons
 pages.
 
+%package BetaFeatures
+Requires:       %{name}
+Summary:        Register beta features
+Group:          Development/Tools
+
+%description BetaFeatures
+The BetaFeatures extension allows other MediaWiki extensions to register beta
+features with the list of user preferences on the wiki. It uses the existing
+user preferences architecture and a few special pages to accomplish its
+function.
+
 %prep
 %setup -q
 
@@ -296,6 +308,7 @@ tar -xzf %{SOURCE14} -C %{buildroot}%{wiki_ext_path}/
 tar -xzf %{SOURCE15} -C %{buildroot}%{wiki_ext_path}/
 tar -xzf %{SOURCE16} -C %{buildroot}%{wiki_ext_path}/
 tar -xzf %{SOURCE17} -C %{buildroot}%{wiki_ext_path}/
+tar -xzf %{SOURCE18} -C %{buildroot}%{wiki_ext_path}/
 %{__mkdir_p} %{buildroot}%{wiki_ext_path}/CalcBitrate
 %{__mkdir_p} %{buildroot}%{wiki_ext_path}/CustomTag
 %{__mkdir_p} %{buildroot}%{wiki_ext_path}/SSL_authentification
@@ -339,6 +352,7 @@ rm -rf %{buildroot}
 %exclude %{wiki_ext_path}/NoTitle
 %exclude %{wiki_ext_path}/MultimediaViewer
 %exclude %{wiki_ext_path}/CommonsMetadata
+%exclude %{wiki_ext_path}/BetaFeatures
 
 %files Mpdf
 %defattr(-,root,root,-)
@@ -392,7 +406,15 @@ rm -rf %{buildroot}
 %defattr(-,root,root,-)
 %{wiki_ext_path}/CommonsMetadata
 
+%files BetaFeatures
+%defattr(-,root,root,-)
+%{wiki_ext_path}/BetaFeatures
+
 %changelog
+* Fri May 16 2014 Didier Fabert <didier.fabert@gmail.com> - 1.23.0-0.rc0
+- New upstream release.
+- Add BetaFeatures extension
+
 * Thu May 15 2014 Didier Fabert <didier.fabert@gmail.com> - 1.22.6-2
 - Add MultimediaViewer extension
 - Add CommonsMetadata extension
