@@ -419,7 +419,7 @@ rm -rf %{buildroot}
 - Add MultimediaViewer extension
 - Add CommonsMetadata extension
 
-* Thu May 15 2014 Didier Fabert <didier.fabert@gmail.com> - 1.22.6-1
+* Fri Apr 25 2014 Didier Fabert <didier.fabert@gmail.com> - 1.22.6-1
 - New upstream release.
 
 * Thu Apr 03 2014 Didier Fabert <didier.fabert@gmail.com> - 1.22.5-1
