@@ -10,6 +10,9 @@ REPOPATH := /var/www/fedora-repo
 REPODIR := $(REPOPATH)/fc$(DISTRELEASE)
 SRCDIR := $(shell pwd)
 
+dummy:
+	@echo "Type make all to (re)build all packages"
+
 all: clean build repo
 repo: dirlist copy sign refresh repoview
 
