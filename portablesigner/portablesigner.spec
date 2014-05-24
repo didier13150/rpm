@@ -2,9 +2,9 @@ Name:           portablesigner
 Version:        2.0
 Release:        1%{?dist}
 Summary:        Signing PDF files with X.509 certificates
-License:        GPLv2
+License:        EUPL 1.1
 Group:          Applications/Security
-URL:            http://arbaro.sourceforge.net
+URL:            http://portablesigner.sourceforge.net/
 Source0:        http://sourceforge.net/projects/portablesigner/files/portablesigner/2.0-Release/PortableSigner-Generic-2.0.38c0573.zip
 Source1:        portablesigner
 
@@ -15,7 +15,7 @@ Requires:       java
 Requires:       jpackage-utils
 
 %description
-PortableSigner is a signing program for PDF files with X.509 certificates).
+PortableSigner is a signing program for PDF files with X.509 certificates.
 
 %prep
 %setup -qc %{name}_%{version}
