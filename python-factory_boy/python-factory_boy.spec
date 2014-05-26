@@ -20,6 +20,7 @@ BuildRequires:  python3-setuptools
 %endif
 
 Provides: %{pkgname} = %{version}-%{release}
+Provides: factory-boy = %{version}-%{release}
 
 %description
 factory_boy is a fixtures replacement based on thoughtbot's `factory_girl <http://github.com/thoughtbot/factory_girl>`_.
@@ -59,6 +60,9 @@ Group: Documentation
 Summary: python-%{pkgname} API docs
 Requires: %{name} = %{version}-%{release}
 
+%description apidoc
+Documentation for the %{name} API
+
 %prep
 %setup -qn %{pkgname}-%{version}
 # remove bundled egg-info
@@ -85,7 +89,7 @@ popd
 %{__python} setup.py install -O1 --skip-build --root $RPM_BUILD_ROOT
 %{__mkdir_p} $RPM_BUILD_ROOT%{_datadir}/%{name}-%{version}/apidoc
 %{__mkdir_p} $RPM_BUILD_ROOT%{_mandir}/man1
-%{__cp} docs/_build/man/%{pkgname}.1 $RPM_BUILD_ROOT%{_mandir}/man1
+%{__cp} docs/_build/man/factoryboy.1 $RPM_BUILD_ROOT%{_mandir}/man1/factory_boy.1
 %{__cp} -r docs/_build/html/* $RPM_BUILD_ROOT%{_datadir}/%{name}-%{version}/apidoc
 
 %if 0%{?with_python3}
@@ -95,13 +99,15 @@ popd
 %endif
 
 %files
-%doc README PKG-INFO
+%doc README.rst PKG-INFO
+%{_mandir}/man1/%{pkgname}*
 %{python_sitelib}/factory
 %{python_sitelib}/%{pkgname}-%{version}-py?.?.egg-info
 
 %if 0%{?with_python3}
 %files -n python3-%{pkgname}
-%doc README PKG-INFO
+%{_mandir}/man1/%{pkgname}*
+%doc README.rst PKG-INFO
 %{python3_sitelib}/factory
 %{python3_sitelib}/%{pkgname}-%{version}-py?.?.egg-info
 %endif
