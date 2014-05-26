@@ -68,13 +68,14 @@ popd
 
 %files
 %doc README PKG-INFO
-%{python_sitelib}/*%{pkgname}*.py?
+%{python_sitelib}/*%{pkgname}.py*
 %{python_sitelib}/%{pkgname}-%{version}-py?.?.egg-info
 
 %if 0%{?with_python3}
 %files -n python3-%{pkgname}
 %doc README PKG-INFO
-%{python3_sitelib}/%{pkgname}.py?
+%{python3_sitelib}/*%{pkgname}.py*
+%{python3_sitelib}/__pycache__/*%{pkgname}.cpython-33.py?
 %{python3_sitelib}/%{pkgname}-%{version}-py?.?.egg-info
 %endif
 
