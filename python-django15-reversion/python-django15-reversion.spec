@@ -1,16 +1,14 @@
 %global pkgname django-reversion
-%global shortver 1.8
 
 Name:           python-django15-reversion
-Version:        %{shortver}.0
+Version:        1.8.0
 Release:        1%{?dist}
 Summary:        Version control extension for the Django web framework
 
 Group:          Development/Languages
 License:        BSD
 URL:            https://github.com/etianen/django-reversion
-Source0:        https://github.com/downloads/etianen/django-reversion/%{pkgname}-release-%{version}.tar.gz
-
+Source0:        https://pypi.python.org/packages/source/d/django-reversion/%{pkgname}-%{version}.tar.gz
 BuildArch:      noarch
 BuildRequires:  python2-devel
 BuildRequires:  python-sphinx
@@ -46,7 +44,7 @@ Requires: %{name} = %{version}-%{release}
 Documentation for the %{name} API
 
 %prep
-%setup -q -n %{pkgname}-release-%{shortver}
+%setup -q -n %{pkgname}-%{version}
 
 # remove bundled egg-info
 rm -rf django_reversion.egg-info
