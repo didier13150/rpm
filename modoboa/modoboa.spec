@@ -8,28 +8,20 @@ URL:            http://modoboa.org
 Source0:        https://github.com/tonioo/%{name}/archive/%{version}.tar.gz
 BuildRequires:  python2-devel
 BuildRequires:  python-setuptools
-BuildRequires:  python-django15
-#BuildRequires:  python-django-reversion
-#BuildRequires:  python-django-south
-BuildRequires:  python-pip
-BuildRequires:  python-sieve
-BuildRequires:  python-argcomplete
-BuildRequires:  python-passlib
-BuildRequires:  python-chardet
-BuildRequires:  python-crypto
-BuildRequires:  pycryptopp
-BuildRequires:  python-lxml
 Requires:       python-django15
-#Requires:       python-django-reversion
-#Requires:       python-django-south
-Requires:       python-sieve
-Requires:       python-argcomplete
+Requires:       python-django15-reversion
+Requires:       python-django15-south
+Requires:       python-django15-database-url
+Requires:       python-factory_boy
+Requires:       python-rfc6266
+Requires:       python-sievelib
 Requires:       python-passlib
 Requires:       python-chardet
-Requires:       pycryptopp
-Requires:       python-lxml
 Requires:       python-crypto
-BuildRequires:  tree
+Requires:       python-lxml
+Requires:       python-LEPL
+Requires:       rrdtool-python
+Requires:       MySQL-python
 
 %description
 Modoboa is a mail hosting and management platform including a modern and
@@ -49,8 +41,10 @@ Modoboa is developed with modularity in mind, expanding it is really easy.
 
 %install
 %{__python} setup.py install --skip-build --root %{buildroot}
-pip install --install-option="--prefix=%{buildroot}" modoboa
-tree %{buildroot}
+
+%post
+ln -s %{python_sitelib}/Django-1.5.6-py2.7.egg/django \
+    %{python_sitelib}/django
 
 %files
 %{_bindir}/%{name}-admin.py
