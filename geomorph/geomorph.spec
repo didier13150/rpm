@@ -23,17 +23,17 @@ for rendering the landscape.
 
 %prep
 %setup -qn %{name}-%{version}
+# Tarball contains an already compiled app.
+# Remove and recompile it.
+%{__rm} -f scenes/colmap
 %configure \
     --disable-rpath
 
 %build
-make %{?_smp_mflags}
-# Tarball contains an already compiled app.
-# Remove and recompile it.
-%{__rm} -f scenes/colmap
-cd scenes
+pushd scenes
 g++ colmap.c -o colmap
-cd -
+popd
+make %{?_smp_mflags}
 
 %install
 %{__rm} -rf %{buildroot}
@@ -56,10 +56,10 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root,-)
 %{_bindir}/geomorph
 %{_datadir}/geomorph
-%{_datadir}/locale/*
+%{_datadir}/locale/*/LC_MESSAGES/geomorph.mo
 %{_datadir}/applications/geomorph.desktop
 %{_datadir}/icons/GeoMorph.xpm
 
 %changelog
-* Thu Feb 14 2012 Didier Fabert <didier.fabert@gmail.com> 0.60.1-1
+* Tue Feb 14 2012 Didier Fabert <didier.fabert@gmail.com> 0.60.1-1
 - First Release
