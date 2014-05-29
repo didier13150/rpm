@@ -1,17 +1,18 @@
-%define major_ver 0.60
+%global major_ver 0.60
 Name:           geomorph
 Version:        %{major_ver}.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        A height field editor for Linux
 License:        GPLv2
 Group:          Applications/Multimedia
 URL:            http://geomorph.sourceforge.net
 Source0:        http://sourceforge.net/projects/geomorph/files/geomorph/%{major_ver}/%{name}-%{version}.tar.gz
 Source1:        geomorph.desktop
-
-BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-BuildRequires:  gtkglext-devel, mesa-libGLU-devel
-Requires:       gtkglext-libs, mesa-libGLU
+Patch0:         geomorph-format-security.patch
+BuildRequires:  gtkglext-devel
+BuildRequires:  mesa-libGLU-devel
+BuildRequires:  desktop-file-utils
+Requires:       povray
 
 %description
 Geomorph is a height field generator and editor for the Linux operating system.
@@ -23,43 +24,65 @@ for rendering the landscape.
 
 %prep
 %setup -qn %{name}-%{version}
+%patch0 -p1 -b .format-security
+
+# to avoid rpmlint warnings
+# Remove exe bit from pixmaps
+find . -name \*.xpm -exec chmod -x {} \;
+# Change fsf address
+find src -type f -exec sed -i -e '/Foundation/ s#Inc.,.*#51 Franklin Street, Fifth Floor, Boston, MA 02110-1301#' {} \;
+# Switch to UTF-8
+for file in LISEZMOI AFAIRE FAQ-fr
+do
+    iconv -f ISO-8859-1 -t UTF-8 $file > $file.utf8
+    touch -r $file $file.utf8
+    mv -f $file.utf8 $file
+done
 # Tarball contains an already compiled app.
 # Remove and recompile it.
 %{__rm} -f scenes/colmap
+
+# Remove Hardcoded path
+for file in install-step1-dir install-step2-rcfile install-step3-menu install-step4-desktop install-user
+do
+    sed -i -e '/^VERSION/ s#=.*#=%{version}#g' \
+        -e 's#/usr/local/share/geomorph#%{_datadir}/geomorph#g' \
+        $file
+done
+
 %configure \
     --disable-rpath
 
 %build
 pushd scenes
-g++ colmap.c -o colmap
+%{__cc} ${RPM_OPT_FLAGS} -o colmap colmap.c
 popd
 make %{?_smp_mflags}
 
 %install
-%{__rm} -rf %{buildroot}
-%{__make} install DESTDIR="%{buildroot}"
-
-# Remove sources
-%{__rm} -rf %{buildroot}%{_prefix}/src
+make install DESTDIR="%{buildroot}"
+%find_lang %{name}
+mv %{buildroot}%{_datadir}/geomorph/%{version}/scenes/colmap %{buildroot}%{_bindir}/
+%{__rm} -f %{buildroot}%{_datadir}/geomorph/%{version}/scenes/colmap.c
 # Create directories
-%{__mkdir_p} $RPM_BUILD_ROOT%{_datadir}/icons
-%{__mkdir_p} $RPM_BUILD_ROOT%{_datadir}/applications
+%{__mkdir_p} %{buildroot}%{_datadir}/icons
+%{__mkdir_p} %{buildroot}%{_datadir}/applications
 # Copy new desktop file
-%{__install} %{SOURCE1} $RPM_BUILD_ROOT%{_datadir}/applications
+desktop-file-install --dir=%{buildroot}%{_datadir}/applications %{SOURCE1}
 # Copy icon file
-%{__cp} GeoMorph.xpm $RPM_BUILD_ROOT%{_datadir}/icons
+%{__cp} GeoMorph.xpm %{buildroot}%{_datadir}/icons
 
-%clean
-rm -rf $RPM_BUILD_ROOT
-
-%files
-%defattr(-,root,root,-)
+%files -f %{name}.lang
+%doc ABOUT-NLS AFAIRE AUTHORS ChangeLog FAQ FAQ-fr LISEZMOI NEWS README TODO geomorphrc_de geomorphrc_en geomorphrc_fr
 %{_bindir}/geomorph
+%{_bindir}/colmap
 %{_datadir}/geomorph
-%{_datadir}/locale/*/LC_MESSAGES/geomorph.mo
 %{_datadir}/applications/geomorph.desktop
 %{_datadir}/icons/GeoMorph.xpm
 
 %changelog
+* Tue May 27 2014 Didier Fabert <didier.fabert@gmail.com> 0.60.1-2
+- Follow Fedora Guidelines
+
 * Tue Feb 14 2012 Didier Fabert <didier.fabert@gmail.com> 0.60.1-1
 - First Release

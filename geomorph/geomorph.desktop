@@ -1,12 +1,12 @@
 [Desktop Entry]
 Type=Application
-Version=0.60
+Version=1.0
 Name=Geomorph
 GenericName=Height field editor for Linux
 GenericName[fr]=Editeur de terrains pour Linux
 Exec=geomorph %f
 Icon=/usr/share/icons/GeoMorph.xpm
 Terminal=false
-MimeType=image/png
+MimeType=image/png;
 Categories=Graphics;3DGraphics;
 StartupNotify=true
