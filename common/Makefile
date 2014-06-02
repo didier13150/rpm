@@ -84,8 +84,13 @@ appliance:
 	@mock $(MOCKOPTS) -r '$(TARGET)' --shell 'appliance-creator -n Fedora -c /tmp/graphical.ks' --resultdir=$(SRCDIR)
 	#@mock $(MOCKOPTS) --clean
 
-iso:
-	@echo -e "\033[1;32mBuilding iso\033[0m"
+livecd:
+	@echo -e "\033[1;32mBuilding livecd\033[0m"
+	@mock $(MOCKOPTS) -r '$(TARGET)' --init --resultdir=$(SRCDIR)
+	@mock $(MOCKOPTS) -r '$(TARGET)' --install $(LIVECD_PKGS) --resultdir=$(SRCDIR)
+	@mock $(MOCKOPTS) -r '$(TARGET)' --copyin kickstart/graphical.ks /tmp --resultdir=$(SRCDIR)
+	@mock $(MOCKOPTS) -r '$(TARGET)' --shell 'appliance-creator -n Fedora -c /tmp/graphical.ks' --resultdir=$(SRCDIR)
+	#@mock $(MOCKOPTS) --clean
 
 sources: prepare
 	@echo -e "\033[1;32mDownloading sources\033[0m"
