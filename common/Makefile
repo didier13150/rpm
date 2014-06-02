@@ -14,9 +14,23 @@ TARGET := $(DISTRIB)-$(ARCH)
 SRCURIS := $(shell rpmspec -P $(NAME).spec | grep -i '^source' | awk -F ':' '{print $$2":"$$3}' | tr -d ' ')
 MOCKOPTS := "--disable-plugin=package_state"
 
+
+LIVECD_PKGS :=    livecd-build bash coreutils dbus-python dmraid \
+                  livecd-tools selinux-policy-targeted yum bzip2 cpio diffutils \
+                  findutils gawk gcc gcc-c++ grep gzip info make patch \
+                  redhat-release redhat-rpm-config rpm-build sed shadow-utils \
+                  tar unzip util-linux-ng which squashfs-tools centos-release \
+                  selinux-policy policycoreutils grub parted
+APPLIANCE_PKGS := livecd-build bash coreutils dbus-python dmraid \
+                  appliance-tools selinux-policy-targeted yum bzip2 cpio diffutils \
+                  findutils gawk gcc gcc-c++ grep gzip info make patch \
+                  redhat-release redhat-rpm-config rpm-build sed shadow-utils \
+                  tar unzip util-linux-ng which squashfs-tools centos-release \
+                  selinux-policy policycoreutils grub parted
+	  
 all: fedora
-fedora: clean sources srpm rpmlint build
-centos: clean sources srpm rpmlint el6-build
+fedora: clean sources srpm rpmlint build rpmlint
+centos: clean sources srpm rpmlint el6-build rpmlint
 
 showvars:
 	@echo "ARCH:        $(ARCH)"
@@ -36,7 +50,7 @@ clean:
 
 rpmlint:
 	@echo -e "\033[1;32mChecking "$(NAME)".spec file\033[0m"
-	-rpmlint $(NAME).spec result/$(NAME)*.src.rpm
+	-rpmlint $(NAME).spec result/$(NAME)*.rpm
 
 srpm:
 	@echo -e "\033[1;32mBuilding SRPM file\033[0m"
