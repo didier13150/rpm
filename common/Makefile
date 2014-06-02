@@ -13,6 +13,7 @@ DISTRIB := $(DISTNAME)-$(DISTRELEASE)
 TARGET := $(DISTRIB)-$(ARCH)
 SRCURIS := $(shell rpmspec -P $(NAME).spec | grep -i '^source' | awk -F ':' '{print $$2":"$$3}' | tr -d ' ')
 MOCKOPTS := "--disable-plugin=package_state"
+SRCDIR := $(shell pwd)
 
 all: fedora
 fedora: clean sources srpm rpmlint build
@@ -60,6 +61,17 @@ help:
 	@echo " - srpm:      Make SRPM"
 	@echo " - build:     Make RPMs from SRPM"
 	@echo " - clean:     Delete mock log files and all (S)RPMs"
+
+appliance:
+	@echo -e "\033[1;32mBuilding appliance\033[0m"
+	@mock $(MOCKOPTS) -r '$(TARGET)' --init --resultdir=$(SRCDIR)
+	@mock $(MOCKOPTS) -r '$(TARGET)' --install $(APPLIANCE_PKGS) --resultdir=$(SRCDIR)
+	@mock $(MOCKOPTS) -r '$(TARGET)' --copyin kickstart/graphical.ks /tmp --resultdir=$(SRCDIR)
+	@mock $(MOCKOPTS) -r '$(TARGET)' --shell 'appliance-creator -n Fedora -c /tmp/graphical.ks' --resultdir=$(SRCDIR)
+	#@mock $(MOCKOPTS) --clean
+
+iso:
+	@echo -e "\033[1;32mBuilding iso\033[0m"
 
 sources: prepare
 	@echo -e "\033[1;32mDownloading sources\033[0m"
