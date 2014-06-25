@@ -1,6 +1,6 @@
 Name:     nagstamon
-Version:  0.9.11
-Release:  0.3.head%{?dist}
+Version:  1.0
+Release:  0.rc1%{?dist}
 Summary:  Nagios status monitor for desktop
 Group:    Applications/Productivity
 
@@ -66,6 +66,9 @@ desktop-file-install --dir %{buildroot}/%{_datadir}/applications\
 %{python_sitelib}/%{name}*.egg-info
 
 %changelog
+* Wed Jun 25 2014 Didier Fabert <didier.fabert@gmail.com> 1.0-0.rc1
+- Update from git upstream
+
 * Wed Dec 18 2013 Didier Fabert <didier.fabert@gmail.com> 0.9.11-0.2.head
 - Update from git upstream
 
