@@ -21,12 +21,12 @@ make %{?_smp_mflags}
 %install
 %{__mkdir_p} %{buildroot}%{_bindir}
 %{__install} -pm755 ttygif %{buildroot}%{_bindir}
-%{__install} -pm755 concat.sh %{buildroot}%{_bindir}
+%{__install} -pm755 concat.sh %{buildroot}%{_bindir}/ttygif-concat.sh
 
 %files
 %doc README.md
 %{_bindir}/ttygif
-%{_bindir}/concat.sh
+%{_bindir}/ttygif-concat.sh
 
 %changelog
 * Sun Sep 07 2014 Didier Fabert <didier.fabert@gmail.com> - 1.0.8-1
