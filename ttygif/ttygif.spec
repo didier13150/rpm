@@ -4,7 +4,7 @@ Release:        1%{?dist}
 Summary:        Make GIF from recorded tty
 License:        MIT
 URL:            https://github.com/icholy/ttygif
-Source0:        ttygif.tar.gz
+Source0:        %{name}-%{version}.tar.gz
 BuildRequires:  libbsd-devel
 
 %description
