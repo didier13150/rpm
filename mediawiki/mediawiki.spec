@@ -1,8 +1,8 @@
 %define majorver 1.23
 %global wiki_ext_path %{_datadir}/mediawiki/extensions
 Name:           mediawiki
-Version:        %{majorver}.0rc0
-Release:        0.2%{?dist}
+Version:        %{majorver}.0
+Release:        1%{?dist}
 License:        GPLv2+
 Group:          Development/Tools
 URL:            http://www.mediawiki.org/
@@ -427,6 +427,9 @@ rm -rf %{buildroot}
 %{wiki_ext_path}/ConfirmAccount
 
 %changelog
+* Fri Jun 13 2014 Didier Fabert <didier.fabert@gmail.com> - 1.23.0-1
+- New upstream release.
+
 * Fri May 16 2014 Didier Fabert <didier.fabert@gmail.com> - 1.23.0rc0-0.2
 - Add ConfirmAccount extension
 
