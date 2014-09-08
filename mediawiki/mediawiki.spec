@@ -1,7 +1,7 @@
 %define majorver 1.23
 %global wiki_ext_path %{_datadir}/mediawiki/extensions
 Name:           mediawiki
-Version:        %{majorver}.0
+Version:        %{majorver}.1
 Release:        1%{?dist}
 License:        GPLv2+
 Group:          Development/Tools
@@ -321,6 +321,8 @@ tar -xzf %{SOURCE18} -C %{buildroot}%{wiki_ext_path}/
 %{__cp} %{SOURCE24} %{buildroot}%{wiki_ext_path}/IncludeArticle/
 %{__cp} %{SOURCE25} %{buildroot}%{wiki_ext_path}/NoTitle/
 
+# Remove vcs directories
+find %{buildroot}%{wiki_ext_path} -type d -name '.git' -exec rm -rf {} \; || :
 
 %post
 %{_sbindir}/mw-updateallinstances >> /var/log/mediawiki-updates.log 2>&1 || :
@@ -411,6 +413,9 @@ rm -rf %{buildroot}
 %{wiki_ext_path}/BetaFeatures
 
 %changelog
+* Thu Jun 26 2014 Didier Fabert <didier.fabert@gmail.com> - 1.23.1-1
+- New upstream release.
+
 * Fri Jun 13 2014 Didier Fabert <didier.fabert@gmail.com> - 1.23.0-1
 - New upstream release.
 
