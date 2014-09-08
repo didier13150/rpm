@@ -9,6 +9,7 @@ URL:            http://geomorph.sourceforge.net
 Source0:        http://sourceforge.net/projects/geomorph/files/geomorph/%{major_ver}/%{name}-%{version}.tar.gz
 Source1:        geomorph.desktop
 Patch0:         geomorph-format-security.patch
+Patch1:         geomorph-array-bounds.patch
 BuildRequires:  gtkglext-devel
 BuildRequires:  mesa-libGLU-devel
 BuildRequires:  desktop-file-utils
@@ -25,6 +26,7 @@ for rendering the landscape.
 %prep
 %setup -qn %{name}-%{version}
 %patch0 -p1 -b .format-security
+%patch1 -p1 -b .array-bounds
 
 # to avoid rpmlint warnings
 # Remove exe bit from pixmaps

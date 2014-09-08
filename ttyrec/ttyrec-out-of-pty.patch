@@ -1,0 +1,31 @@
+diff -rup a/Makefile b/Makefile
+--- a/Makefile	2006-06-11 17:52:50.000000000 +0200
++++ b/Makefile	2014-09-07 13:37:23.353256117 +0200
+@@ -1,5 +1,5 @@
+ CC = gcc
+-CFLAGS = -O2
++CFLAGS = -O2 -DHAVE_openpty
+ VERSION = 1.0.8
+ 
+ TARGET = ttyrec ttyplay ttytime
+@@ -10,7 +10,7 @@ DIST =	ttyrec.c ttyplay.c ttyrec.h io.c
+ all: $(TARGET)
+ 
+ ttyrec: ttyrec.o io.o
+-	$(CC) $(CFLAGS) -o ttyrec ttyrec.o io.o
++	$(CC) $(CFLAGS) -o ttyrec ttyrec.o io.o -lutil 
+ 
+ ttyplay: ttyplay.o io.o
+ 	$(CC) $(CFLAGS) -o ttyplay ttyplay.o io.o
+diff -rup a/ttyrec.c b/ttyrec.c
+--- a/ttyrec.c	2006-06-11 17:52:50.000000000 +0200
++++ b/ttyrec.c	2014-09-07 13:38:41.959038110 +0200
+@@ -71,7 +71,7 @@
+ #define _(FOO) FOO
+ 
+ #ifdef HAVE_openpty
+-#include <libutil.h>
++#include <bsd/libutil.h>
+ #endif
+ 
+ #if defined(SVR4) && !defined(CDEL)

@@ -23,6 +23,7 @@ Source15:       https://git.wikimedia.org/git/mediawiki/extensions/RandomImage.t
 Source16:       https://git.wikimedia.org/git/mediawiki/extensions/MultimediaViewer.tgz
 Source17:       https://git.wikimedia.org/git/mediawiki/extensions/CommonsMetadata.tgz
 Source18:       https://git.wikimedia.org/git/mediawiki/extensions/BetaFeatures.tgz
+Source19:       https://git.wikimedia.org/git/mediawiki/extensions/ConfirmAccount.tgz
 Source20:       Linux.tag.php
 Source21:       CalcBitrate.js
 Source22:       CalcBitrate.php
@@ -236,6 +237,15 @@ features with the list of user preferences on the wiki. It uses the existing
 user preferences architecture and a few special pages to accomplish its
 function.
 
+%package ConfirmAccount
+Requires:       %{name}
+Summary:        Requires the approval of new accounts
+Group:          Development/Tools
+
+%description ConfirmAccount
+The ConfirmAccount extension disables direct account creation and requires
+the approval of new accounts by a bureaucrat. 
+
 %prep
 %setup -q
 
@@ -309,6 +319,7 @@ tar -xzf %{SOURCE15} -C %{buildroot}%{wiki_ext_path}/
 tar -xzf %{SOURCE16} -C %{buildroot}%{wiki_ext_path}/
 tar -xzf %{SOURCE17} -C %{buildroot}%{wiki_ext_path}/
 tar -xzf %{SOURCE18} -C %{buildroot}%{wiki_ext_path}/
+tar -xzf %{SOURCE19} -C %{buildroot}%{wiki_ext_path}/
 %{__mkdir_p} %{buildroot}%{wiki_ext_path}/CalcBitrate
 %{__mkdir_p} %{buildroot}%{wiki_ext_path}/CustomTag
 %{__mkdir_p} %{buildroot}%{wiki_ext_path}/SSL_authentification
@@ -355,6 +366,7 @@ rm -rf %{buildroot}
 %exclude %{wiki_ext_path}/MultimediaViewer
 %exclude %{wiki_ext_path}/CommonsMetadata
 %exclude %{wiki_ext_path}/BetaFeatures
+%exclude %{wiki_ext_path}/ConfirmAccount
 
 %files Mpdf
 %defattr(-,root,root,-)
@@ -412,6 +424,10 @@ rm -rf %{buildroot}
 %defattr(-,root,root,-)
 %{wiki_ext_path}/BetaFeatures
 
+%files ConfirmAccount
+%defattr(-,root,root,-)
+%{wiki_ext_path}/ConfirmAccount
+
 %changelog
 * Thu Jun 26 2014 Didier Fabert <didier.fabert@gmail.com> - 1.23.1-1
 - New upstream release.
@@ -419,7 +435,10 @@ rm -rf %{buildroot}
 * Fri Jun 13 2014 Didier Fabert <didier.fabert@gmail.com> - 1.23.0-1
 - New upstream release.
 
-* Fri May 16 2014 Didier Fabert <didier.fabert@gmail.com> - 1.23.0-0.rc0
+* Fri May 16 2014 Didier Fabert <didier.fabert@gmail.com> - 1.23.0rc0-0.2
+- Add ConfirmAccount extension
+
+* Fri May 16 2014 Didier Fabert <didier.fabert@gmail.com> - 1.23.0rc0-0.1
 - New upstream release.
 - Add BetaFeatures extension
 
