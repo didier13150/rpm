@@ -5,6 +5,7 @@ Summary:        Make GIF from recorded tty
 License:        MIT
 URL:            https://github.com/icholy/ttygif
 Source0:        %{name}-%{version}.tar.gz
+Patch0:         ttygif-concat.patch
 BuildRequires:  libbsd-devel
 
 %description
@@ -13,6 +14,7 @@ of ttyplay which calls import on every frame.
 
 %prep
 %setup -qn %{name}-%{version}
+%patch0 -p1
 find . -name '*_osx*' -delete
 
 %build
