@@ -9,7 +9,8 @@ Summary:        Terminal session recorder that outputs self-contained HTML
 Group:          Development/Languages
 License:        MIT
 URL:            https://github.com/theonewolf
-Source:         https://github.com/theonewolf/%{pkgname}/archive/v%{version}.tar.gz
+Source0:        https://github.com/theonewolf/%{pkgname}/archive/v%{version}.tar.gz
+Patch0:         python-TermRecord-prefix.patch
 
 BuildArch:      noarch
 BuildRequires:  python2-devel 
@@ -22,6 +23,7 @@ BuildRequires:  python3-setuptools
 Requires:       python3-jinja2
 Requires:       python3-argparse
 %endif
+Requires:       ubuntu-font-family
 
 Provides: %{pkgname} = %{version}-%{release}
 
@@ -41,8 +43,7 @@ self-contained HTML output
 
 %prep
 %setup -qn %{pkgname}-%{version}
-sed -i -e '/DEFAULT_TEMPLATE/ s#/usr/local#/usr#' src/TermRecord
-sed -i -e '/data_files/ s#/usr/local#/usr#' setup.py
+%patch0 -p1
 rm -rf %{pkgname}.egg-info
 
 %if 0%{?with_python3}
@@ -60,12 +61,13 @@ popd
 
 %install
 %{__python} setup.py install -O1 --skip-build --root %{buildroot}
-
 %if 0%{?with_python3}
 pushd %{py3dir}
 %{__python3} setup.py install -O1 --skip-build --root %{buildroot}
 popd
 %endif
+%{__mkdir_p} %{buildroot}%{_datadir}/%{pkgname}/examples
+%{__install} -m0644 examples/* %{buildroot}%{_datadir}/%{pkgname}/examples
 
 %files
 %doc README.md
