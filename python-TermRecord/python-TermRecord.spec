@@ -15,14 +15,12 @@ Patch0:         python-TermRecord-prefix.patch
 BuildArch:      noarch
 BuildRequires:  python2-devel 
 BuildRequires:  python-setuptools
-Requires:       python-jinja2
-Requires:       python-argparse
 %if 0%{?with_python3}
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
-Requires:       python3-jinja2
-Requires:       python3-argparse
 %endif
+Requires:       python-jinja2
+Requires:       python-argparse
 Requires:       ubuntu-font-family
 
 Provides: %{pkgname} = %{version}-%{release}
