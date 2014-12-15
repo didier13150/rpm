@@ -1,34 +1,42 @@
-Name:     nagstamon
-Version:  1.0
-Release:  0.rc1%{?dist}
-Summary:  Nagios status monitor for desktop
-Group:    Applications/Productivity
+Name:          nagstamon
+Version:       1.0.1
+Release:       1%{?dist}
+Summary:       Nagios status monitor for desktop
+Group:         Applications/Productivity
 
-License:  GPLv2+
-URL:      http://nagstamon.ifw-dresden.de/
-Source0:  http://sourceforge.net/projects/nagstamon/files/nagstamon/nagstamon%20%{version}/%{name}_%{version}.tar.gz
+License:       GPLv2+
+URL:           http://nagstamon.ifw-dresden.de/
+Source0:       http://sourceforge.net/projects/nagstamon/files/nagstamon/nagstamon%20%{version}/%{name}_%{version}.tar.gz
 
 BuildArch:     noarch
 BuildRequires: pygtk2
 BuildRequires: python2-devel  
 BuildRequires: desktop-file-utils
+BuildRequires: Distutils
+Requires:      gnome-icon-theme
 Requires:      pygtk2
 Requires:      python-setuptools
+Requires:      python-keyring
+Requires:      python-SecretStorage
+Requires:      python-crypto
 Requires:      python-BeautifulSoup
 Requires:      gnome-python2-libegg 
 
 %description
-Nagstamon is a Nagios status monitor which takes place in system tray
-or on desktop (GNOME, KDE, Windows) as floating status bar to inform
-you in real-time about the status of your Nagios and derivatives
-monitored network. It allows to connect to multiple Nagios,
-Icinga, Opsview, Op5, Check_MK/Multisite and Centreon servers.
+Nagstamon is a Nagios status monitor for the desktop. It connects to multiple
+Nagios, Icinga, Opsview, Centreon, Op5 Monitor/Ninja and Check_MK Multisite
+monitoring servers and resides in systray or as a floating statusbar at the
+desktop showing a brief summary of critical, warning, unknown, unreachable and
+down hosts and services and pops up a detailed status overview when moving the
+mouse pointer over it. Connecting to displayed hosts and services is easily
+established by context menu via SSH, RDP and VNC. Users can be notified by
+sound. Hosts and services can be filtered by category and regular expressions.
 
 %prep
-%setup -q -n Nagstamon
+%setup -qn Nagstamon
 
 #Remove embedded BeautifulSoup http://sourceforge.net/p/nagstamon/bugs/44/
-rm -rf Nagstamon/BeautifulSoup.py
+rm -rf Nagstamon/thirdparty/BeautifulSoup.py
 
 %build
 %{__python} setup.py build
@@ -66,6 +74,9 @@ desktop-file-install --dir %{buildroot}/%{_datadir}/applications\
 %{python_sitelib}/%{name}*.egg-info
 
 %changelog
+* Wed Jun 25 2014 Didier Fabert <didier.fabert@gmail.com> 1.0.1-1
+- Update from git upstream
+
 * Wed Jun 25 2014 Didier Fabert <didier.fabert@gmail.com> 1.0-0.rc1
 - Update from git upstream
 
