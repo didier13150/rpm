@@ -54,7 +54,7 @@ copy:
 	@for dir in $(PKGS) ; do \
 		if [ -d $$dir/result ] ; then \
 			mkdir -p $(REPODIR)/$$dir ; \
-			cp -u $$dir/result/*.rpm $(REPODIR)/$$dir/ || true ; \
+			cp -u $$dir/result/*.rpm $(REPODIR)/$$dir/ 2>/dev/null || true ; \
 		fi ; \
 	done
 
