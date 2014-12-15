@@ -1,12 +1,22 @@
-#!/usr/bin/env xdg-open
 [Desktop Entry]
-Version=1.0
-Name=FracPlanet
+Categories=Graphics;3DGraphics;
+Comment[en_US]=
+Comment=
 Exec=fracplanet
-Icon=fracplanet
-Type=Application
+GenericName[en_US]=Fractal planet and terrain generator
 GenericName=Fractal planet and terrain generator
 GenericName[fr]=Générateur de planète et de terrain fractal
-Terminal=false
-Categories=Graphics;3DGraphics;
+Icon=fracplanet
+MimeType=
+Name[en_US]=FracPlanet
+Name=FracPlanet
+Path=
 StartupNotify=true
+Terminal=false
+TerminalOptions=
+Type=Application
+Version=1.0
+X-DBUS-ServiceName=
+X-DBUS-StartupType=
+X-KDE-SubstituteUID=false
+X-KDE-Username=
