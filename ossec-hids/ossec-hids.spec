@@ -201,21 +201,21 @@ echo "DATE=\"`date`\""                        >> ossec-init.conf
 %{__mkdir_p} ${RPM_BUILD_ROOT}%{_localstatedir}/ossec/var/run
 %{__mkdir_p} ${RPM_BUILD_ROOT}%{_localstatedir}/ossec/.ssh
 
-install -m 0600 ossec-init.conf ${RPM_BUILD_ROOT}%{_sysconfdir}
+%{__install} -m 0600 ossec-init.conf ${RPM_BUILD_ROOT}%{_sysconfdir}
 
-install -m 0644 etc/ossec.conf ${RPM_BUILD_ROOT}%{_localstatedir}/ossec/etc/ossec.conf.sample
-install -m 0644 etc/ossec-{agent,server}.conf ${RPM_BUILD_ROOT}%{_localstatedir}/ossec/etc
-install -m 0644 etc/*.xml ${RPM_BUILD_ROOT}%{_localstatedir}/ossec/etc
-install -m 0644 etc/internal_options* ${RPM_BUILD_ROOT}%{_localstatedir}/ossec/etc
-install -m 0644 etc/rules/*xml ${RPM_BUILD_ROOT}%{_localstatedir}/ossec/rules
-install -m 0644 etc/rules/translated/pure_ftpd/* ${RPM_BUILD_ROOT}%{_localstatedir}/ossec/rules/translated/pure_ftpd
-install -m 0644 etc/templates/config/* ${RPM_BUILD_ROOT}%{_localstatedir}/ossec/etc/templates/
-install -m 0750 bin/* ${RPM_BUILD_ROOT}%{_localstatedir}/ossec/bin
-install -m 0755 active-response/*.sh ${RPM_BUILD_ROOT}%{_localstatedir}/ossec/active-response/bin
-install -m 0644 src/rootcheck/db/*.txt ${RPM_BUILD_ROOT}%{_localstatedir}/ossec/etc/shared
-install -m 0644 src/os_dbd/mysql.schema ${RPM_BUILD_ROOT}%{_localstatedir}/ossec/etc/mysql/mysql.schema
-install -m 0550 src/init/ossec-{client,server}.sh ${RPM_BUILD_ROOT}%{_localstatedir}/ossec/bin
-install -m 0550 src/agentlessd/scripts/* ${RPM_BUILD_ROOT}%{_localstatedir}/ossec/agentless
+%{__install} -m 0644 etc/ossec.conf ${RPM_BUILD_ROOT}%{_localstatedir}/ossec/etc/ossec.conf.sample
+%{__install} -m 0644 etc/ossec-{agent,server}.conf ${RPM_BUILD_ROOT}%{_localstatedir}/ossec/etc
+%{__install} -m 0644 etc/*.xml ${RPM_BUILD_ROOT}%{_localstatedir}/ossec/etc
+%{__install} -m 0644 etc/internal_options* ${RPM_BUILD_ROOT}%{_localstatedir}/ossec/etc
+%{__install} -m 0644 etc/rules/*xml ${RPM_BUILD_ROOT}%{_localstatedir}/ossec/rules
+%{__install} -m 0644 etc/rules/translated/pure_ftpd/* ${RPM_BUILD_ROOT}%{_localstatedir}/ossec/rules/translated/pure_ftpd
+%{__install} -m 0644 etc/templates/config/* ${RPM_BUILD_ROOT}%{_localstatedir}/ossec/etc/templates/
+%{__install} -m 0750 bin/* ${RPM_BUILD_ROOT}%{_localstatedir}/ossec/bin
+%{__install} -m 0755 active-response/*.sh ${RPM_BUILD_ROOT}%{_localstatedir}/ossec/active-response/bin
+%{__install} -m 0644 src/rootcheck/db/*.txt ${RPM_BUILD_ROOT}%{_localstatedir}/ossec/etc/shared
+%{__install} -m 0644 src/os_dbd/mysql.schema ${RPM_BUILD_ROOT}%{_localstatedir}/ossec/etc/mysql/mysql.schema
+%{__install} -m 0550 src/init/ossec-{client,server}.sh ${RPM_BUILD_ROOT}%{_localstatedir}/ossec/bin
+%{__install} -m 0550 src/agentlessd/scripts/* ${RPM_BUILD_ROOT}%{_localstatedir}/ossec/agentless
 %{__install} -m 0755 bin/agent-auth           ${RPM_BUILD_ROOT}%{_localstatedir}/ossec/bin
 
 # Install contrib files
@@ -229,17 +229,17 @@ touch ${RPM_BUILD_ROOT}%{_localstatedir}/ossec/etc/ossec.conf
 
 %if %{asl}
 mkdir -p $RPM_BUILD_ROOT/etc/logrotate.d
-install -m 0755 %{SOURCE5} ${RPM_BUILD_ROOT}%{_localstatedir}/ossec/active-response/bin/asl-shun.pl
-install -m 0644 %{SOURCE6} ${RPM_BUILD_ROOT}/etc/logrotate.d/%{name}
-install -m 0755 %{SOURCE7} ${RPM_BUILD_ROOT}%{_localstatedir}/ossec/active-response/bin/zabbix-alert.sh
-install -m 0755 %{SOURCE8} ${RPM_BUILD_ROOT}%{_localstatedir}/ossec/bin/ossec-configure
-install -m 0644 %{SOURCE9} ${RPM_BUILD_ROOT}%{_localstatedir}/ossec/etc/shared/agent.conf
+%{__install} -m 0755 %{SOURCE5} ${RPM_BUILD_ROOT}%{_localstatedir}/ossec/active-response/bin/asl-shun.pl
+%{__install} -m 0644 %{SOURCE6} ${RPM_BUILD_ROOT}/etc/logrotate.d/%{name}
+%{__install} -m 0755 %{SOURCE7} ${RPM_BUILD_ROOT}%{_localstatedir}/ossec/active-response/bin/zabbix-alert.sh
+%{__install} -m 0755 %{SOURCE8} ${RPM_BUILD_ROOT}%{_localstatedir}/ossec/bin/ossec-configure
+%{__install} -m 0644 %{SOURCE9} ${RPM_BUILD_ROOT}%{_localstatedir}/ossec/etc/shared/agent.conf
 %endif
 
 %if %{with_systemd}
 # Unit file
 %{__mkdir_p} %{buildroot}%{_unitdir}/
-install -Dp -m0644 %{SOURCE1} %{buildroot}%{_unitdir}/ossec-hids.service
+%{__install} -Dp -m0644 %{SOURCE1} %{buildroot}%{_unitdir}/ossec-hids.service
 %{__rm} -f %{buildroot}%{_initrddir}/ossec-hids
 %else
 mkdir -p ${RPM_BUILD_ROOT}%{_initrddir}
