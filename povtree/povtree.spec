@@ -10,6 +10,7 @@ Source1:        %{name}.desktop
 Source2:        %{name}
 Source3:        make-icons.sh
 Source4:        icon.svg
+Source5:        README.icon
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires:  java-devel
@@ -29,7 +30,7 @@ save it either as an include file or as a mesh file.
 
 %prep
 %setup -qc %{name}%{version}
-cp %{SOURCE3} %{SOURCE4} .
+cp %{SOURCE3} %{SOURCE4} %{SOURCE5} .
 
 %build
 sed -i -e 's/@appname@/%{name}/' make-icons.sh
@@ -68,6 +69,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root,-)
+%doc README.icon
 %{_bindir}/%{name}
 %{_javadir}/%{name}
 %{_datadir}/%{name}
