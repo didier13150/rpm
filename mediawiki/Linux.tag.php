@@ -11,6 +11,7 @@ function linuxParserInit( Parser $parser ) {
         $parser->setHook( 'app', 'appRender' );
         $parser->setHook( 'class', 'classRender' );
         $parser->setHook( 'previous', 'previousPage' );
+        $parser->setHook( 'showterm', 'showtermRender' );
         // Always return true from this function. The return value does not denote
         // success or otherwise have meaning - it just must always be true.
         return true;
@@ -40,3 +41,12 @@ function previousPage( $input, array $args, Parser $parser, PPFrame $frame ) {
         return '<a href="javascript:history.go(-1)">' . htmlspecialchars( $input ) . '</a>';
 }
 
+function showtermRender( $input, array $args, Parser $parser, PPFrame $frame ) {
+        $width = 640;
+        $height = 480;
+        $border = 0;
+        if ( isset( $args['width'] ) && intval( $args['width'] ) ) $width = intval( $args['width'] );
+        if ( isset( $args['height'] ) && intval( $args['height'] ) ) $height = intval( $args['height'] );
+        if ( isset( $args['border'] ) && intval( $args['border'] ) ) $border = intval( $args['border'] );
+        return '<iframe src="https://showterm.b2pweb.com/' . htmlspecialchars( $input ) . '" width="' . $width . '" height="' . $height . '" border="' . $border . '"></iframe>';
+}
