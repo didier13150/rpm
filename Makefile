@@ -1,4 +1,4 @@
-PKGS := $(shell ls -l | grep ^d | grep -v '^common$$' | grep -v '^doc$$' | awk '{print $$9}')
+PKGS := $(shell ls -l | grep ^d | grep -v '^common$$' | grep -v '^doc$$' | awk '{print $$9}' | grep -v '^povray' )
 LOGFILE := globalbuild.log
 ARCH := $(shell uname -i)
 DISTNAME := $(shell source /etc/os-release && echo $${ID})
@@ -54,7 +54,7 @@ copy:
 	@for dir in $(PKGS) ; do \
 		if [ -d $$dir/result ] ; then \
 			mkdir -p $(REPODIR)/$$dir ; \
-			cp -u $$dir/result/*.rpm $(REPODIR)/$$dir/ || true ; \
+			cp -u $$dir/result/*fc$(DISTRELEASE)*.rpm $(REPODIR)/$$dir/ || true ; \
 		fi ; \
 	done
 
