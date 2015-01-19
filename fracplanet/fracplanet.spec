@@ -29,7 +29,7 @@ or Blender. Written in C++ using Qt and OpenGL.
 
 %package apidoc
 Group: Documentation
-Summary: fracplanet API docs
+Summary: Fracplanet API docs
 Requires: fracplanet = %{version}-%{release}
 
 %description apidoc

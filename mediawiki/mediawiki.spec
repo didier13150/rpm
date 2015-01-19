@@ -1,4 +1,4 @@
-%define majorver 1.23
+%define majorver 1.24
 %global wiki_ext_path %{_datadir}/mediawiki/extensions
 Name:           mediawiki
 Version:        %{majorver}.1
@@ -30,6 +30,8 @@ Source22:       CalcBitrate.php
 Source23:       SSLAuthPlugin.php
 Source24:       http://www.bomber-online.de/progs/IncludeArticle/IncludeArticle.php
 Source25:       NoTitle.php
+Source26:       https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Widgets.tgz
+
 BuildArch:      noarch
 # to make sure the "apache" group is created before mediawiki is installed
 Requires(pre):  httpd
@@ -246,6 +248,18 @@ Group:          Development/Tools
 The ConfirmAccount extension disables direct account creation and requires
 the approval of new accounts by a bureaucrat. 
 
+%package Widgets
+Requires:       %{name}
+Summary:        Allows the creation of raw HTML pages that can be embedded
+Group:          Development/Tools
+
+%description Widgets
+The Widgets extension allows the creation of raw HTML pages that can be
+embedded (similary to templates) in normal wiki pages. You do this by
+creating pages in the Widget namespace. They avoid the security problems of
+raw HTML in editable wiki pages because the privilege to edit in the Widget
+namespace is managed. Many pre-written Widgets are available.
+
 %prep
 %setup -q
 
@@ -270,12 +284,12 @@ rm -fr %{buildroot}%{_datadir}/mediawiki/{t,test,tests}
 rm -fr %{buildroot}%{_datadir}/mediawiki/includes/zhtable
 find %{buildroot}%{_datadir}/mediawiki/ \
   \( -name .htaccess -or -name \*.cmi \) \
-  | xargs -r rm
+  -delete
 
 # fix permissions
 find %{buildroot}%{_datadir}/mediawiki -name \*.pl | xargs -r chmod +x
-chmod +x %{buildroot}%{_datadir}/mediawiki/maintenance/cssjanus/cssjanus.py
-chmod +x %{buildroot}%{_datadir}/mediawiki/maintenance/cssjanus/csslex.py
+#chmod +x %{buildroot}%{_datadir}/mediawiki/maintenance/cssjanus/cssjanus.py
+#chmod +x %{buildroot}%{_datadir}/mediawiki/maintenance/cssjanus/csslex.py
 #chmod +x %{buildroot}%{_datadir}/mediawiki/maintenance/hiphop/make
 #chmod +x %{buildroot}%{_datadir}/mediawiki/maintenance/hiphop/run-server
 chmod +x %{buildroot}%{_datadir}/mediawiki/maintenance/storage/make-blobs
@@ -284,11 +298,13 @@ chmod +x %{buildroot}%{_datadir}/mediawiki/includes/normal/UtfNormalTest2.php
 chmod +x %{buildroot}%{_datadir}/mediawiki/extensions/ConfirmEdit/captcha.py
 
 # remove version control/patch files
-find %{buildroot} -name .svnignore | xargs -r rm
-find %{buildroot} -name \*.commoncode | xargs -r rm
-find %{buildroot} -name .gitreview | xargs -r rm
-find %{buildroot} -name .jshintignore | xargs -r rm
-find %{buildroot} -name .jshintrc | xargs -r rm
+find %{buildroot} -name .svnignore -delete
+find %{buildroot} -name \*.commoncode -delete
+find %{buildroot} -name .gitreview -delete
+find %{buildroot} -name .gitignore -delete
+find %{buildroot} -name .gitmodules -delete
+find %{buildroot} -name .jshintignore -delete
+find %{buildroot} -name .jshintrc -delete
 
 # https://bugzilla.wikimedia.org/show_bug.cgi?id=49436
 rm -f %{buildroot}%{_datadir}/mediawiki/maintenance/language/zhtable/trad2simp_supp_unset.manual
@@ -320,6 +336,7 @@ tar -xzf %{SOURCE16} -C %{buildroot}%{wiki_ext_path}/
 tar -xzf %{SOURCE17} -C %{buildroot}%{wiki_ext_path}/
 tar -xzf %{SOURCE18} -C %{buildroot}%{wiki_ext_path}/
 tar -xzf %{SOURCE19} -C %{buildroot}%{wiki_ext_path}/
+tar -xzf %{SOURCE26} -C %{buildroot}%{wiki_ext_path}/
 %{__mkdir_p} %{buildroot}%{wiki_ext_path}/CalcBitrate
 %{__mkdir_p} %{buildroot}%{wiki_ext_path}/CustomTag
 %{__mkdir_p} %{buildroot}%{wiki_ext_path}/SSL_authentification
@@ -367,6 +384,7 @@ rm -rf %{buildroot}
 %exclude %{wiki_ext_path}/CommonsMetadata
 %exclude %{wiki_ext_path}/BetaFeatures
 %exclude %{wiki_ext_path}/ConfirmAccount
+%exclude %{wiki_ext_path}/Widgets
 
 %files Mpdf
 %defattr(-,root,root,-)
@@ -428,7 +446,21 @@ rm -rf %{buildroot}
 %defattr(-,root,root,-)
 %{wiki_ext_path}/ConfirmAccount
 
+%files Widgets
+%defattr(-,root,root,-)
+%{wiki_ext_path}/Widgets
+
 %changelog
+* Mon Jan 19 2015 Didier Fabert <didier.fabert@gmail.com> - 1.24.1-1
+- New upstream release.
+
+* Mon Dec 15 2014 Didier Fabert <didier.fabert@gmail.com> - 1.24.0-1
+- New upstream release.
+
+* Tue Sep 09 2014 Didier Fabert <didier.fabert@gmail.com> - 1.23.3-1
+- New upstream release.
+- Add Widgets extension
+
 * Thu Jun 26 2014 Didier Fabert <didier.fabert@gmail.com> - 1.23.1-1
 - New upstream release.
 

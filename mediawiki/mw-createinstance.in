@@ -24,6 +24,10 @@ if ! test -e "$path"/images; then
   ln -s "@datadir@"/mediawiki/images/.htaccess "$path"/images
   chown apache:apache "$path"/images
 fi
+if ! test -e "$path"/cache; then
+  mkdir "$path"/cache
+  chown apache:apache "$path"/cache
+fi
 if test -h "$path"/redirect.php; then
   rm -f "$path"/redirect.php
 fi
