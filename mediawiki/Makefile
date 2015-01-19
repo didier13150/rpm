@@ -2,7 +2,7 @@ SRCDIR := $(shell pwd)
 NAME := $(shell basename $(SRCDIR))
 include ../common/Makefile
 GERRITSRCS := Mpdf CategoryTree Math Auth_remoteuser
-WIKIMEDIASRCS := Git2Pages RandomImage MultimediaViewer CommonsMetadata BetaFeatures ConfirmAccount
+WIKIMEDIASRCS := Git2Pages RandomImage MultimediaViewer CommonsMetadata BetaFeatures ConfirmAccount PdfHandler
 SPECIALSRCS := Widgets
 
 prepare:
