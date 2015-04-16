@@ -5,6 +5,8 @@ GERRITSRCS := Mpdf CategoryTree Math Auth_remoteuser
 WIKIMEDIASRCS := Git2Pages RandomImage MultimediaViewer CommonsMetadata BetaFeatures ConfirmAccount PdfHandler
 SPECIALSRCS := Widgets
 
+clean-all: clean clean-extension
+
 prepare:
 	@echo -e "\033[1;32mDownloading extensions from GIT\033[0m"
 	
@@ -38,7 +40,7 @@ prepare:
 	done
 
 clean-extension:
-	@for extension in $(GERRITSRCS) ; do \
+	@for extension in $(GERRITSRCS) $(SPECIALSRCS) ; do \
 		rm -f  $$extension.tgz ; \
 	done
 	@for extension in $(WIKIMEDIASRCS) ; do \
