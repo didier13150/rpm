@@ -31,6 +31,7 @@ Source23:       SSLAuthPlugin.php
 Source24:       http://www.bomber-online.de/progs/IncludeArticle/IncludeArticle.php
 Source25:       NoTitle.php
 Source26:       https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Widgets.tgz
+Source27:       https://git.wikimedia.org/git/mediawiki/extensions/PdfHandler.tgz
 
 BuildArch:      noarch
 # to make sure the "apache" group is created before mediawiki is installed
@@ -56,7 +57,6 @@ Provides:       mediawiki-Interwiki = %{version}-%{release}
 Provides:       mediawiki-LocalisationUpdate = %{version}-%{release}
 Provides:       mediawiki-Nuke = %{version}-%{release}
 Provides:       mediawiki-ParserFunctions = %{version}-%{release}
-Provides:       mediawiki-PdfHandler = %{version}-%{release}
 Provides:       mediawiki-Poem = %{version}-%{release}
 Provides:       mediawiki-Renameuser = %{version}-%{release}
 Provides:       mediawiki-SpamBlacklist = %{version}-%{release}
@@ -77,7 +77,6 @@ Obsoletes:      mediawiki-Interwiki < %{version}-%{release}
 Obsoletes:      mediawiki-LocalisationUpdate < %{version}-%{release}
 Obsoletes:      mediawiki-Nuke < %{version}-%{release}
 Obsoletes:      mediawiki-ParserFunctions < %{version}-%{release}
-Obsoletes:      mediawiki-PdfHandler < %{version}-%{release}
 Obsoletes:      mediawiki-Poem < %{version}-%{release}
 Obsoletes:      mediawiki-Renameuser < %{version}-%{release}
 Obsoletes:      mediawiki-SpamBlacklist < %{version}-%{release}
@@ -260,6 +259,18 @@ creating pages in the Widget namespace. They avoid the security problems of
 raw HTML in editable wiki pages because the privilege to edit in the Widget
 namespace is managed. Many pre-written Widgets are available.
 
+%package PdfHandler
+Requires:       %{name}
+Summary:        Shows uploaded pdf files in a multipage preview layout
+Group:          Development/Tools
+Requires:       ghostscript, poppler-utils, php-mbstring
+
+%description PdfHandler
+The PdfHandler extension shows uploaded pdf files in a multipage preview layout.
+With the Proofread Page extension enabled, pdfs can be displayed side-by-side
+with text for transcribing books and other documents, as is commonly done with
+DjVu files.
+
 %prep
 %setup -q
 
@@ -337,6 +348,7 @@ tar -xzf %{SOURCE17} -C %{buildroot}%{wiki_ext_path}/
 tar -xzf %{SOURCE18} -C %{buildroot}%{wiki_ext_path}/
 tar -xzf %{SOURCE19} -C %{buildroot}%{wiki_ext_path}/
 tar -xzf %{SOURCE26} -C %{buildroot}%{wiki_ext_path}/
+tar -xzf %{SOURCE27} -C %{buildroot}%{wiki_ext_path}/
 %{__mkdir_p} %{buildroot}%{wiki_ext_path}/CalcBitrate
 %{__mkdir_p} %{buildroot}%{wiki_ext_path}/CustomTag
 %{__mkdir_p} %{buildroot}%{wiki_ext_path}/SSL_authentification
@@ -385,6 +397,7 @@ rm -rf %{buildroot}
 %exclude %{wiki_ext_path}/BetaFeatures
 %exclude %{wiki_ext_path}/ConfirmAccount
 %exclude %{wiki_ext_path}/Widgets
+%exclude %{wiki_ext_path}/PdfHandler
 
 %files Mpdf
 %defattr(-,root,root,-)
@@ -449,6 +462,10 @@ rm -rf %{buildroot}
 %files Widgets
 %defattr(-,root,root,-)
 %{wiki_ext_path}/Widgets
+
+%files PdfHandler
+%defattr(-,root,root,-)
+%{wiki_ext_path}/PdfHandler
 
 %changelog
 * Thu Apr 16 2015 Didier Fabert <didier.fabert@gmail.com> - 1.24.2-1
