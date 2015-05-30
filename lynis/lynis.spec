@@ -1,12 +1,11 @@
 Name:           lynis
-Version:        1.5.1
+Version:        2.1.0
 Release:        1%{?dist}
 Summary:        Security and system auditing tool
 License:        GPLv3
 URL:            http://cisofy.com/lynis/
 Source0:        http://cisofy.com/files/%{name}-%{version}.tar.gz
-Patch0:         lynis-grub-sha-password.patch
-Patch1:         lynis-legal-banner-add-string.patch
+Patch0:         lynis-legal-banner-add-string.patch
 BuildArch:      noarch
 Requires:       audit
 Requires:       e2fsprogs
@@ -20,9 +19,8 @@ state of the machine, detects security issues and provides suggestions to
 improve the security defense of the system.
 
 %prep
-%setup -q
+%setup -qn %{name}
 %patch0 -p1
-%patch1 -p1
 
 %build
 # Empty build.
@@ -62,6 +60,9 @@ touch %{buildroot}%{_localstatedir}/log/lynis-report.dat
 %ghost %{_localstatedir}/log/lynis-report.dat
 
 %changelog
+* Sat May 30 2015 Didier Fabert <didier.fabert@gmail.com> - 2.1.0-1
+- Update to 2.1.0
+
 * Sun Apr 13 2014 Didier Fabert <didier.fabert@gmail.com> - 1.5.0-1
 - Update to 1.5.0
 
