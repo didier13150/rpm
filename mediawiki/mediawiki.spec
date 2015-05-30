@@ -1,7 +1,7 @@
-%define majorver 1.24
+%define majorver 1.25
 %global wiki_ext_path %{_datadir}/mediawiki/extensions
 Name:           mediawiki
-Version:        %{majorver}.2
+Version:        %{majorver}.1
 Release:        1%{?dist}
 License:        GPLv2+
 Group:          Development/Tools
@@ -305,7 +305,7 @@ find %{buildroot}%{_datadir}/mediawiki -name \*.pl | xargs -r chmod +x
 #chmod +x %{buildroot}%{_datadir}/mediawiki/maintenance/hiphop/run-server
 chmod +x %{buildroot}%{_datadir}/mediawiki/maintenance/storage/make-blobs
 chmod +x %{buildroot}%{_datadir}/mediawiki/includes/limit.sh
-chmod +x %{buildroot}%{_datadir}/mediawiki/includes/normal/UtfNormalTest2.php
+#chmod +x %{buildroot}%{_datadir}/mediawiki/includes/normal/UtfNormalTest2.php
 chmod +x %{buildroot}%{_datadir}/mediawiki/extensions/ConfirmEdit/captcha.py
 
 # remove version control/patch files
@@ -468,6 +468,9 @@ rm -rf %{buildroot}
 %{wiki_ext_path}/PdfHandler
 
 %changelog
+* Wed May 27 2015 Didier Fabert <didier.fabert@gmail.com> - 1.25.1-1
+- New upstream release.
+
 * Thu Apr 16 2015 Didier Fabert <didier.fabert@gmail.com> - 1.24.2-1
 - New upstream release.
 
