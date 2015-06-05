@@ -4,6 +4,7 @@ include ../common/Makefile
 GERRITSRCS := Mpdf CategoryTree Math Auth_remoteuser
 WIKIMEDIASRCS := Git2Pages RandomImage MultimediaViewer CommonsMetadata BetaFeatures ConfirmAccount PdfHandler
 SPECIALSRCS := Widgets
+VENDORSRC := vendor
 
 clean-all: clean clean-extension
 
@@ -24,6 +25,16 @@ prepare:
 		if [ ! -f $$extension.tgz ] ; then \
 			echo -n "$$extension: " ; \
 			git clone https://gerrit.wikimedia.org/r/p/mediawiki/extensions/$$extension.git ; \
+			pushd $$extension ; git submodule init ; git submodule update ; popd ; \
+			tar -czf $$extension.tgz $$extension ; \
+			rm -rf $$extension ; \
+		fi ; \
+	done
+	@for extension in $(VENDORSRC) ; do \
+		echo -e "\033[1;32m$$extension\033[0m" ; \
+		if [ ! -f $$extension.tgz ] ; then \
+			echo -n "$$extension: " ; \
+			git clone https://gerrit.wikimedia.org/r/p/mediawiki/$$extension.git ; \
 			pushd $$extension ; git submodule init ; git submodule update ; popd ; \
 			tar -czf $$extension.tgz $$extension ; \
 			rm -rf $$extension ; \

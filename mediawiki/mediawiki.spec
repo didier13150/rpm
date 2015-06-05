@@ -1,8 +1,9 @@
 %define majorver 1.25
-%global wiki_ext_path %{_datadir}/mediawiki/extensions
+%global wiki_path %{_datadir}/mediawiki
+%global wiki_ext_path %{wiki_path}/extensions
 Name:           mediawiki
 Version:        %{majorver}.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+
 Group:          Development/Tools
 URL:            http://www.mediawiki.org/
@@ -32,7 +33,8 @@ Source24:       http://www.bomber-online.de/progs/IncludeArticle/IncludeArticle.
 Source25:       NoTitle.php
 Source26:       https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Widgets.tgz
 Source27:       https://git.wikimedia.org/git/mediawiki/extensions/PdfHandler.tgz
-
+# https://www.mediawiki.org/wiki/Thread:Project:Support_desk/Fatal_error:_Interface_%27Psr%5CLog%5CLoggerInterface%27_not_found
+Source50:       https://gerrit.wikimedia.org/r/p/mediawiki/vendor.tgz
 BuildArch:      noarch
 # to make sure the "apache" group is created before mediawiki is installed
 Requires(pre):  httpd
@@ -299,6 +301,7 @@ find %{buildroot}%{_datadir}/mediawiki/ \
 
 # fix permissions
 find %{buildroot}%{_datadir}/mediawiki -name \*.pl | xargs -r chmod +x
+find %{buildroot}%{_datadir}/mediawiki -name \*.py | xargs -r chmod +x
 #chmod +x %{buildroot}%{_datadir}/mediawiki/maintenance/cssjanus/cssjanus.py
 #chmod +x %{buildroot}%{_datadir}/mediawiki/maintenance/cssjanus/csslex.py
 #chmod +x %{buildroot}%{_datadir}/mediawiki/maintenance/hiphop/make
@@ -336,6 +339,9 @@ chmod 0755 %{buildroot}%{_sbindir}/mw-*
 mkdir %{buildroot}%{_sysconfdir}/mediawiki
 echo /var/www/wiki > %{buildroot}%{_sysconfdir}/mediawiki/instances
 
+# Add vendor
+tar -xzf %{SOURCE50} -C %{buildroot}%{wiki_path}/
+
 # Extract extensions
 tar -xzf %{SOURCE10} -C %{buildroot}%{wiki_ext_path}/
 tar -xzf %{SOURCE11} -C %{buildroot}%{wiki_ext_path}/
@@ -362,7 +368,7 @@ tar -xzf %{SOURCE27} -C %{buildroot}%{wiki_ext_path}/
 %{__cp} %{SOURCE25} %{buildroot}%{wiki_ext_path}/NoTitle/
 
 # Remove vcs directories
-find %{buildroot}%{wiki_ext_path} -type d -name '.git' -exec rm -rf {} \; || :
+find %{buildroot}%{wiki_path} -type d -name '.git*' -exec rm -rf {} \; || :
 
 %post
 %{_sbindir}/mw-updateallinstances >> /var/log/mediawiki-updates.log 2>&1 || :
@@ -468,6 +474,9 @@ rm -rf %{buildroot}
 %{wiki_ext_path}/PdfHandler
 
 %changelog
+* Thu Jun 04 2015 Didier Fabert <didier.fabert@gmail.com> - 1.25.1-2
+- Add missing vendor directory for mediawiki
+
 * Wed May 27 2015 Didier Fabert <didier.fabert@gmail.com> - 1.25.1-1
 - New upstream release.
 
