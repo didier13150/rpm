@@ -1,6 +1,6 @@
 Summary:        Linux Security Auditing Tool
 Name:           lsat
-Version:        0.9.8
+Version:        0.9.8.2
 Release:        1%{?dist}
 License:        GPLv2
 Group:          Applications/System
@@ -43,6 +43,9 @@ make %{?_smp_mflags}
 %{_mandir}/man*/%{name}*
 
 %changelog
+* Sat May 30 2015 Didier Fabert <didier.fabert@gmail.com> 0.9.8.2-1
+- Update from upstream
+
 * Tue May 06 2014 Didier Fabert <didier.fabert@gmail.com> 0.9.8-1
 - First Import
 
