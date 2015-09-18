@@ -1,20 +1,23 @@
-%define alpha alpha6.1
+%define candidate beta2.1
 
 Name:           keepassx
 Version:        2.0
-Release:        0.3.%{alpha}%{?dist}
+Release:        0.4.%{candidate}%{?dist}
 Summary:        Cross-platform password manager
 Group:          User Interface/Desktops
 License:        GPLv2+
 URL:            http://keepassx.sourceforge.net
-Source0:        https://github.com/didier13150/%{name}/archive/%{name}-%{version}-%{alpha}.tar.gz
+Source0:        https://github.com/didier13150/%{name}/archive/%{name}-%{version}-%{candidate}.tar.gz
 Source1:        %{name}.desktop
-BuildRequires:  qt4-devel > 4.1
+BuildRequires:  qt5-qtx11extras-devel
+BuildRequires:  qt5-linguist
+BuildRequires:  qt5-qtbase-devel
 BuildRequires:  libXtst-devel
 BuildRequires:  ImageMagick
 BuildRequires:  desktop-file-utils
 BuildRequires:  cmake
 BuildRequires:  libgcrypt-devel
+BuildRequires:  zlib-devel
 Requires:       hicolor-icon-theme
 Requires:       libgcrypt
 
@@ -108,6 +111,9 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 %{_datadir}/mime/packages/keepassx.xml
 
 %changelog
+* Fri Sep 18 2015 Didier Fabert <didier.fabert@gmail.com> - 2.0-0.4.beta2.1
+- Sync to upstream
+
 * Sat Apr 19 2014 Didier Fabert <didier.fabert@gmail.com> - 2.0-0.3.alpha6.1
 - Sync to upstream
 
