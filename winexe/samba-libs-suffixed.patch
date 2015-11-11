@@ -1,0 +1,31 @@
+diff -rup a/source/wscript b/source/wscript
+--- a/source/wscript	2014-01-09 13:37:09.000000000 +0100
++++ b/source/wscript	2015-11-10 16:06:43.068484245 +0100
+@@ -78,12 +78,12 @@ def configure(ctx):
+                 ''' % (h in 'smb_cli.h smb_cliraw.h smb_composite.h util/debug.h'.split(), h))
+ 
+             libs = []
+-            for l in 'cli-ldap dcerpc dcerpc-samba errors popt talloc ndr-standard samba-hostconfig samba-credentials smbclient-raw'.split():
++            for l in 'cli-ldap dcerpc dcerpc-samba errors popt talloc ndr-standard samba-hostconfig samba-credentials smbclient-raw samba-debug'.split():
+                 if ctx.check(lib=l, libpath=ctx.env.SAMBA_LIBS, mandatory=False):
+                     libs.append(l)
+                 else:
+-                    ctx.check(lib=':lib'+l+'.so.0', libpath=ctx.env.SAMBA_LIBS)
+-                    libs.append(':lib'+l+'.so.0')
++                    ctx.check(lib=':lib'+l+'-samba4.so', libpath=ctx.env.SAMBA_LIBS)
++                    libs.append(l+'-samba4')
+             ctx.env.LIBS = ' '.join(libs)
+         except:
+             ctx.msg('Build of shared winexe', 'disabled', 'YELLOW')
+diff -rup a/source/wscript_build b/source/wscript_build
+--- a/source/wscript_build	2014-01-09 13:37:09.000000000 +0100
++++ b/source/wscript_build	2015-11-10 15:56:22.538394825 +0100
+@@ -35,7 +35,7 @@ if bld.env.ENABLE_SHARED:
+     bld.program(target='winexe',
+         source='winexe.c svcinstall.c async.c winexesvc32_exe.c winexesvc64_exe.c',
+         includes=bld.env.SAMBA_INCS,
+-        cflags='-D_FORTIFY_SOURCE=2 -Wall',
++        cflags='-D_FORTIFY_SOURCE=2 -Wall -O0',
+         linkflags=['-Wl,-z,relro', '-Wl,-z,now'],
+         libpath=bld.env.SAMBA_LIBS,
+         rpath=bld.env.SAMBA_LIBS,
