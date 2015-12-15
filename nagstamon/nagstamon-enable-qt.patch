@@ -1,0 +1,51 @@
+diff -rup Nagstamon/Nagstamon/GUI.py b/Nagstamon/GUI.py
+--- Nagstamon/Nagstamon/GUI.py	2015-12-15 09:04:22.499419233 +0100
++++ b/Nagstamon/GUI.py	2015-12-14 12:32:42.000000000 +0100
+@@ -20,11 +20,11 @@
+ try:
+     import pygtk
+     pygtk.require("2.0")
+-except Exception, err:
++except (Exception) as err:
+     print
+-    print err
++    print (err)
+     print
+-    print "Could not load pygtk, maybe you need to install python gtk."
++    print ("Could not load pygtk, maybe you need to install python gtk.")
+     print
+     import sys
+     sys.exit()
+@@ -3004,7 +3004,7 @@ class ServerVBox(gtk.VBox):
+             # close popwin
+             self.output.popwin.PopDown()
+ 
+-        except Exception, err:
++        except (Exception) as err:
+             self.output.Dialog(message=err)
+ 
+ 
+@@ -3972,7 +3972,7 @@ class Settings(object):
+             filechooser = self.builder.get_object("input_filechooser_notification_custom_sound_" + gtk.Buildable.get_name(playbutton))
+             sound = Actions.PlaySound(sound="FILE", file=filechooser.get_filename(), conf=self.conf, servers=self.servers)
+             sound.start()
+-        except Exception, err:
++        except (Exception) as err:
+             import traceback
+             traceback.print_exc(file=sys.stdout)
+ 
+diff -rup Nagstamon/setup.py b/setup.py
+--- Nagstamon/setup.py	2015-12-15 09:10:59.478747813 +0100
++++ b/setup.py	2015-12-15 09:05:14.807069045 +0100
+@@ -45,8 +45,8 @@ setup(name = 'nagstamon',
+     author_email = 'h.wahl@ifw-dresden.de',
+     url = 'https://nagstamon.ifw-dresden.de',
+     download_url = 'https://nagstamon.ifw-dresden.de/files-nagstamon/stable/',
+-    scripts = ['nagstamon.py'],
+-    packages = ['Nagstamon', 'Nagstamon.Server', 'Nagstamon.thirdparty'],
++    scripts = ['nagstamon-qt.py'],
++    packages = ['Nagstamon', 'Nagstamon.Servers', 'Nagstamon.QUI', 'Nagstamon.thirdparty', 'Nagstamon.thirdparty.Xlib', 'Nagstamon.thirdparty.Xlib.ext', 'Nagstamon.thirdparty.Xlib.keysymdef', 'Nagstamon.thirdparty.Xlib.protocol', 'Nagstamon.thirdparty.Xlib.support', 'Nagstamon.thirdparty.Xlib.xobject'],
+     package_dir = {'Nagstamon':'Nagstamon'},
+     package_data = {'Nagstamon':['resources/*']},
+     data_files = [('%s/share/man/man1' % sys.prefix, ['Nagstamon/resources/nagstamon.1'])]
+

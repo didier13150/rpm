@@ -1,5 +1,5 @@
 Name:          nagstamon
-Version:       1.0.1
+Version:       2.0.0.alpha1
 Release:       1%{?dist}
 Summary:       Nagios status monitor for desktop
 Group:         Applications/Productivity
@@ -7,20 +7,21 @@ Group:         Applications/Productivity
 License:       GPLv2+
 URL:           http://nagstamon.ifw-dresden.de/
 Source0:       http://sourceforge.net/projects/nagstamon/files/nagstamon/nagstamon%20%{version}/%{name}_%{version}.tar.gz
+Patch0:        nagstamon-enable-qt.patch
 
 BuildArch:     noarch
-BuildRequires: pygtk2
-BuildRequires: python2-devel  
+BuildRequires: python3-qt5-devel
+BuildRequires: python3-devel  
 BuildRequires: desktop-file-utils
 BuildRequires: Distutils
-Requires:      gnome-icon-theme
-Requires:      pygtk2
-Requires:      python-setuptools
-Requires:      python-keyring
-Requires:      python-SecretStorage
-Requires:      python-crypto
-Requires:      python-BeautifulSoup
-Requires:      gnome-python2-libegg 
+Requires:      python3-qt5
+Requires:      python3-setuptools
+Requires:      python3-keyring
+Requires:      python3-SecretStorage
+Requires:      python3-crypto
+Requires:      python3-beautifulsoup4
+#Requires:      python3-xlib
+Requires:      mesa-vdpau-drivers
 
 %description
 Nagstamon is a Nagios status monitor for the desktop. It connects to multiple
@@ -34,18 +35,16 @@ sound. Hosts and services can be filtered by category and regular expressions.
 
 %prep
 %setup -qn Nagstamon
-
-#Remove embedded BeautifulSoup http://sourceforge.net/p/nagstamon/bugs/44/
-rm -rf Nagstamon/thirdparty/BeautifulSoup.py
+%patch0 -p1
 
 %build
-%{__python} setup.py build
+%{__python3} setup.py build
 
 %install
-%{__python} setup.py install --skip-build --root %{buildroot}
+%{__python3} setup.py install --skip-build --root %{buildroot}
 
 #Fix 'non-executable-script' error
-chmod +x %{buildroot}%{python_sitelib}/Nagstamon/Server/Multisite.py
+chmod +x %{buildroot}%{python3_sitelib}/Nagstamon/Servers/Multisite.py
 
 #Provide directory to install icon for desktop file
 mkdir -p %{buildroot}%{_datadir}/pixmaps
@@ -57,23 +56,26 @@ cp Nagstamon/resources/%{name}.svg %{buildroot}%{_datadir}/pixmaps/%{name}.svg
 chmod -x %{buildroot}%{_datadir}/pixmaps/%{name}.svg
 
 #Remove the file extension for convenience
-mv %{buildroot}%{_bindir}/%{name}.py %{buildroot}%{_bindir}/%{name}
+mv %{buildroot}%{_bindir}/%{name}-qt.py %{buildroot}%{_bindir}/%{name}
 
 desktop-file-install --dir %{buildroot}/%{_datadir}/applications\
                      --delete-original\
                      --set-icon=%{name}.svg\
-                     %{buildroot}%{python_sitelib}/Nagstamon/resources/%{name}.desktop
+                     %{buildroot}%{python3_sitelib}/Nagstamon/resources/%{name}.desktop
 
 %files
 %doc ChangeLog COPYRIGHT LICENSE
 %{_datadir}/pixmaps/%{name}.svg
 %{_datadir}/applications/%{name}.desktop
-%{python_sitelib}/Nagstamon/
+%{python3_sitelib}/Nagstamon/
 %{_bindir}/%{name}
 %{_mandir}/man1/%{name}.1*
-%{python_sitelib}/%{name}*.egg-info
+%{python3_sitelib}/%{name}*.egg-info
 
 %changelog
+* Fri Dec 11 2015 Didier Fabert <didier.fabert@gmail.com> 2.0.0.alpha1
+- Update from git upstream
+
 * Wed Jun 25 2014 Didier Fabert <didier.fabert@gmail.com> 1.0.1-1
 - Update from git upstream
 
