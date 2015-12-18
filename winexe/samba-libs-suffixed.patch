@@ -12,7 +12,7 @@ diff -rup a/source/wscript b/source/wscript
                  else:
 -                    ctx.check(lib=':lib'+l+'.so.0', libpath=ctx.env.SAMBA_LIBS)
 -                    libs.append(':lib'+l+'.so.0')
-+                    ctx.check(lib=':lib'+l+'-samba4.so', libpath=ctx.env.SAMBA_LIBS)
++                    #ctx.check(lib=':lib'+l+'-samba4.so', libpath=ctx.env.SAMBA_LIBS)
 +                    libs.append(l+'-samba4')
              ctx.env.LIBS = ' '.join(libs)
          except:
