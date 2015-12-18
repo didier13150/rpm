@@ -6,6 +6,7 @@ License:        ASL 2.0
 Group:          Applications/Databases
 URL:            http://www.couchbase.com
 Source0:        http://packages.couchbase.com/clients/c/%{name}-%{version}.tar.gz
+Source1:        http://packages.couchbase.com/clients/c/mock/CouchbaseMock-1.1.0-gda80301.jar
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires:  cmake
@@ -28,6 +29,7 @@ developing couchbase client applications.
 
 %prep
 %setup -qn %{name}-%{version}
+%{__cp} %{SOURCE1} tests/CouchbaseMock.jar
 
 %build
 cmake . \
