@@ -31,7 +31,8 @@ APPLIANCE_PKGS := livecd-build bash coreutils dbus-python dmraid \
 	  
 all: fedora
 fedora: clean sources srpm rpmlint build rpmlint
-centos: clean sources srpm rpmlint el6-build rpmlint
+centos-6: clean sources srpm rpmlint el6-build rpmlint
+centos-7: clean sources srpm rpmlint el7-build rpmlint
 
 showvars:
 	@echo "ARCH:        $(ARCH)"
@@ -66,6 +67,12 @@ el6-build: srpm
 	@rm -rf $(SRCDIR)/result-el6
 	@mkdir -p $(SRCDIR)/result-el6
 	@mock $(MOCKOPTS) -r 'centos-6-$(ARCH)' --resultdir=$(SRCDIR)/result-el6 rebuild $(SRCDIR)/result/$(NAME)*.src.rpm
+
+el7-build: srpm
+	@echo -e "\033[1;32mBuild RPMs files for CentOS 7\033[0m"
+	@rm -rf $(SRCDIR)/result-el7
+	@mkdir -p $(SRCDIR)/result-el7
+	@mock $(MOCKOPTS) -r 'centos-7-$(ARCH)' --resultdir=$(SRCDIR)/result-el7 rebuild $(SRCDIR)/result/$(NAME)*.src.rpm
 
 help:
 	@echo -e "\033[1;32mAvailable targets:\033[0m"
