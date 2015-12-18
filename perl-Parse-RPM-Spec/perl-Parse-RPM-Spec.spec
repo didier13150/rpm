@@ -21,6 +21,7 @@ Parse::RPM::Spec is a Perl module which models RPM spec files.
 
 %prep
 %setup -qn %{perlname}-%{version}
+chmod -x Changes README
 
 
 %build
@@ -44,7 +45,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root,-)
-%doc Changes MANIFEST README
+%doc Changes README
 %{perl_vendorlib}/*
 %{_mandir}/man3/*
 
