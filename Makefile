@@ -60,7 +60,7 @@ copy:
 
 refresh:
 	@echo -e "\033[1;32mUpdating repository on $(REPODIR)\033[0m"
-	@createrepo --update -d $(REPODIR)
+	@createrepo_c --update -d $(REPODIR)
 
 repoview:
 	@echo -e "\033[1;32mRun repoview on $(REPODIR)\033[0m"
