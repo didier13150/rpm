@@ -1,51 +1,93 @@
-%define majorver 1.25
+%define majorver 1.26
 %global wiki_path %{_datadir}/mediawiki
 %global wiki_ext_path %{wiki_path}/extensions
-Name:           mediawiki
-Version:        %{majorver}.1
-Release:        2%{?dist}
-License:        GPLv2+
-Group:          Development/Tools
-URL:            http://www.mediawiki.org/
-Summary:        A wiki engine
-BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+%global remove_bundle 0
+%if 0%{?fedora} >= 23
+%global remove_bundle 1
+%endif
+Name: mediawiki
+Version:   %{majorver}.1
+Release: 1%{?dist}
+License: GPLv2+
+Group:     Development/Tools
+URL: http://www.mediawiki.org/
+Summary:   A wiki engine
+BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
-Source0:        http://download.wikimedia.org/mediawiki/%{majorver}/%{name}-%{version}.tar.gz
-Source1:        mediawiki.conf
-#Source2:        README.RPM
-Source3:        mw-createinstance.in
-Source4:        mw-updateallinstances.in
-Source10:       https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Mpdf.tgz
-Source11:       https://gerrit.wikimedia.org/r/p/mediawiki/extensions/CategoryTree.tgz
-Source12:       https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Math.tgz
-Source13:       https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Auth_remoteuser.tgz
-Source14:       https://git.wikimedia.org/git/mediawiki/extensions/Git2Pages.tgz
-Source15:       https://git.wikimedia.org/git/mediawiki/extensions/RandomImage.tgz
-Source16:       https://git.wikimedia.org/git/mediawiki/extensions/MultimediaViewer.tgz
-Source17:       https://git.wikimedia.org/git/mediawiki/extensions/CommonsMetadata.tgz
-Source18:       https://git.wikimedia.org/git/mediawiki/extensions/BetaFeatures.tgz
-Source19:       https://git.wikimedia.org/git/mediawiki/extensions/ConfirmAccount.tgz
-Source20:       Linux.tag.php
-Source21:       CalcBitrate.js
-Source22:       CalcBitrate.php
-Source23:       SSLAuthPlugin.php
-Source24:       http://www.bomber-online.de/progs/IncludeArticle/IncludeArticle.php
-Source25:       NoTitle.php
-Source26:       https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Widgets.tgz
-Source27:       https://git.wikimedia.org/git/mediawiki/extensions/PdfHandler.tgz
+Source0:   http://download.wikimedia.org/mediawiki/%{majorver}/%{name}-%{version}.tar.gz
+Source1: mediawiki.conf
+Source2: README.RPM
+Source3: mw-createinstance.in
+Source4: mw-updateallinstances.in
+Source10:  https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Mpdf.tgz
+Source11:  https://gerrit.wikimedia.org/r/p/mediawiki/extensions/CategoryTree.tgz
+Source12:  https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Math.tgz
+Source13:  https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Auth_remoteuser.tgz
+Source14:  https://git.wikimedia.org/git/mediawiki/extensions/Git2Pages.tgz
+Source15:  https://git.wikimedia.org/git/mediawiki/extensions/RandomImage.tgz
+Source16:  https://git.wikimedia.org/git/mediawiki/extensions/MultimediaViewer.tgz
+Source17:  https://git.wikimedia.org/git/mediawiki/extensions/CommonsMetadata.tgz
+Source18:  https://git.wikimedia.org/git/mediawiki/extensions/BetaFeatures.tgz
+Source19:  https://git.wikimedia.org/git/mediawiki/extensions/ConfirmAccount.tgz
+Source20:  Linux.tag.php
+Source21:  CalcBitrate.js
+Source22:  CalcBitrate.php
+Source23:  SSLAuthPlugin.php
+Source24:  http://www.bomber-online.de/progs/IncludeArticle/IncludeArticle.php
+Source25:  NoTitle.php
+Source26:  https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Widgets.tgz
+Source27:  https://git.wikimedia.org/git/mediawiki/extensions/PdfHandler.tgz
 # https://www.mediawiki.org/wiki/Thread:Project:Support_desk/Fatal_error:_Interface_%27Psr%5CLog%5CLoggerInterface%27_not_found
-Source50:       https://gerrit.wikimedia.org/r/p/mediawiki/vendor.tgz
-BuildArch:      noarch
-# to make sure the "apache" group is created before mediawiki is installed
-Requires(pre):  httpd
-Requires:       php-common >= 5, php-xml
-Conflicts:      php-common = 5.3.1
-Requires:       php-mysql, php-pgsql
-Requires:       diffutils
-Requires:       ImageMagick
-Requires:       php-gd
-# for mw-createinstance and mw-updateallinstances
-Requires:       php-cli
+Source50:  https://gerrit.wikimedia.org/r/p/mediawiki/vendor.tgz
+BuildArch: noarch
+
+BuildRequires: djvulibre
+BuildRequires: php-cli
+BuildRequires: php-gd
+BuildRequires: php-intl
+BuildRequires: php-pdo
+BuildRequires: php-pecl-xhprof
+BuildRequires: php-phpunit-PHPUnit
+BuildRequires: php-theseer-autoload
+BuildRequires: php-composer(cssjanus/cssjanus) >= 1.1.1
+#BuildRequires: php-composer(leafo/lessphp) >= 0.5.0
+BuildRequires: php-composer(liuggio/statsd-php-client) >= 1.0.12
+BuildRequires: php-composer(mediawiki/at-ease) >= 1.1.0
+BuildRequires: php-composer(monolog/monolog) >= 1.14.0
+BuildRequires: php-composer(oojs/oojs-ui) >= 0.11.3
+BuildRequires: php-composer(psr/log) >= 1.0.0
+BuildRequires: php-composer(wikimedia/assert) >= 0.2.2
+BuildRequires: php-composer(wikimedia/avro) >= 1.7.7
+BuildRequires: php-composer(wikimedia/cdb) >= 1.0.1
+BuildRequires: php-composer(wikimedia/ip-set) >= 0
+BuildRequires: php-composer(wikimedia/utfnormal) >= 1.0.2
+BuildRequires: php-composer(zordius/lightncandy) >= 0.22
+
+Requires: httpd
+Requires: php(httpd)
+Requires: php(language) >= 5.3.3
+Requires: php-gd
+Requires: php-pecl-jsonc
+Requires: php-xml
+Requires: diffutils, ImageMagick
+Requires: php-composer(cssjanus/cssjanus) >= 1.1.1
+#Requires: php-composer(leafo/lessphp) >= 0.5.0
+Requires: php-composer(liuggio/statsd-php-client) >= 1.0.12
+Requires: php-composer(mediawiki/at-ease) >= 1.1.0
+Requires: php-composer(monolog/monolog) >= 1.14.0
+Requires: php-composer(oojs/oojs-ui) >= 0.11.3
+Requires: php-composer(psr/log) >= 1.0.0
+Requires: php-composer(symfony/process) >= 2.5.0
+Requires: php-composer(wikimedia/assert) >= 0.2.2
+Requires: php-composer(wikimedia/avro) >= 1.7.7
+Requires: php-composer(wikimedia/cdb) >= 1.0.1
+Requires: php-composer(wikimedia/ip-set) >= 0
+Requires: php-composer(wikimedia/utfnormal) >= 1.0.2
+Requires: php-composer(zordius/lightncandy) >= 0.22
+Requires: php-mysql, php-pgsql
+
+# Update script call command-line php
+Requires(post): php-cli
 
 Provides:       mediawiki-math = %{version}-%{release}
 Provides:       mediawiki-nomath = %{version}-%{release}
@@ -93,7 +135,7 @@ Foundation websites. Compared to other wikis, it has an excellent
 range of features and support for high-traffic websites using multiple
 servers
 
-This package supports wiki farms. Read the instructions for creating wiki 
+This package supports wiki farms. Read the instructions for creating wiki
 instances under %{_defaultdocdir}/%{name}-%{version}/README.RPM.
 Remember to remove the config dir after completing the configuration.
 
@@ -275,24 +317,58 @@ DjVu files.
 
 %prep
 %setup -q
-
+%if %{remove_bundle}
+# Remove bundled PHP libraries in order to use system versions
+rm -rf vendor/composer/*php
+rm -rf vendor/composer/*json
+rm -rf vendor/composer/LICENSE
+rm -rf vendor/cssjanus
+rm -rf vendor/liuggio
+rm -rf vendor/mediawiki/at-ease
+rm -rf vendor/monolog
+rm -rf vendor/oojs
+#rm -rf vendor/oyejorge
+rm -rf vendor/psr
+rm -rf vendor/wikimedia/assert
+rm -rf vendor/wikimedia/avro
+rm -rf vendor/wikimedia/cdb
+rm -rf vendor/wikimedia/composer-merge-plugin
+rm -rf vendor/wikimedia/ip-set
+rm -rf vendor/wikimedia/utfnormal
+rm -rf vendor/zordius
+ln -s %{_datadir}/php/cssjanus vendor/cssjanus-shared
+ln -s %{_datadir}/php/Liuggio vendor/liuggio-shared
+ln -s %{_datadir}/php/MediaWiki vendor/mediawiki/at-ease-shared
+ln -s %{_datadir}/php/Monolog vendor/monolog-shared
+ln -s %{_datadir}/php/OOUI vendor/oojs-shared
+#ln -s %{_datadir}/php/lessphp vendor/oyejorge-shared
+ln -s %{_datadir}/php/Psr vendor/psr-shared
+ln -s %{_datadir}/php/Wikimedia vendor/wikimedia/assert-shared
+ln -s %{_datadir}/php/avro vendor/wikimedia/avro-shared
+ln -s %{_datadir}/php/Cdb vendor/wikimedia/cdb-shared
+ln -s %{_datadir}/php/IPSet vendor/wikimedia/ip-set-shared
+ln -s %{_datadir}/php/UtfNormal vendor/wikimedia/utfnormal-shared
+ln -s %{_datadir}/php/zordius vendor/zordius-shared
+%endif
 
 %build
+%if %{remove_bundle}
+phpab --follow --output vendor/autoload.php vendor
+echo "require dirname(dirname(__FILE__)) . '/vendor/mediawiki/at-ease-shared/at-ease/Functions.php';" >> vendor/autoload.php
+%endif
 
 
 %install
 rm -rf %{buildroot}
 
 # move away the documentation to the final folder.
-#mkdir -p %{buildroot}%{_defaultdocdir}/%{name}-%{version}
-#cp -p %{SOURCE2} %{buildroot}%{_defaultdocdir}/%{name}-%{version}/
+cp -p %{SOURCE2} .
 
 # now copy the rest to the buildroot.
 mkdir -p %{buildroot}%{_datadir}/mediawiki
 cp -a * %{buildroot}%{_datadir}/mediawiki/
 
 # remove unneeded parts
-rm -fr %{buildroot}%{_datadir}/mediawiki/maintenance/hiphop
 rm -fr %{buildroot}%{_datadir}/mediawiki/{t,test,tests}
 rm -fr %{buildroot}%{_datadir}/mediawiki/includes/zhtable
 find %{buildroot}%{_datadir}/mediawiki/ \
@@ -302,13 +378,9 @@ find %{buildroot}%{_datadir}/mediawiki/ \
 # fix permissions
 find %{buildroot}%{_datadir}/mediawiki -name \*.pl | xargs -r chmod +x
 find %{buildroot}%{_datadir}/mediawiki -name \*.py | xargs -r chmod +x
-#chmod +x %{buildroot}%{_datadir}/mediawiki/maintenance/cssjanus/cssjanus.py
-#chmod +x %{buildroot}%{_datadir}/mediawiki/maintenance/cssjanus/csslex.py
-#chmod +x %{buildroot}%{_datadir}/mediawiki/maintenance/hiphop/make
-#chmod +x %{buildroot}%{_datadir}/mediawiki/maintenance/hiphop/run-server
+chmod +x %{buildroot}%{_datadir}/mediawiki/maintenance/hiphop/run-server
 chmod +x %{buildroot}%{_datadir}/mediawiki/maintenance/storage/make-blobs
 chmod +x %{buildroot}%{_datadir}/mediawiki/includes/limit.sh
-#chmod +x %{buildroot}%{_datadir}/mediawiki/includes/normal/UtfNormalTest2.php
 chmod +x %{buildroot}%{_datadir}/mediawiki/extensions/ConfirmEdit/captcha.py
 
 # remove version control/patch files
@@ -319,9 +391,6 @@ find %{buildroot} -name .gitignore -delete
 find %{buildroot} -name .gitmodules -delete
 find %{buildroot} -name .jshintignore -delete
 find %{buildroot} -name .jshintrc -delete
-
-# https://bugzilla.wikimedia.org/show_bug.cgi?id=49436
-rm -f %{buildroot}%{_datadir}/mediawiki/maintenance/language/zhtable/trad2simp_supp_unset.manual
 
 # placeholder for a default instance
 mkdir -p %{buildroot}%{_localstatedir}/www/wiki
@@ -340,7 +409,10 @@ mkdir %{buildroot}%{_sysconfdir}/mediawiki
 echo /var/www/wiki > %{buildroot}%{_sysconfdir}/mediawiki/instances
 
 # Add vendor
+%if %{remove_bundle}
+%else
 tar -xzf %{SOURCE50} -C %{buildroot}%{wiki_path}/
+%endif
 
 # Extract extensions
 tar -xzf %{SOURCE10} -C %{buildroot}%{wiki_ext_path}/
@@ -370,6 +442,18 @@ tar -xzf %{SOURCE27} -C %{buildroot}%{wiki_ext_path}/
 # Remove vcs directories
 find %{buildroot}%{wiki_path} -type d -name '.git*' -exec rm -rf {} \; || :
 
+%check
+# Database tests currently fail on the 1.26 release series
+php maintenance/install.php \
+    --dbtype sqlite \
+    --dbname mediawiki-test \
+    --dbpath /tmp \
+    --pass test123 \
+    Test test
+cd tests/phpunit
+make databaseless
+
+
 %post
 %{_sbindir}/mw-updateallinstances >> /var/log/mediawiki-updates.log 2>&1 || :
 
@@ -378,7 +462,7 @@ rm -rf %{buildroot}
 
 %files
 %defattr(-,root,root,-)
-%doc COPYING FAQ HISTORY README RELEASE-NOTES* UPGRADE CREDITS docs
+%doc COPYING FAQ HISTORY README README.RPM RELEASE-NOTES* UPGRADE CREDITS docs
 %{_datadir}/mediawiki
 %attr(-,apache,apache) %{_datadir}/mediawiki/mw-config
 %{_localstatedir}/www/wiki
@@ -474,6 +558,9 @@ rm -rf %{buildroot}
 %{wiki_ext_path}/PdfHandler
 
 %changelog
+* Mon Jan 11 2016 Didier Fabert <didier.fabert@gmail.com> - 1.26.2-1
+- New upstream release.
+
 * Thu Jun 04 2015 Didier Fabert <didier.fabert@gmail.com> - 1.25.1-2
 - Add missing vendor directory for mediawiki
 
