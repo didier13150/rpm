@@ -1,13 +1,11 @@
-%define candidate beta2.1
-
 Name:           keepassx
-Version:        2.0
-Release:        0.4.%{candidate}%{?dist}
+Version:        2.0.1
+Release:        1%{?dist}
 Summary:        Cross-platform password manager
 Group:          User Interface/Desktops
 License:        GPLv2+
 URL:            http://keepassx.sourceforge.net
-Source0:        https://github.com/didier13150/%{name}/archive/%{name}-%{version}-%{candidate}.tar.gz
+Source0:        https://github.com/didier13150/%{name}/archive/%{name}-%{version}.tar.gz
 Source1:        %{name}.desktop
 BuildRequires:  qt5-qtx11extras-devel
 BuildRequires:  qt5-linguist
@@ -111,6 +109,21 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 %{_datadir}/mime/packages/keepassx.xml
 
 %changelog
+* Tue Jan 05 2016 Didier Fabert <didier.fabert@gmail.com> - 2.0.1-1
+- New upstream version (2.0)
+
+* Tue Nov 10 2015 Didier Fabert <didier.fabert@gmail.com> - 2.0-0.8.beta2.1
+- Sync to upstream
+
+* Tue Sep 22 2015 Didier Fabert <didier.fabert@gmail.com> - 2.0-0.7.beta2.1
+- Modify systray menu action text (to be translated)
+
+* Mon Sep 21 2015 Didier Fabert <didier.fabert@gmail.com> - 2.0-0.6.beta2.1
+- Resize about Window
+
+* Mon Sep 21 2015 Didier Fabert <didier.fabert@gmail.com> - 2.0-0.5.beta2.1
+- Rebuild with modified sources
+
 * Fri Sep 18 2015 Didier Fabert <didier.fabert@gmail.com> - 2.0-0.4.beta2.1
 - Sync to upstream
 
