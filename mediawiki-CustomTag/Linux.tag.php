@@ -45,8 +45,10 @@ function showtermRender( $input, array $args, Parser $parser, PPFrame $frame ) {
         $width = 640;
         $height = 480;
         $border = 0;
+        $protocole = 'http';
         if ( isset( $args['width'] ) && intval( $args['width'] ) ) $width = intval( $args['width'] );
         if ( isset( $args['height'] ) && intval( $args['height'] ) ) $height = intval( $args['height'] );
         if ( isset( $args['border'] ) && intval( $args['border'] ) ) $border = intval( $args['border'] );
-        return '<iframe src="https://showterm.b2pweb.com/' . htmlspecialchars( $input ) . '" width="' . $width . '" height="' . $height . '" border="' . $border . '"></iframe>';
+        if ( isset( $args['protocole'] ) && $args['protocole'] == 'https' ) $protocole = 'https';
+        return '<iframe src="' . $protocole . '://showterm.b2pweb.com/' . htmlspecialchars( $input ) . '" width="' . $width . '" height="' . $height . '" border="' . $border . '"></iframe>';
 }

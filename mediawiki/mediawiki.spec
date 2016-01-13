@@ -5,40 +5,20 @@
 %if 0%{?fedora} >= 23
 %global remove_bundle 1
 %endif
-Name: mediawiki
+Name:      mediawiki
 Version:   %{majorver}.1
-Release: 1%{?dist}
-License: GPLv2+
+Release:   2%{?dist}
+License:   GPLv2+
 Group:     Development/Tools
-URL: http://www.mediawiki.org/
+URL:       http://www.mediawiki.org/
 Summary:   A wiki engine
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 Source0:   http://download.wikimedia.org/mediawiki/%{majorver}/%{name}-%{version}.tar.gz
-Source1: mediawiki.conf
-Source2: README.RPM
-Source3: mw-createinstance.in
-Source4: mw-updateallinstances.in
-Source10:  https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Mpdf.tgz
-Source11:  https://gerrit.wikimedia.org/r/p/mediawiki/extensions/CategoryTree.tgz
-Source12:  https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Math.tgz
-Source13:  https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Auth_remoteuser.tgz
-Source14:  https://git.wikimedia.org/git/mediawiki/extensions/Git2Pages.tgz
-Source15:  https://git.wikimedia.org/git/mediawiki/extensions/RandomImage.tgz
-Source16:  https://git.wikimedia.org/git/mediawiki/extensions/MultimediaViewer.tgz
-Source17:  https://git.wikimedia.org/git/mediawiki/extensions/CommonsMetadata.tgz
-Source18:  https://git.wikimedia.org/git/mediawiki/extensions/BetaFeatures.tgz
-Source19:  https://git.wikimedia.org/git/mediawiki/extensions/ConfirmAccount.tgz
-Source20:  Linux.tag.php
-Source21:  CalcBitrate.js
-Source22:  CalcBitrate.php
-Source23:  SSLAuthPlugin.php
-Source24:  http://www.bomber-online.de/progs/IncludeArticle/IncludeArticle.php
-Source25:  NoTitle.php
-Source26:  https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Widgets.tgz
-Source27:  https://git.wikimedia.org/git/mediawiki/extensions/PdfHandler.tgz
-# https://www.mediawiki.org/wiki/Thread:Project:Support_desk/Fatal_error:_Interface_%27Psr%5CLog%5CLoggerInterface%27_not_found
-Source50:  https://gerrit.wikimedia.org/r/p/mediawiki/vendor.tgz
+Source1:   mediawiki.conf
+Source2:   README.RPM
+Source3:   mw-createinstance.in
+Source4:   mw-updateallinstances.in
 BuildArch: noarch
 
 BuildRequires: djvulibre
@@ -108,6 +88,8 @@ Provides:       mediawiki-SyntaxHighlight_GeSHi = %{version}-%{release}
 Provides:       mediawiki-TitleBlacklist = %{version}-%{release}
 Provides:       mediawiki-Vector = %{version}-%{release}
 Provides:       mediawiki-WikiEditor = %{version}-%{release}
+Provides:       mediawiki-CiteThisPage = %{version}-%{release}
+Provides:       mediawiki-PdfHandler = %{version}-%{release}
 
 Obsoletes:      mediawiki-math < 1.16.5-62
 Obsoletes:      mediawiki-nomath < 1.16.5-62
@@ -128,6 +110,8 @@ Obsoletes:      mediawiki-SyntaxHighlight_GeSHi < %{version}-%{release}
 Obsoletes:      mediawiki-TitleBlacklist < %{version}-%{release}
 Obsoletes:      mediawiki-Vector < %{version}-%{release}
 Obsoletes:      mediawiki-WikiEditor < %{version}-%{release}
+Obsoletes:      mediawiki-CiteThisPage < %{version}-%{release}
+Obsoletes:      mediawiki-PdfHandler < %{version}-%{release}
 
 %description
 MediaWiki is the software used for Wikipedia and the other Wikimedia
@@ -139,181 +123,6 @@ This package supports wiki farms. Read the instructions for creating wiki
 instances under %{_defaultdocdir}/%{name}-%{version}/README.RPM.
 Remember to remove the config dir after completing the configuration.
 
-%package Mpdf
-Requires:       %{name}
-Summary:        Mpdf mediawiki extension
-Group:          Development/Tools
-
-%description Mpdf
-This extension lets you export printable version of wiki page as PDF file.
-For conversion uses mPDF PHP class
-
-%package CategoryTree
-Requires:       %{name}
-Summary:        CategoryTree mediawiki extension
-Group:          Development/Tools
-
-%description CategoryTree
-The CategoryTree extension provides a dynamic view of the wiki's category
-structure as a tree. It uses AJAX to load parts of the tree on demand.
-
-%package Math
-Requires:       %{name}
-Summary:        Math mediawiki extension
-Group:          Development/Tools
-Requires:       LabPlot
-
-%description Math
-Math extension provides support for rendering mathematical formulas on-wiki
-via texvc
-
-%package CustomTag
-Requires:       %{name}
-Summary:        CustomTag mediawiki extension
-Group:          Development/Tools
-
-%description CustomTag
-CustomTag extension support custom tags to modify display:
-<path>, <package>, <app>, <class>
-
-%package CalcBitrate
-Requires:       %{name}
-Summary:        CalcBitrate mediawiki extension
-Group:          Development/Tools
-
-%description CalcBitrate
-CalcBitrate extension provides a bitrate calculator with the simple tag
-"<calcBitrate/>"
-
-%package AuthRemoteUser
-Requires:       %{name}
-Summary:        Log user via the REMOTE_USER environment variable
-Group:          Development/Tools
-
-%description AuthRemoteUser
-This extension allows integration with the web server's built-in authentication 
-system via the REMOTE_USER environment variable, which is set through HTTP-Auth,
-LDAP, CAS, PAM, and other authentication systems. The extension automatically 
-logs-in users using the value of the REMOTE_USER environment variable as the 
-MediaWiki username. If an account of that name does not already exist, one is 
-created.
-
-%package AuthSSL
-Requires:       %{name}
-Summary:        Log user via the SSL certificate
-Group:          Development/Tools
-
-%description AuthSSL
-SSL Authentication is an extension that automatically logs users into the wiki
-using their SSL certificate. It uses mod_ssl in Apache to fetch the DN from the
-client certificate and maps that to a MediaWiki user name. All users are
-automatically logged in, and all users are required to use certificates.
-These certificates must be vouched for by one of the certification authorities
-on file, specified by SSLCACertificateFile option. Wiki user names are taken
-from the user's certificate (SSL_CLIENT_S_DN_CN), and if that user name does
-not already exist, it is created.
-
-%package Git2Pages
-Requires:       %{name}
-Summary:        Add file from git
-Group:          Development/Tools
-Requires:       bash
-
-%description Git2Pages
-The Git2Pages extension allows a user to add snippets of code to a wiki page
-from a file in a git repository.
-
-%package RandomImage
-Requires:       %{name}
-Summary:        Display Random Image
-Group:          Development/Tools
-
-%description RandomImage
-The Random Image extension adds a <randomimage> tag to the MediaWiki parser
-which allows for randomisation of multimedia content on a page.
-
-%package IncludeArticle
-Requires:       %{name}
-Summary:        Display the first letters of an article
-Group:          Development/Tools
-
-%description IncludeArticle
-The Include Article extension allows any page to be shown on any other wiki
-page. An editor can choose how many letters or lines of the article are shown.
-
-%package NoTitle
-Requires:       %{name}
-Summary:        Hide Page name
-Group:          Development/Tools
-
-%description NoTitle
-Just put __NOTITLE__ on any pages where you want to hide the title.
-This extension will work for any skin that puts the title heading in an h1 
-with class="firstHeading", including the default Vector skin.
-
-%package MultimediaViewer
-Requires:       %{name}
-Requires:       %{name}-CommonsMetadata
-Summary:        Slightly nicer interface for viewing images
-Group:          Development/Tools
-
-%description MultimediaViewer
-The MultimediaViewer extension gives the user of a wiki a slightly nicer
-interface for viewing full-size, or nearly full-size, images in their browser
-without extraneous page loads or confusing interstitial pages.
-
-%package CommonsMetadata
-Requires:       %{name}
-Summary:        extracting metadata from Wikimedia Commons pages
-Group:          Development/Tools
-
-%description CommonsMetadata
-CommonsMetadata is an attempt at extracting metadata from Wikimedia Commons
-pages.
-
-%package BetaFeatures
-Requires:       %{name}
-Summary:        Register beta features
-Group:          Development/Tools
-
-%description BetaFeatures
-The BetaFeatures extension allows other MediaWiki extensions to register beta
-features with the list of user preferences on the wiki. It uses the existing
-user preferences architecture and a few special pages to accomplish its
-function.
-
-%package ConfirmAccount
-Requires:       %{name}
-Summary:        Requires the approval of new accounts
-Group:          Development/Tools
-
-%description ConfirmAccount
-The ConfirmAccount extension disables direct account creation and requires
-the approval of new accounts by a bureaucrat. 
-
-%package Widgets
-Requires:       %{name}
-Summary:        Allows the creation of raw HTML pages that can be embedded
-Group:          Development/Tools
-
-%description Widgets
-The Widgets extension allows the creation of raw HTML pages that can be
-embedded (similary to templates) in normal wiki pages. You do this by
-creating pages in the Widget namespace. They avoid the security problems of
-raw HTML in editable wiki pages because the privilege to edit in the Widget
-namespace is managed. Many pre-written Widgets are available.
-
-%package PdfHandler
-Requires:       %{name}
-Summary:        Shows uploaded pdf files in a multipage preview layout
-Group:          Development/Tools
-Requires:       ghostscript, poppler-utils, php-mbstring
-
-%description PdfHandler
-The PdfHandler extension shows uploaded pdf files in a multipage preview layout.
-With the Proofread Page extension enabled, pdfs can be displayed side-by-side
-with text for transcribing books and other documents, as is commonly done with
-DjVu files.
 
 %prep
 %setup -q
@@ -361,7 +170,7 @@ echo "require dirname(dirname(__FILE__)) . '/vendor/mediawiki/at-ease-shared/at-
 %install
 rm -rf %{buildroot}
 
-# move away the documentation to the final folder.
+# copy additional documentation
 cp -p %{SOURCE2} .
 
 # now copy the rest to the buildroot.
@@ -408,37 +217,6 @@ chmod 0755 %{buildroot}%{_sbindir}/mw-*
 mkdir %{buildroot}%{_sysconfdir}/mediawiki
 echo /var/www/wiki > %{buildroot}%{_sysconfdir}/mediawiki/instances
 
-# Add vendor
-%if %{remove_bundle}
-%else
-tar -xzf %{SOURCE50} -C %{buildroot}%{wiki_path}/
-%endif
-
-# Extract extensions
-tar -xzf %{SOURCE10} -C %{buildroot}%{wiki_ext_path}/
-tar -xzf %{SOURCE11} -C %{buildroot}%{wiki_ext_path}/
-tar -xzf %{SOURCE12} -C %{buildroot}%{wiki_ext_path}/
-tar -xzf %{SOURCE13} -C %{buildroot}%{wiki_ext_path}/
-tar -xzf %{SOURCE14} -C %{buildroot}%{wiki_ext_path}/
-tar -xzf %{SOURCE15} -C %{buildroot}%{wiki_ext_path}/
-tar -xzf %{SOURCE16} -C %{buildroot}%{wiki_ext_path}/
-tar -xzf %{SOURCE17} -C %{buildroot}%{wiki_ext_path}/
-tar -xzf %{SOURCE18} -C %{buildroot}%{wiki_ext_path}/
-tar -xzf %{SOURCE19} -C %{buildroot}%{wiki_ext_path}/
-tar -xzf %{SOURCE26} -C %{buildroot}%{wiki_ext_path}/
-tar -xzf %{SOURCE27} -C %{buildroot}%{wiki_ext_path}/
-%{__mkdir_p} %{buildroot}%{wiki_ext_path}/CalcBitrate
-%{__mkdir_p} %{buildroot}%{wiki_ext_path}/CustomTag
-%{__mkdir_p} %{buildroot}%{wiki_ext_path}/SSL_authentification
-%{__mkdir_p} %{buildroot}%{wiki_ext_path}/IncludeArticle
-%{__mkdir_p} %{buildroot}%{wiki_ext_path}/NoTitle
-%{__cp} %{SOURCE20} %{buildroot}%{wiki_ext_path}/CustomTag/
-%{__cp} %{SOURCE21} %{buildroot}%{wiki_ext_path}/CalcBitrate/
-%{__cp} %{SOURCE22} %{buildroot}%{wiki_ext_path}/CalcBitrate/
-%{__cp} %{SOURCE23} %{buildroot}%{wiki_ext_path}/SSL_authentification/
-%{__cp} %{SOURCE24} %{buildroot}%{wiki_ext_path}/IncludeArticle/
-%{__cp} %{SOURCE25} %{buildroot}%{wiki_ext_path}/NoTitle/
-
 # Remove vcs directories
 find %{buildroot}%{wiki_path} -type d -name '.git*' -exec rm -rf {} \; || :
 
@@ -471,93 +249,12 @@ rm -rf %{buildroot}
 %config(noreplace) %{_sysconfdir}/mediawiki/instances
 %{_sbindir}/mw-createinstance
 %{_sbindir}/mw-updateallinstances
-%exclude %{wiki_ext_path}/Mpdf
-%exclude %{wiki_ext_path}/CategoryTree
-%exclude %{wiki_ext_path}/Math
-%exclude %{wiki_ext_path}/CalcBitrate
-%exclude %{wiki_ext_path}/CustomTag
-%exclude %{wiki_ext_path}/Auth_remoteuser
-%exclude %{wiki_ext_path}/SSL_authentification
-%exclude %{wiki_ext_path}/Git2Pages
-%exclude %{wiki_ext_path}/RandomImage
-%exclude %{wiki_ext_path}/IncludeArticle
-%exclude %{wiki_ext_path}/NoTitle
-%exclude %{wiki_ext_path}/MultimediaViewer
-%exclude %{wiki_ext_path}/CommonsMetadata
-%exclude %{wiki_ext_path}/BetaFeatures
-%exclude %{wiki_ext_path}/ConfirmAccount
-%exclude %{wiki_ext_path}/Widgets
-%exclude %{wiki_ext_path}/PdfHandler
 
-%files Mpdf
-%defattr(-,root,root,-)
-%{wiki_ext_path}/Mpdf
-
-%files CategoryTree
-%defattr(-,root,root,-)
-%{wiki_ext_path}/CategoryTree
-
-%files Math
-%defattr(-,root,root,-)
-%{wiki_ext_path}/Math
-
-%files CalcBitrate
-%defattr(-,root,root,-)
-%{wiki_ext_path}/CalcBitrate
-
-%files CustomTag
-%defattr(-,root,root,-)
-%{wiki_ext_path}/CustomTag
-
-%files AuthRemoteUser
-%defattr(-,root,root,-)
-%{wiki_ext_path}/Auth_remoteuser
-
-%files AuthSSL
-%defattr(-,root,root,-)
-%{wiki_ext_path}/SSL_authentification
-
-%files Git2Pages
-%defattr(-,root,root,-)
-%{wiki_ext_path}/Git2Pages
-
-%files RandomImage
-%defattr(-,root,root,-)
-%{wiki_ext_path}/RandomImage
-
-%files IncludeArticle
-%defattr(-,root,root,-)
-%{wiki_ext_path}/IncludeArticle
-
-%files NoTitle
-%defattr(-,root,root,-)
-%{wiki_ext_path}/NoTitle
-
-%files MultimediaViewer
-%defattr(-,root,root,-)
-%{wiki_ext_path}/MultimediaViewer
-
-%files CommonsMetadata
-%defattr(-,root,root,-)
-%{wiki_ext_path}/CommonsMetadata
-
-%files BetaFeatures
-%defattr(-,root,root,-)
-%{wiki_ext_path}/BetaFeatures
-
-%files ConfirmAccount
-%defattr(-,root,root,-)
-%{wiki_ext_path}/ConfirmAccount
-
-%files Widgets
-%defattr(-,root,root,-)
-%{wiki_ext_path}/Widgets
-
-%files PdfHandler
-%defattr(-,root,root,-)
-%{wiki_ext_path}/PdfHandler
 
 %changelog
+* Mon Jan 11 2016 Didier Fabert <didier.fabert@gmail.com> - 1.26.2-2
+- Move sub-packages to specific packages.
+
 * Mon Jan 11 2016 Didier Fabert <didier.fabert@gmail.com> - 1.26.2-1
 - New upstream release.
 
