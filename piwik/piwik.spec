@@ -48,6 +48,8 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(-,root,root,-)
 %{_localstatedir}/www/%{name}
+%attr(-,apache,apache,-) %{_localstatedir}/www/%{name}/tmp
+%attr(-,apache,apache,-) %{_localstatedir}/www/%{name}/config
 %doc CHANGELOG.md CONTRIBUTING.md PRIVACY.md README.md SECURITY.md LEGALNOTICE
 
 %changelog
