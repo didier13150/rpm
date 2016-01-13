@@ -1,13 +1,15 @@
-# norootforbuild
+%global samba_major_ver 4.3
 
 Summary: Remote Windows-command executor
-Name: winexe
+Name:    winexe
 Version: 1.1
-Release: 1%{?dist}
-License: GPL3
-Group: Administration/Network
-Source: %{name}-%{version}.tar.gz
-Patch0: samba-libs-suffixed.patch
+Release: 2-smb%{samba_major_ver}%{?dist}
+License: GPLv3
+Group:   Administration/Network
+Url:     http://winexe.sourceforge.net/
+Source:  %{name}-%{version}.tar.gz
+Patch0:  samba-libs-suffixed.patch
+
 BuildRequires: automake
 BuildRequires: gcc
 BuildRequires: mingw-binutils-generic
@@ -63,5 +65,9 @@ rm -rf %{buildroot}
 %{_mandir}/man1/*
 
 %changelog
-* Tue Nov 10 2015 didier Fabert <didier.fabert@gmail.com> 1.1-1
+* Mon Jan 11 2016 Didier Fabert <didier.fabert@gmail.com> 1.1-2-smb4.3
+- Rebuild against samba 2:4.3.3-0
+- Tag release with samba major version
+
+* Tue Nov 10 2015 Didier Fabert <didier.fabert@gmail.com> 1.1-1
 - First release
