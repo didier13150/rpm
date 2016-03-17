@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<service>
+  <short>Munin NRPE Daemon</short>
+  <description>Network-wide graphing framework</description>
+  <port protocol="tcp" port="4949"/>
+</service>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<service>
+  <short>Nagios NRPE Daemon</short>
+  <description>Host/service/network monitoring agent for Nagios</description>
+  <port protocol="tcp" port="5666"/>
+</service>
