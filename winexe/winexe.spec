@@ -1,11 +1,11 @@
-%global samba_ver 4.3.4
+%global samba_ver 4.3.9
 
 Summary: Remote Windows-command executor
 Name:    winexe
 Version: 1.1
-Release: 2-smb%{samba_ver}%{?dist}
+Release: 2.smb%{samba_ver}%{?dist}
 License: GPLv3
-Group:   Administration/Network
+Group:   Applications/Productivity
 Url:     http://winexe.sourceforge.net/
 Source:  %{name}-%{version}.tar.gz
 Patch0:  samba-libs-suffixed.patch
@@ -65,6 +65,15 @@ rm -rf %{buildroot}
 %{_mandir}/man1/*
 
 %changelog
+* Tue May 17 2016 Didier Fabert <didier.fabert@gmail.com> 1.1-3-smb4.3.9
+- Rebuild against samba 2:4.3.9-0
+
+* Mon Apr 25 2016 Didier Fabert <didier.fabert@gmail.com> 1.1-3-smb4.3.8
+- Rebuild against samba 2:4.3.8-0
+
+* Mon Mar 14 2016 Didier Fabert <didier.fabert@gmail.com> 1.1-3-smb4.3.6
+- Rebuild against samba 2:4.3.6-0
+
 * Wed Feb 17 2016 Didier Fabert <didier.fabert@gmail.com> 1.1-3-smb4.3.4
 - Rebuild against samba 2:4.3.4-1
 
