@@ -4,12 +4,12 @@
 %global with_systemd 0
 %endif
 Name:           netdata
-Version:        1.0.0
-Release:        1%{?dist}
+Version:        1.2.0
+Release:        2%{?dist}
 Summary:        Real-time performance monitoring
 License:        GPLv3
 Group:          Applications/Productivity
-URL:            https://github.com/firehol/%{name}
+URL:            http://netdata.firehol.org/
 Source0:        https://github.com/firehol/%{name}/archive/v%{version}.tar.gz
 Source1:        netdata.conf
 Source2:        netdata.tmpfiles.conf
@@ -23,6 +23,7 @@ BuildRequires:  git
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  pkgconfig
+BuildRequires:  libuuid-devel
 %if %{with_systemd}
 BuildRequires:  systemd
 Requires(post): systemd-sysv
@@ -61,7 +62,7 @@ find %{buildroot} -name '.keep' -delete
 %if %{with_systemd}
 %{__mkdir_p} %{buildroot}%{_unitdir}
 %{__mkdir_p} %{buildroot}%{_tmpfilesdir}
-install -Dp -m0644 system/netdata-systemd %{buildroot}%{_unitdir}/%{name}.service
+install -Dp -m0644 system/netdata.service %{buildroot}%{_unitdir}/%{name}.service
 install %{SOURCE2} %{buildroot}%{_tmpfilesdir}/%{name}.conf
 %else
 # Init script
@@ -69,6 +70,7 @@ install %{SOURCE2} %{buildroot}%{_tmpfilesdir}/%{name}.conf
 install -Dp -m0755 %{SOURCE3} %{buildroot}%{_initrddir}/%{name}
 %endif
 install %{SOURCE1} %{buildroot}%{_sysconfdir}/%{name}/%{name}.conf
+%{__mkdir_p} %{buildroot}%{_localstatedir}/lib/%{name}
 
 %pre
 getent group netdata > /dev/null || groupadd -r netdata
@@ -153,7 +155,14 @@ fi
 %attr(0755, netdata, netdata) %dir %{_localstatedir}/cache/%{name}
 %attr(0755, netdata, netdata) %dir %{_localstatedir}/log/%{name}
 %attr(4755,root,root) %{_libexecdir}/%{name}/plugins.d/apps.plugin
+%attr(0755, netdata, netdata) %{_localstatedir}/lib/%{name}
 
 %changelog
+* Wed Jun 15 2016 Didier Fabert <didier.fabert@gmail.com> 1.2.0-2
+- Create missing dir: /var/lib/netdata (useful for registry)
+
+* Wed Jun 15 2016 Didier Fabert <didier.fabert@gmail.com> 1.2.0-1
+- Update from upstream
+
 * Fri Apr 01 2016 Didier Fabert <didier.fabert@gmail.com> 1.0.0-1
 - First Release
