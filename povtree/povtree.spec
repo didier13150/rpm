@@ -1,3 +1,4 @@
+%define debug_package %{nil}
 Name:           povtree
 Version:        1.5
 Release:        2%{?dist}

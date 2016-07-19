@@ -1,4 +1,5 @@
 %define us_ver %(echo %{version} | sed -e 's/\\\./_/g')
+%define debug_package %{nil}
 Name:           arbaro
 Version:        1.9.8
 Release:        2%{?dist}

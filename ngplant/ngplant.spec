@@ -1,3 +1,4 @@
+%define debug_package %{nil}
 Name:           ngplant
 Version:        0.9.11
 Release:        1%{?dist}
