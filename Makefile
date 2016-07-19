@@ -8,6 +8,8 @@ TARGET := $(DISTRIB)-$(ARCH)
 HOSTNAME := $(shell hostname --fqdn)
 REPOPATH := /var/www/fedora-repo
 REPODIR := $(REPOPATH)/fc$(DISTRELEASE)
+REPODIR7 := $(REPOPATH)/centos/7
+REPODIR6 := $(REPOPATH)/centos/6
 SRCDIR := $(shell pwd)
 
 dummy:
@@ -15,6 +17,8 @@ dummy:
 
 all: clean build repo
 repo: dirlist copy sign refresh repoview
+repo6: dirlist copy6 sign refresh6
+repo7: dirlist copy7 sign refresh7
 
 build:
 	@rm -f $(LOGFILE)
@@ -58,9 +62,37 @@ copy:
 		fi ; \
 	done
 
+copy6:
+	@echo -e "\033[1;32mCopy RPM to $(REPODIR6)\033[0m"
+	@mkdir -p $(REPODIR6)
+	@for dir in $(PKGS) ; do \
+		if [ -d $$dir/result ] ; then \
+			mkdir -p $(REPODIR6)/$$dir ; \
+			cp -u $$dir/result/*el6*.rpm $(REPODIR6)/$$dir/ || true ; \
+		fi ; \
+	done
+
+copy7:
+	@echo -e "\033[1;32mCopy RPM to $(REPODIR7)\033[0m"
+	@mkdir -p $(REPODIR7)
+	@for dir in $(PKGS) ; do \
+		if [ -d $$dir/result ] ; then \
+			mkdir -p $(REPODIR7)/$$dir ; \
+			cp -u $$dir/result/*el7*.rpm $(REPODIR7)/$$dir/ || true ; \
+		fi ; \
+	done
+
 refresh:
 	@echo -e "\033[1;32mUpdating repository on $(REPODIR)\033[0m"
 	@createrepo_c --update -d $(REPODIR)
+
+refresh6:
+	@echo -e "\033[1;32mUpdating repository on $(REPODIR6)\033[0m"
+	@createrepo_c --update -d $(REPODIR6)
+
+refresh7:
+	@echo -e "\033[1;32mUpdating repository on $(REPODIR7)\033[0m"
+	@createrepo_c --update -d $(REPODIR7)
 
 repoview:
 	@echo -e "\033[1;32mRun repoview on $(REPODIR)\033[0m"
@@ -72,7 +104,7 @@ repoview:
 	@rsync -avzr ./common/repoview/images $(REPODIR)/repoview/
 
 sign:   
-	@echo -e "\033[1;32mSigning RPM on $(REPODIR)\033[0m"
+	@echo -e "\033[1;32mSigning RPM on $(REPOPATH)\033[0m"
 	@for rpm in `find $(REPOPATH) -name '*.rpm' -exec rpm --checksig {} \; | grep -v pgp | awk -F ':' '{print $$1}'` ; do \
 		rpm --checksig $$rpm ; \
 		LANG=C rpm --addsign $$rpm ; \
