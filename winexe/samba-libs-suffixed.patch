@@ -6,14 +6,14 @@ diff -rup a/source/wscript b/source/wscript
  
              libs = []
 -            for l in 'cli-ldap dcerpc dcerpc-samba errors popt talloc ndr-standard samba-hostconfig samba-credentials smbclient-raw'.split():
-+            for l in 'cli-ldap dcerpc dcerpc-samba errors popt talloc ndr-standard samba-hostconfig samba-credentials smbclient-raw samba-debug'.split():
++            for l in 'cli-ldap-samba4 dcerpc dcerpc-samba-samba4 errors-samba4 popt talloc ndr-standard samba-hostconfig samba-credentials smbclient-raw samba-debug-samba4'.split():
                  if ctx.check(lib=l, libpath=ctx.env.SAMBA_LIBS, mandatory=False):
                      libs.append(l)
                  else:
 -                    ctx.check(lib=':lib'+l+'.so.0', libpath=ctx.env.SAMBA_LIBS)
 -                    libs.append(':lib'+l+'.so.0')
 +                    #ctx.check(lib=':lib'+l+'-samba4.so', libpath=ctx.env.SAMBA_LIBS)
-+                    libs.append(l+'-samba4')
++                    libs.append(l)
              ctx.env.LIBS = ' '.join(libs)
          except:
              ctx.msg('Build of shared winexe', 'disabled', 'YELLOW')
