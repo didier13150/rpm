@@ -46,7 +46,7 @@ clean:
 	@rm -rfv \
 		*~ \
 		$(SRCDIR)/{build,root,state,available_pkgs,installed_pkgs}.log \
-		$(SRCDIR)/*.rpm \
+		$(SRCDIR)/*fc$(DISTRELEASE)*.rpm \
 		$(SRCDIR)/result/$(NAME)*.src.rpm \
 		$(SRCDIR)/result/*log
 
