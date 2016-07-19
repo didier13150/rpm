@@ -1,5 +1,5 @@
 Name:           keepassx
-Version:        2.0.1
+Version:        2.0.2
 Release:        1%{?dist}
 Summary:        Cross-platform password manager
 Group:          User Interface/Desktops
@@ -18,6 +18,7 @@ BuildRequires:  libgcrypt-devel
 BuildRequires:  zlib-devel
 Requires:       hicolor-icon-theme
 Requires:       libgcrypt
+Epoch:          2
 
 %description
 KeePassX is an application for people with extremely high demands on secure
@@ -109,6 +110,10 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 %{_datadir}/mime/packages/keepassx.xml
 
 %changelog
+* Wed Jun 15 2016 Didier Fabert <didier.fabert@gmail.com> - 2:2.0.2-1
+- New upstream version
+- Increment epoch
+
 * Tue Jan 05 2016 Didier Fabert <didier.fabert@gmail.com> - 2.0.1-1
 - New upstream version (2.0)
 
