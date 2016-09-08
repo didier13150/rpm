@@ -1,24 +1,34 @@
-PKGS := $(shell ls -l | grep ^d | grep -v '^common$$' | grep -v '^doc$$' | awk '{print $$9}' | grep -v '^povray' )
-LOGFILE := globalbuild.log
-ARCH := $(shell uname -i)
-DISTNAME := $(shell source /etc/os-release && echo $${ID})
-DISTRELEASE := $(shell source /etc/os-release && echo $${VERSION_ID})
-DISTRIB := $(DISTNAME)-$(DISTRELEASE)
-TARGET := $(DISTRIB)-$(ARCH)
-HOSTNAME := $(shell hostname --fqdn)
-REPOPATH := /var/www/fedora-repo
-REPODIR := $(REPOPATH)/fc$(DISTRELEASE)
-REPODIR7 := $(REPOPATH)/centos/7
-REPODIR6 := $(REPOPATH)/centos/6
-SRCDIR := $(shell pwd)
+PKGS           := $(shell ls -l | grep ^d | grep -v '^common$$' | grep -v '^doc$$' | awk '{print $$9}' | grep -v '^povray' )
+LOGFILE        := globalbuild.log
+ARCH           := $(shell uname -i)
+DISTNAME       := $(shell source /etc/os-release && echo $${ID})
+DISTID         := $(shell source /etc/os-release && echo $${VERSION_ID})
+DISTIDNEXT     := $(shell echo $(DISTID)+1 | bc)
+DISTRIB        := $(DISTNAME)-$(DISTID)
+DISTRIBNEXT    := $(DISTNAME)-$(DISTIDNEXT)
+TARGET         := $(DISTRIB)-$(ARCH)
+TARGETNEXT     := $(DISTRIBNEXT)-$(ARCH)
+HOSTNAME       := $(shell hostname --fqdn)
+REPOPATH       := /var/www/fedora-repo
+REPODIR        := $(REPOPATH)/fc$(DISTID)
+REPODIRNEXT    := $(REPOPATH)/fc$(DISTIDNEXT)
+REPODIR7       := $(REPOPATH)/centos/7
+REPODIR6       := $(REPOPATH)/centos/6
+SRCDIR         := $(shell pwd)
 
-dummy:
-	@echo "Type make all to (re)build all packages"
+help:
+	@echo -e "\033[1;32mAvailable targets:\033[0m"
+	@echo " - all:       Building all SRPM and RPMs and create repository (default target: ie when make is called without arg)"
+	@echo " - repo:      Create or update local repository, and run repoview"
+	@echo " - srpm:      Make SRPM"
+	@echo " - build:     Make RPMs from SRPM"
+	@echo " - clean:     Delete mock log files and all (S)RPMs"
 
-all: clean build repo
-repo: dirlist copy sign refresh repoview
-repo6: dirlist copy6 sign refresh6
-repo7: dirlist copy7 sign refresh7
+all:      clean build repo
+repo:     dirlist copy sign refresh repoview
+reponext: dirlist copy-next sign refresh-next
+repo6:    dirlist copy6 sign refresh6
+repo7:    dirlist copy7 sign refresh7
 
 build:
 	@rm -f $(LOGFILE)
@@ -28,6 +38,16 @@ build:
 		echo -e "\033[1;32mBuilding $$dir\033[0m" ; \
 		cd $$dir ; \
 		make 1>>../$(LOGFILE) 2>&1; \
+		cd .. ; \
+	done
+build-next:
+	@rm -f $(LOGFILE)
+	@touch $(LOGFILE)
+	@for dir in $(PKGS) ; \
+	do \
+		echo -e "\033[1;32mBuilding $$dir\033[0m" ; \
+		cd $$dir ; \
+		make fedora-next-build 1>>../$(LOGFILE) 2>&1; \
 		cd .. ; \
 	done
 
@@ -62,6 +82,16 @@ copy:
 		fi ; \
 	done
 
+copy-next:
+	@echo -e "\033[1;32mCopy RPM to $(REPODIRNEXT)\033[0m"
+	@mkdir -p $(REPODIRNEXT)
+	@for dir in $(PKGS) ; do \
+		if [ -d $$dir/result ] ; then \
+			mkdir -p $(REPODIRNEXT)/$$dir ; \
+			cp -u $$dir/result/*fc$(DISTRELEASENEXT)*.rpm $(REPODIRNEXT)/$$dir/ || true ; \
+		fi ; \
+	done
+
 copy6:
 	@echo -e "\033[1;32mCopy RPM to $(REPODIR6)\033[0m"
 	@mkdir -p $(REPODIR6)
@@ -85,6 +115,10 @@ copy7:
 refresh:
 	@echo -e "\033[1;32mUpdating repository on $(REPODIR)\033[0m"
 	@createrepo_c --update -d $(REPODIR)
+
+refresh-next:
+	@echo -e "\033[1;32mUpdating repository on $(REPODIRNEXT)\033[0m"
+	@createrepo_c --update -d $(REPODIRNEXT)
 
 refresh6:
 	@echo -e "\033[1;32mUpdating repository on $(REPODIR6)\033[0m"
@@ -128,11 +162,3 @@ showvars:
 	@echo "REPODIR:     $(REPODIR)"
 	@echo "LOGFILE:     $(LOGFILE)"
 	@echo "PKGS:        $(PKGS)"
-	
-help:
-	@echo -e "\033[1;32mAvailable targets:\033[0m"
-	@echo " - all:       Building all SRPM and RPMs and create repository (default target: ie when make is called without arg)"
-	@echo " - repo:      Create or update local repository, and run repoview"
-	@echo " - srpm:      Make SRPM"
-	@echo " - build:     Make RPMs from SRPM"
-	@echo " - clean:     Delete mock log files and all (S)RPMs"
