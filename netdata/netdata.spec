@@ -3,12 +3,18 @@
 %else
 %global with_systemd 0
 %endif
+
+# This is temporary and should eventually be resolved. This bypasses
+# the default rhel __os_install_post which throws a python compile
+# error.
+%define __os_install_post %{nil}
+
 Name:           netdata
-Version:        1.2.0
-Release:        2%{?dist}
+Version:        1.4.0
+Release:        1%{?dist}
 Summary:        Real-time performance monitoring
 License:        GPLv3
-Group:          Applications/Productivity
+Group:          Applications/System
 URL:            http://netdata.firehol.org/
 Source0:        https://github.com/firehol/%{name}/archive/v%{version}.tar.gz
 Source1:        netdata.conf
@@ -39,9 +45,9 @@ Requires:       nodejs
 netdata is a highly optimized Linux daemon providing real-time performance
 monitoring for Linux systems, Applications, SNMP devices, over the web!
 
-It tries to visualize the truth of now, in its greatest detail, so that you
-can get insights of what is happening now and what just happened, on your
-systems and applications.
+netdata tries to visualize the truth of now, in its greatest detail,
+so that you can get insights of what is happening now and what just
+happened, on your systems and applications.
 
 %prep
 %setup -qn %{name}-%{version}
@@ -71,6 +77,9 @@ install -Dp -m0755 %{SOURCE3} %{buildroot}%{_initrddir}/%{name}
 %endif
 install %{SOURCE1} %{buildroot}%{_sysconfdir}/%{name}/%{name}.conf
 %{__mkdir_p} %{buildroot}%{_localstatedir}/lib/%{name}
+
+mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/logrotate.d
+install -m 644 -p system/netdata.logrotate $RPM_BUILD_ROOT%{_sysconfdir}/logrotate.d/%{name}
 
 %pre
 getent group netdata > /dev/null || groupadd -r netdata
@@ -142,7 +151,11 @@ fi
 %files
 %doc README.md ChangeLog
 %{_sbindir}/%{name}
-%config(noreplace) %{_sysconfdir}/%{name}
+%dir %{_sysconfdir}/%{name}
+%config(noreplace) %{_sysconfdir}/%{name}/*.conf
+%config(noreplace) %{_sysconfdir}/%{name}/health.d/*.conf
+%config(noreplace) %{_sysconfdir}/%{name}/python.d/*.conf
+%config(noreplace) %{_sysconfdir}/logrotate.d/%{name}
 %{_libexecdir}/%{name}
 %dir %{_datadir}/%{name}
 %attr(0755, netdata, netdata) %{_datadir}/%{name}/web
@@ -158,6 +171,12 @@ fi
 %attr(0755, netdata, netdata) %{_localstatedir}/lib/%{name}
 
 %changelog
+* Thu Dec 01 2016 Didier Fabert <didier.fabert@gmail.com> 1.4.0-1
+- Update from upstream
+
+* Wed Sep 07 2016 Didier Fabert <didier.fabert@gmail.com> 1.3.0-1
+- Update from upstream
+
 * Wed Jun 15 2016 Didier Fabert <didier.fabert@gmail.com> 1.2.0-2
 - Create missing dir: /var/lib/netdata (useful for registry)
 
